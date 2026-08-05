@@ -38,7 +38,6 @@ export function PatientsPage() {
     const activeSearch = useMemo<PatientSearchRequest>(() => {
         const request: PatientSearchRequest = {}
         const keyword = searchText.trim()
-        // Thanh search hoạt động như một ô tìm "tên HOẶC CCCD HOẶC SĐT":
         // cùng một chuỗi được gửi vào cả 3 field để backend ghép OR (LIKE %x%).
         if (keyword) {
             request.fullName = keyword
@@ -141,7 +140,7 @@ export function PatientsPage() {
                         </button>
                     </div>
 
-                    <SummaryCards />
+                    <SummaryCards refreshKey={refreshKey} />
 
                     {isFilterOpen ? (
                         <PatientFilterPanel

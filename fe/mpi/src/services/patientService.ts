@@ -30,12 +30,11 @@ async function request<T>(url: string, options?: RequestInit): Promise<T> {
 export interface PatientsQuery extends PatientSearchRequest {
     /** Trang hiện tại (1-based cho FE) — sẽ được chuyển về 0-based khi gọi API. */
     page?: number
-    /** Số bệnh nhân trên một trang. Mặc định 5. */
     size?: number
 }
 
 /** Kích thước trang mặc định khi không truyền. */
-export const DEFAULT_PAGE_SIZE = 1
+export const DEFAULT_PAGE_SIZE = 5
 
 /** Các kích thước trang được phép hiển thị trong UI. */
 export const PAGE_SIZE_OPTIONS = [5, 10, 20, 50] as const
