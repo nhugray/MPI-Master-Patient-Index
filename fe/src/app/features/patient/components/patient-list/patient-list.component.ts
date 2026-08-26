@@ -34,8 +34,8 @@ export class PatientListComponent implements OnInit {
 
   private readonly patientService = inject(PatientService);
   private readonly toastService = inject(ToastService);
-  private readonly destroyRef = inject(DestroyRef);
   private readonly searchService = inject(SearchService);
+  private readonly destroyRef = inject(DestroyRef);
 
   patients = signal<Patient[]>([]);
   pageMeta = signal<PageMeta | null>(null);
@@ -50,15 +50,13 @@ export class PatientListComponent implements OnInit {
   constructor() {
     effect(() => {
       const query = this.searchService.searchQuery();
-      if (query !== undefined) {
-        this.searchParams = {
-          ...this.searchParams,
-          fullName: query || undefined,
-          page: 0
-        };
-        this.loadPatients();
-      }
-    });
+      this.searchParams = {
+        ...this.searchParams,
+        fullName: query || undefined,
+        page: 0
+      };
+      this.loadPatients();
+    }, { allowSignalWrites: true });
   }
 
   ngOnInit(): void {
@@ -71,7 +69,6 @@ export class PatientListComponent implements OnInit {
 
   loadPatients(): void {
     this.isLoading.set(true);
-
     this.patientService.search(this.searchParams).pipe(
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
