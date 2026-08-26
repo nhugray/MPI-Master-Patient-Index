@@ -13,7 +13,8 @@ public record PatientResponse(
         GenderEnum gender,
         String nationalId,
         String phoneNumber,
-        PatientStatusEnum status) {
+        PatientStatusEnum status,
+        String healthInsuranceNo) {
 
     public static PatientResponse fromEntity(Patient patient) {
         return new PatientResponse(
@@ -23,6 +24,7 @@ public record PatientResponse(
                 patient.getGender(),
                 patient.getNationalId(),
                 patient.getPhoneNumber(),
-                patient.getStatus());
+                patient.getStatus(),
+                patient.getHealthInsuranceNo());
     }
 }

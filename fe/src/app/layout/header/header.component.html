@@ -1,0 +1,32 @@
+<header class="header">
+  <div class="search-wrapper">
+    <span class="material-symbols-outlined search-icon">search</span>
+    <input
+      type="text"
+      class="search-input"
+      placeholder="Tìm kiếm bệnh nhân..."
+      [(ngModel)]="searchQuery"
+      (keyup.enter)="onSearch()">
+  </div>
+
+  <div class="header-actions">
+    <button class="btn-icon" title="Thông báo">
+      <span class="material-symbols-outlined">notifications</span>
+      <span class="notification-dot"></span>
+    </button>
+    <button class="btn-icon" title="Trợ giúp">
+      <span class="material-symbols-outlined">help</span>
+    </button>
+
+    <div class="user-info">
+      <div class="user-avatar">
+        <img src="https://via.placeholder.com/32" alt="Avatar">
+      </div>
+      <div class="user-details">
+        <p class="user-name">BS. Nguyễn Khoa</p>
+        <p class="user-role">Trưởng khoa Nội</p>
+      </div>
+      <span class="material-symbols-outlined dropdown-icon">account_circle</span>
+    </div>
+  </div>
+</header>

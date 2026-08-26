@@ -1,0 +1,24 @@
+<div class="patients-page">
+  <app-patient-list
+    #patientList
+    (addPatient)="openAddModal()"
+    (editPatient)="openEditModal($event)"
+    (deletePatient)="openDeleteConfirm($event)">
+  </app-patient-list>
+
+  <app-patient-form
+    #patientForm
+    (saved)="onPatientSaved()">
+  </app-patient-form>
+
+  <app-confirm-dialog
+    [isOpen]="isDeleteDialogOpen"
+    title="Xác nhận xóa bệnh nhân"
+    [message]="deleteMessage"
+    confirmText="Xóa hồ sơ"
+    (confirm)="onConfirmDelete()"
+    (cancel)="onCancelDelete()">
+  </app-confirm-dialog>
+
+  <app-toast-container></app-toast-container>
+</div>

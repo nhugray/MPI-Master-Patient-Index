@@ -1,0 +1,144 @@
+<div class="page-header">
+  <div class="page-header-content">
+    <h2 class="page-title">Danh sách Bệnh nhân</h2>
+    <p class="page-subtitle">Quản lý và theo dõi thông tin bệnh nhân toàn hệ thống</p>
+  </div>
+  <button class="btn-primary" (click)="onAddPatient()">
+    <span class="material-symbols-outlined">person_add</span>
+    Thêm bệnh nhân mới
+  </button>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon stat-icon-primary">
+      <span class="material-symbols-outlined">groups</span>
+    </div>
+    <div class="stat-content">
+      <p class="stat-label">Tổng bệnh nhân</p>
+      <p class="stat-value stat-value-primary">{{ pageMeta()?.total || 0 | number }}</p>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon stat-icon-secondary">
+      <span class="material-symbols-outlined">home_health</span>
+    </div>
+    <div class="stat-content">
+      <p class="stat-label">Đang điều trị</p>
+      <p class="stat-value stat-value-secondary">{{ activeCount() | number }}</p>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon stat-icon-tertiary">
+      <span class="material-symbols-outlined">event_note</span>
+    </div>
+    <div class="stat-content">
+      <p class="stat-label">Lượt khám hôm nay</p>
+      <p class="stat-value stat-value-tertiary">{{ todayCount() | number }}</p>
+    </div>
+  </div>
+</div>
+
+<div class="table-card">
+  <div class="table-header">
+    <h3 class="table-title">Tất cả bệnh nhân</h3>
+    <div class="table-actions">
+      <div class="filter-wrapper">
+        <button class="btn-filter" (click)="toggleFilter()">
+          <span class="material-symbols-outlined">filter_list</span>
+          Bộ lọc
+        </button>
+        @if (isFilterOpen()) {
+          <div class="filter-dropdown">
+            <app-patient-filter-panel
+              (filterChange)="onFilterChange($event)"
+              (resetFilter)="onResetFilter()">
+            </app-patient-filter-panel>
+          </div>
+        }
+      </div>
+      <button class="btn-export">
+        <span class="material-symbols-outlined">download</span>
+        Xuất Excel
+      </button>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <table class="patient-table">
+      <thead>
+        <tr>
+          <th>Họ và tên</th>
+          <th>Ngày sinh</th>
+          <th>Giới tính</th>
+          <th>CCCD/CMND</th>
+          <th>Mã BHYT</th>
+          <th>Số điện thoại</th>
+          <th>Trạng thái</th>
+          <th class="text-right">Thao tác</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (isLoading()) {
+          <tr>
+            <td colspan="8" class="loading-cell">
+              <div class="loading-spinner"></div>
+              <span>Đang tải dữ liệu...</span>
+            </td>
+          </tr>
+        } @else if (patients().length === 0) {
+          <tr>
+            <td colspan="8" class="empty-cell">
+              <span class="material-symbols-outlined">search_off</span>
+              <p>Không tìm thấy bệnh nhân nào</p>
+            </td>
+          </tr>
+        } @else {
+          @for (patient of patients(); track patient.id) {
+            <tr class="table-row">
+              <td>
+                <div class="patient-info">
+                  <div class="patient-avatar" [class]="'avatar-' + getAvatarColor(patient.gender)">
+                    {{ getInitials(patient.fullName) }}
+                  </div>
+                  <div class="patient-details">
+                    <p class="patient-name">{{ patient.fullName }}</p>
+                    <p class="patient-id">BN-{{ patient.id | number }}</p>
+                  </div>
+                </div>
+              </td>
+              <td>{{ patient.dateOfBirth | date:'dd/MM/yyyy' }}</td>
+              <td>{{ getGenderLabel(patient.gender) }}</td>
+              <td>{{ patient.nationalId }}</td>
+              <td>{{ patient.healthInsuranceNo || '-' }}</td>
+              <td>{{ formatPhone(patient.phoneNumber) }}</td>
+              <td>
+                <span class="status-badge" [class]="'status-' + patient.status.toLowerCase()">
+                  <span class="status-dot"></span>
+                  {{ getStatusLabel(patient.status) }}
+                </span>
+              </td>
+              <td class="text-right">
+                <div class="action-buttons">
+                  <button class="btn-action btn-edit" (click)="onEditPatient(patient)" title="Sửa">
+                    <span class="material-symbols-outlined">edit</span>
+                  </button>
+                  <button class="btn-action btn-delete" (click)="onDeletePatient(patient)" title="Xóa">
+                    <span class="material-symbols-outlined">delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+
+  @if (!isLoading() && patients().length > 0) {
+    <app-pagination
+      [pageMeta]="pageMeta()"
+      (pageChange)="onPageChange($event)">
+    </app-pagination>
+  }
+</div>

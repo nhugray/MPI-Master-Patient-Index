@@ -1,0 +1,103 @@
+<div class="modal-backdrop" [class.active]="isOpen" (click)="onBackdropClick($event)">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3 class="modal-title">{{ isEditMode ? 'Cập nhật thông tin bệnh nhân' : 'Thêm bệnh nhân mới' }}</h3>
+      <button class="btn-close" (click)="close()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="modal-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Họ và tên <span class="required">*</span></label>
+          <input
+            type="text"
+            formControlName="fullName"
+            class="form-input"
+            placeholder="Nhập họ và tên...">
+          @if (form.get('fullName')?.touched && form.get('fullName')?.errors?.['required']) {
+            <span class="form-error">Họ tên không được để trống</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Ngày sinh</label>
+          <input
+            type="date"
+            formControlName="dateOfBirth"
+            class="form-input">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Giới tính</label>
+          <div class="radio-group">
+            @for (gender of genderOptions; track gender.value) {
+              <label class="radio-label">
+                <input type="radio" formControlName="gender" [value]="gender.value">
+                <span>{{ gender.label }}</span>
+              </label>
+            }
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Số CCCD <span class="required">*</span></label>
+          <input
+            type="text"
+            formControlName="nationalId"
+            class="form-input"
+            placeholder="012345678901"
+            maxlength="12">
+          @if (form.get('nationalId')?.touched && form.get('nationalId')?.errors?.['required']) {
+            <span class="form-error">Số CCCD không được để trống</span>
+          }
+          @if (form.get('nationalId')?.touched && form.get('nationalId')?.errors?.['pattern']) {
+            <span class="form-error">Số CCCD phải gồm 12 chữ số</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Mã số BHYT</label>
+          <input
+            type="text"
+            formControlName="healthInsuranceNo"
+            class="form-input"
+            placeholder="GD4...">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Số điện thoại</label>
+          <input
+            type="tel"
+            formControlName="phoneNumber"
+            class="form-input"
+            placeholder="0..."
+            maxlength="10">
+          @if (form.get('phoneNumber')?.touched && form.get('phoneNumber')?.errors?.['pattern']) {
+            <span class="form-error">Số điện thoại phải gồm 10 chữ số và bắt đầu bằng số 0</span>
+          }
+        </div>
+
+        <div class="form-group form-group-full">
+          <label class="form-label">Trạng thái</label>
+          <select formControlName="status" class="form-select">
+            @for (status of statusOptions; track status.value) {
+              <option [value]="status.value">{{ status.label }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-cancel" (click)="close()">Hủy</button>
+        <button type="submit" class="btn-submit" [disabled]="isSubmitting">
+          @if (isSubmitting) {
+            <span class="loading-spinner-small"></span>
+          }
+          {{ isEditMode ? 'Cập nhật' : 'Lưu thông tin' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

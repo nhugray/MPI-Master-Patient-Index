@@ -1,0 +1,47 @@
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="logo">
+      <div class="logo-icon">
+        <span class="material-symbols-outlined">medical_services</span>
+      </div>
+      <div class="logo-text">
+        <h1 class="logo-title">MediCare Admin</h1>
+        <p class="logo-subtitle">Hệ thống quản lý y tế</p>
+      </div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a class="nav-item" routerLink="/dashboard" routerLinkActive="active">
+      <span class="material-symbols-outlined">dashboard</span>
+      <span class="nav-label">Dashboard</span>
+    </a>
+    <a class="nav-item active" routerLink="/patients" routerLinkActive="active">
+      <span class="material-symbols-outlined">person</span>
+      <span class="nav-label">Bệnh nhân</span>
+    </a>
+    <a class="nav-item" routerLink="/appointments" routerLinkActive="active">
+      <span class="material-symbols-outlined">calendar_today</span>
+      <span class="nav-label">Lịch hẹn</span>
+    </a>
+    <a class="nav-item" routerLink="/records" routerLinkActive="active">
+      <span class="material-symbols-outlined">clinical_notes</span>
+      <span class="nav-label">Hồ sơ bệnh án</span>
+    </a>
+    <a class="nav-item" routerLink="/reports" routerLinkActive="active">
+      <span class="material-symbols-outlined">analytics</span>
+      <span class="nav-label">Báo cáo</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <a class="nav-item" routerLink="/settings">
+      <span class="material-symbols-outlined">settings</span>
+      <span class="nav-label">Cài đặt</span>
+    </a>
+    <a class="nav-item nav-item-danger" routerLink="/logout">
+      <span class="material-symbols-outlined">logout</span>
+      <span class="nav-label">Đăng xuất</span>
+    </a>
+  </div>
+</aside>
