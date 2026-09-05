@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output, computed, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PageMeta } from '../../../features/patient/models/patient.model';
+import { PageMeta } from '../../../shared/models';
 
 @Component({
   selector: 'app-pagination',

@@ -1,11 +1,7 @@
 <header class="header">
   <div class="search-wrapper">
     <span class="material-symbols-outlined search-icon">search</span>
-    <input
-      type="text"
-      class="search-input"
-      placeholder="Tìm kiếm bệnh nhân..."
-      [(ngModel)]="searchQuery"
+    <input type="text" class="search-input" placeholder="Tìm kiếm bệnh nhân..." [(ngModel)]="searchQuery"
       (keyup.enter)="onSearch()">
   </div>
 
@@ -20,7 +16,7 @@
 
     <div class="user-info">
       <div class="user-avatar">
-        <img src="https://via.placeholder.com/32" alt="Avatar">
+        <!-- <img src="https://via.placeholder.com" alt="Avatar"> -->
       </div>
       <div class="user-details">
         <p class="user-name">BS. Nguyễn Khoa</p>

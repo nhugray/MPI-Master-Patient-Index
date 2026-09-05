@@ -2,11 +2,11 @@ spring:
   application:
     name: demo
   datasource:
-    url: jdbc:mysql://localhost:3306/mpi?allowPublicKeyRetrieval=true&useSSL=false
+    url: jdbc:mysql://localhost:3306/mpi_system?allowPublicKeyRetrieval=true&useSSL=false
     username: root
     password: nhu123
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     show-sql: false

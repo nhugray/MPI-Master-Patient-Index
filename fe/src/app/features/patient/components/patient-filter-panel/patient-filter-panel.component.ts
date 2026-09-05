@@ -1,7 +1,8 @@
 import { Component, EventEmitter, Output, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Gender, PatientStatus } from '../../models/patient.model';
+import { Gender } from '../../../../shared/enums';
+import { PatientStatus } from '../../models/patient.model';
 import { GENDER_OPTIONS, STATUS_OPTIONS } from '../../models/patient.constants';
 
 export interface FilterState {

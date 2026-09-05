@@ -1,4 +1,7 @@
-import { Gender, PatientStatus } from './patient.model';
+import { Gender } from '../../../shared/enums';
+import { PatientStatus } from './patient.model';
+
+export { Gender, PatientStatus };
 
 export interface PatientSearchParams {
   fullName?: string;

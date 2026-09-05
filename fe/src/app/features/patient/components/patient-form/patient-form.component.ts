@@ -5,9 +5,9 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 
 import { PatientService } from '../../services/patient.service';
 import { ToastService } from '../../../../shared/components/toast/toast.service';
+import { Gender } from '../../../../shared/enums';
 import {
   Patient,
-  Gender,
   PatientStatus,
   CreatePatientRequest,
   UpdatePatientRequest

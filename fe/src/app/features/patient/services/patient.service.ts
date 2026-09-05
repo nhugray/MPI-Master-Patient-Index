@@ -3,10 +3,9 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../../../environments/environment';
+import { ApiResponse, PageResponse } from '../../../shared/models';
 import {
-  ApiResponse,
   CreatePatientRequest,
-  PageResponse,
   Patient,
   UpdatePatientRequest
 } from '../models/patient.model';

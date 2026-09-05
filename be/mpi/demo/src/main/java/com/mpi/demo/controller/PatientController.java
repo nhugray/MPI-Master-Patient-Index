@@ -67,7 +67,7 @@ public class PatientController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
-        patientService.deletePatient(id);
+        patientService.delete(id);
         return ResponseEntity.ok(ApiResponse.success("Xóa bệnh nhân thành công", null));
     }
 

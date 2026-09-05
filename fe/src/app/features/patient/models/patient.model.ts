@@ -1,9 +1,6 @@
-export enum Gender {
-  MALE = 'MALE',
-  FEMALE = 'FEMALE',
-  OTHER = 'OTHER',
-  UNKNOWN = 'UNKNOWN'
-}
+import { Gender } from '../../../shared/enums';
+
+export { Gender };
 
 export enum PatientStatus {
   ACTIVE = 'ACTIVE',
@@ -35,24 +32,4 @@ export interface CreatePatientRequest {
 
 export interface UpdatePatientRequest extends CreatePatientRequest {
   id: number;
-}
-
-export interface PageResponse<T> {
-  meta: PageMeta;
-  result: T[];
-}
-
-export interface PageMeta {
-  page: number;
-  pageSize: number;
-  pages: number;
-  total: number;
-}
-
-export interface ApiResponse<T> {
-  statusCode: number;
-  message: string;
-  data: T;
-  error: string | null;
-  details: string[] | null;
 }

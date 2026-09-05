@@ -1,4 +1,5 @@
-import { Gender, PatientStatus } from './patient.model';
+import { Gender } from '../../../shared/enums';
+import { PatientStatus } from './patient.model';
 
 export const GENDER_OPTIONS = [
   { value: Gender.MALE, label: 'Nam' },

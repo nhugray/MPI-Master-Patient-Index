@@ -16,7 +16,7 @@ public interface PatientService {
 
     PatientResponse update(UpdatePatientRequest request);
 
-    void deletePatient(Long id);
+    void delete(Long id);
 
     ResultPagination search(PatientSearchRequest search, Pageable pageable);
 }

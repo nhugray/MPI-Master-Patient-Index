@@ -3,10 +3,11 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { PageMeta } from '../../models/patient.model';
+import { PageMeta } from '../../../../shared/models';
+import { Gender } from '../../../../shared/enums';
 import { ToastService } from '../../../../shared/components/toast/toast.service';
 import { PatientService } from '../../services/patient.service';
-import { Patient, Gender, PatientStatus } from '../../models/patient.model';
+import { Patient, PatientStatus } from '../../models/patient.model';
 import { PatientSearchParams, defaultSearchParams } from '../../models/patient-search-params.model';
 import { GENDER_OPTIONS, STATUS_OPTIONS } from '../../models/patient.constants';
 import { PatientFilterPanelComponent } from '../patient-filter-panel/patient-filter-panel.component';

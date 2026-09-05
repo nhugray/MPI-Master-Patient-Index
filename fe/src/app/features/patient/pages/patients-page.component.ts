@@ -4,11 +4,10 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { PatientListComponent } from '../components/patient-list/patient-list.component';
 import { PatientFormComponent } from '../components/patient-form/patient-form.component';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
-import { ToastContainerComponent } from '../../../shared/components/toast/toast-container.component';
 import { PatientService } from '../services/patient.service';
 import { ToastService } from '../../../shared/components/toast/toast.service';
 import { Patient } from '../models/patient.model';
-import { ApiResponse } from '../models/patient.model';
+import { ApiResponse } from '../../../shared/models';
 
 @Component({
   selector: 'app-patients-page',
@@ -16,8 +15,7 @@ import { ApiResponse } from '../models/patient.model';
   imports: [
     PatientListComponent,
     PatientFormComponent,
-    ConfirmDialogComponent,
-    ToastContainerComponent
+    ConfirmDialogComponent
   ],
   templateUrl: './patients-page.component.html',
   styleUrls: ['./patients-page.component.css']
