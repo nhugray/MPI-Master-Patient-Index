@@ -5,14 +5,14 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 
 import { PatientService } from '../../services/patient.service';
 import { ToastService } from '../../../../shared/components/toast/toast.service';
-import { Gender } from '../../../../shared/enums';
+import { Gender, MatchStatus } from '../../../../shared/enums';
 import {
   Patient,
-  PatientStatus,
   CreatePatientRequest,
   UpdatePatientRequest
 } from '../../models/patient.model';
-import { GENDER_OPTIONS, STATUS_OPTIONS } from '../../models/patient.constants';
+import { GENDER_OPTIONS, MATCH_STATUS_OPTIONS } from '../../models/patient.constants';
+import { phoneValidator } from '../../../../shared/validators/phone.validator';
 
 @Component({
   selector: 'app-patient-form',
@@ -41,7 +41,7 @@ export class PatientFormComponent implements OnInit {
   }
 
   genderOptions = GENDER_OPTIONS;
-  statusOptions = STATUS_OPTIONS;
+  matchStatusOptions = MATCH_STATUS_OPTIONS;
 
   ngOnInit(): void {
     this.initForm();
@@ -51,13 +51,15 @@ export class PatientFormComponent implements OnInit {
     const patient = this.patient;
 
     this.form = this.fb.group({
+      sourceSystemId: [patient?.sourceSystemId || '', Validators.required],
+      localPatientCode: [patient?.localPatientCode || '', Validators.required],
       fullName: [patient?.fullName || '', Validators.required],
       dateOfBirth: [patient?.dateOfBirth || ''],
       gender: [patient?.gender || Gender.MALE],
-      nationalId: [patient?.nationalId || '', [Validators.required, Validators.pattern(/^\d{12}$/)]],
+      nationalId: [patient?.nationalId || '', Validators.pattern(/^\d{12}$/)],
       healthInsuranceNo: [patient?.healthInsuranceNo || ''],
-      phoneNumber: [patient?.phoneNumber || '', Validators.pattern(/^0\d{9}$/)],
-      status: [patient?.status || PatientStatus.ACTIVE]
+      phoneNumber: [patient?.phoneNumber || '', phoneValidator()],
+      address: [patient?.address || '']
     });
   }
 
@@ -68,23 +70,27 @@ export class PatientFormComponent implements OnInit {
 
     if (patient) {
       this.form.patchValue({
+        sourceSystemId: patient.sourceSystemId,
+        localPatientCode: patient.localPatientCode,
         fullName: patient.fullName,
         dateOfBirth: patient.dateOfBirth,
         gender: patient.gender,
         nationalId: patient.nationalId,
         healthInsuranceNo: patient.healthInsuranceNo,
         phoneNumber: patient.phoneNumber,
-        status: patient.status
+        address: patient.address
       });
     } else {
       this.form.reset({
+        sourceSystemId: '',
+        localPatientCode: '',
         fullName: '',
         dateOfBirth: '',
         gender: Gender.MALE,
         nationalId: '',
         healthInsuranceNo: '',
         phoneNumber: '',
-        status: PatientStatus.ACTIVE
+        address: ''
       });
     }
   }
@@ -113,13 +119,15 @@ export class PatientFormComponent implements OnInit {
     if (this.isEditMode) {
       const request: UpdatePatientRequest = {
         id: this.patient!.id,
+        sourceSystemId: formValue.sourceSystemId,
+        localPatientCode: formValue.localPatientCode,
         fullName: formValue.fullName,
         dateOfBirth: formValue.dateOfBirth || null,
         gender: formValue.gender,
-        nationalId: formValue.nationalId,
+        nationalId: formValue.nationalId || null,
         healthInsuranceNo: formValue.healthInsuranceNo || null,
-        phoneNumber: formValue.phoneNumber || '',
-        status: formValue.status
+        phoneNumber: formValue.phoneNumber || null,
+        address: formValue.address || null
       };
 
       this.patientService.update(request).pipe(
@@ -130,13 +138,15 @@ export class PatientFormComponent implements OnInit {
       });
     } else {
       const request: CreatePatientRequest = {
+        sourceSystemId: formValue.sourceSystemId,
+        localPatientCode: formValue.localPatientCode,
         fullName: formValue.fullName,
         dateOfBirth: formValue.dateOfBirth || null,
         gender: formValue.gender,
-        nationalId: formValue.nationalId,
+        nationalId: formValue.nationalId || null,
         healthInsuranceNo: formValue.healthInsuranceNo || null,
-        phoneNumber: formValue.phoneNumber || '',
-        status: formValue.status
+        phoneNumber: formValue.phoneNumber || null,
+        address: formValue.address || null
       };
 
       this.patientService.create(request).pipe(

@@ -45,6 +45,13 @@ public class PatientSpecification {
                 }
             }
 
+            if (isNotBlank(request.localPatientCode())) {
+                keywordPredicates.add(
+                        cb.like(
+                                cb.lower(root.get("localPatientCode")),
+                                "%" + request.localPatientCode().toLowerCase().trim() + "%"));
+            }
+
             if (!keywordPredicates.isEmpty()) {
                 predicates.add(cb.or(keywordPredicates.toArray(new Predicate[0])));
             }
@@ -63,11 +70,25 @@ public class PatientSpecification {
                                 "%" + request.healthInsuranceNo().toLowerCase().trim() + "%"));
             }
 
-            if (request.status() != null) {
+            if (isNotBlank(request.address())) {
+                predicates.add(
+                        cb.like(
+                                cb.lower(root.get("address")),
+                                "%" + request.address().toLowerCase().trim() + "%"));
+            }
+
+            if (request.sourceSystemId() != null) {
                 predicates.add(
                         cb.equal(
-                                root.get("status"),
-                                request.status()));
+                                root.get("sourceSystem").get("id"),
+                                request.sourceSystemId()));
+            }
+
+            if (request.matchStatus() != null) {
+                predicates.add(
+                        cb.equal(
+                                root.get("matchStatus"),
+                                request.matchStatus()));
             }
 
             return cb.and(predicates.toArray(new Predicate[0]));

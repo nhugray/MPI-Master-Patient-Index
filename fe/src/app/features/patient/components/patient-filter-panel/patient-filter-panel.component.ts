@@ -1,14 +1,13 @@
 import { Component, EventEmitter, Output, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Gender } from '../../../../shared/enums';
-import { PatientStatus } from '../../models/patient.model';
-import { GENDER_OPTIONS, STATUS_OPTIONS } from '../../models/patient.constants';
+import { Gender, MatchStatus } from '../../../../shared/enums';
+import { GENDER_OPTIONS, MATCH_STATUS_OPTIONS } from '../../models/patient.constants';
 
 export interface FilterState {
   fullName: string;
   gender: Gender | null;
-  status: PatientStatus | null;
+  matchStatus: MatchStatus | null;
 }
 
 @Component({
@@ -20,14 +19,14 @@ export interface FilterState {
   styleUrls: ['./patient-filter-panel.component.css']
 })
 export class PatientFilterPanelComponent {
-  @Output() filterChange = new EventEmitter<{ genders: Gender[]; statuses: PatientStatus[] }>();
+  @Output() filterChange = new EventEmitter<{ genders: Gender[]; matchStatuses: MatchStatus[] }>();
   @Output() resetFilter = new EventEmitter<void>();
 
   selectedGenders = new Set<Gender>();
-  selectedStatuses = new Set<PatientStatus>();
+  selectedMatchStatuses = new Set<MatchStatus>();
 
   genderOptions = GENDER_OPTIONS;
-  statusOptions = STATUS_OPTIONS;
+  matchStatusOptions = MATCH_STATUS_OPTIONS;
 
   toggleGender(gender: Gender): void {
     if (this.selectedGenders.has(gender)) {
@@ -37,24 +36,24 @@ export class PatientFilterPanelComponent {
     }
   }
 
-  toggleStatus(status: PatientStatus): void {
-    if (this.selectedStatuses.has(status)) {
-      this.selectedStatuses.delete(status);
+  toggleMatchStatus(status: MatchStatus): void {
+    if (this.selectedMatchStatuses.has(status)) {
+      this.selectedMatchStatuses.delete(status);
     } else {
-      this.selectedStatuses.add(status);
+      this.selectedMatchStatuses.add(status);
     }
   }
 
   apply(): void {
     this.filterChange.emit({
       genders: Array.from(this.selectedGenders),
-      statuses: Array.from(this.selectedStatuses)
+      matchStatuses: Array.from(this.selectedMatchStatuses)
     });
   }
 
   reset(): void {
     this.selectedGenders.clear();
-    this.selectedStatuses.clear();
+    this.selectedMatchStatuses.clear();
     this.resetFilter.emit();
   }
 }

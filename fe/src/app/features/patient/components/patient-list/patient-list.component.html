@@ -21,20 +21,20 @@
   </div>
   <div class="stat-card">
     <div class="stat-icon stat-icon-secondary">
-      <span class="material-symbols-outlined">home_health</span>
+      <span class="material-symbols-outlined">pending</span>
     </div>
     <div class="stat-content">
-      <p class="stat-label">Đang điều trị</p>
-      <p class="stat-value stat-value-secondary">{{ activeCount() | number }}</p>
+      <p class="stat-label">Chờ đối chiếu</p>
+      <p class="stat-value stat-value-secondary">{{ pendingCount() | number }}</p>
     </div>
   </div>
   <div class="stat-card">
     <div class="stat-icon stat-icon-tertiary">
-      <span class="material-symbols-outlined">event_note</span>
+      <span class="material-symbols-outlined">verified</span>
     </div>
     <div class="stat-content">
-      <p class="stat-label">Lượt khám hôm nay</p>
-      <p class="stat-value stat-value-tertiary">{{ todayCount() | number }}</p>
+      <p class="stat-label">Đã đối chiếu</p>
+      <p class="stat-value stat-value-tertiary">{{ matchedCount() | number }}</p>
     </div>
   </div>
 </div>
@@ -69,12 +69,12 @@
       <thead>
         <tr>
           <th>Họ và tên</th>
+          <th>Hệ thống nguồn</th>
+          <th>Mã BN cục bộ</th>
           <th>Ngày sinh</th>
           <th>Giới tính</th>
-          <th>CCCD/CMND</th>
-          <th>Mã BHYT</th>
           <th>Số điện thoại</th>
-          <th>Trạng thái</th>
+          <th>Trạng thái đối chiếu</th>
           <th class="text-right">Thao tác</th>
         </tr>
       </thead>
@@ -103,19 +103,19 @@
                   </div>
                   <div class="patient-details">
                     <p class="patient-name">{{ patient.fullName }}</p>
-                    <p class="patient-id">BN-{{ patient.id | number }}</p>
+                    <p class="patient-id">ID-{{ patient.id | number }}</p>
                   </div>
                 </div>
               </td>
+              <td>{{ patient.sourceSystemName || 'N/A' }}</td>
+              <td>{{ patient.localPatientCode }}</td>
               <td>{{ patient.dateOfBirth | date:'dd/MM/yyyy' }}</td>
               <td>{{ getGenderLabel(patient.gender) }}</td>
-              <td>{{ patient.nationalId }}</td>
-              <td>{{ patient.healthInsuranceNo || '-' }}</td>
-              <td>{{ formatPhone(patient.phoneNumber) }}</td>
+              <td>{{ formatPhone(patient.phoneNumber) || '-' }}</td>
               <td>
-                <span class="status-badge" [class]="'status-' + patient.status.toLowerCase()">
+                <span class="status-badge" [class]="'status-' + patient.matchStatus.toLowerCase()">
                   <span class="status-dot"></span>
-                  {{ getStatusLabel(patient.status) }}
+                  {{ getMatchStatusLabel(patient.matchStatus) }}
                 </span>
               </td>
               <td class="text-right">

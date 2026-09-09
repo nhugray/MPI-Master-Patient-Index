@@ -7,7 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import com.mpi.demo.constant.GenderEnum;
-import com.mpi.demo.constant.PatientStatusEnum;
+import com.mpi.demo.constant.MatchStatusEnum;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,6 +16,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,7 +25,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "patients")
+@Table(name = "patient")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -32,6 +34,13 @@ public class Patient {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "source_system_id", nullable = false)
+    private SourceSystem sourceSystem;
+
+    @Column(name = "local_patient_code", nullable = false, length = 100)
+    private String localPatientCode;
 
     @Column(name = "full_name", nullable = false, length = 255)
     private String fullName;
@@ -52,9 +61,15 @@ public class Patient {
     @Column(name = "phone_number", length = 20)
     private String phoneNumber;
 
+    @Column(name = "address", length = 500)
+    private String address;
+
+    @Column(name = "master_patient_id")
+    private Long masterPatientId;
+
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, length = 15)
-    private PatientStatusEnum status;
+    @Column(name = "match_status", nullable = false, length = 15)
+    private MatchStatusEnum matchStatus;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

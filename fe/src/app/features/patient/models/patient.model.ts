@@ -1,6 +1,6 @@
-import { Gender } from '../../../shared/enums';
+import { Gender, MatchStatus } from '../../../shared/enums';
 
-export { Gender };
+export { Gender, MatchStatus };
 
 export enum PatientStatus {
   ACTIVE = 'ACTIVE',
@@ -11,22 +11,29 @@ export enum PatientStatus {
 
 export interface Patient {
   id: number;
+  sourceSystemId: number;
+  sourceSystemName: string;
+  localPatientCode: string;
   fullName: string;
   dateOfBirth: string | null;
   gender: Gender;
-  nationalId: string;
-  phoneNumber: string;
-  status: PatientStatus;
+  nationalId: string | null;
+  phoneNumber: string | null;
+  address: string | null;
   healthInsuranceNo: string | null;
+  masterPatientId: number | null;
+  matchStatus: MatchStatus;
 }
 
 export interface CreatePatientRequest {
+  sourceSystemId: number;
+  localPatientCode: string;
   fullName: string;
   dateOfBirth: string | null;
   gender: Gender;
-  nationalId: string;
-  phoneNumber: string;
-  status: PatientStatus;
+  nationalId: string | null;
+  phoneNumber: string | null;
+  address: string | null;
   healthInsuranceNo: string | null;
 }
 

@@ -37,14 +37,14 @@ export class PatientService {
     if (params.phoneNumber) {
       httpParams = httpParams.set('phoneNumber', params.phoneNumber);
     }
-    if (params.status) {
-      httpParams = httpParams.set('status', params.status);
-    }
     if (params.page !== undefined) {
       httpParams = httpParams.set('page', params.page.toString());
     }
     if (params.size !== undefined) {
       httpParams = httpParams.set('size', params.size.toString());
+    }
+    if (params.matchStatus !== undefined) {
+      httpParams = httpParams.set('matchStatus', params.matchStatus);
     }
 
     return this.http.get<ApiResponse<PageResponse<Patient>>>(`${this.apiUrl}${this.basePath}`, {

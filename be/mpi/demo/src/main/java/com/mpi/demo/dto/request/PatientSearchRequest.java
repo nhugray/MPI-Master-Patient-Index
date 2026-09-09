@@ -1,7 +1,7 @@
 package com.mpi.demo.dto.request;
 
 import com.mpi.demo.constant.GenderEnum;
-import com.mpi.demo.constant.PatientStatusEnum;
+import com.mpi.demo.constant.MatchStatusEnum;
 
 public record PatientSearchRequest(
                 String fullName,
@@ -14,7 +14,13 @@ public record PatientSearchRequest(
 
                 String phoneNumber,
 
-                PatientStatusEnum status
+                String address,
+
+                Long sourceSystemId,
+
+                String localPatientCode,
+
+                MatchStatusEnum matchStatus
 
 ) {
 

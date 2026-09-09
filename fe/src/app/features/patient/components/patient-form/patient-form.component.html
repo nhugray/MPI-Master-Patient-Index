@@ -10,6 +10,30 @@
     <form [formGroup]="form" (ngSubmit)="onSubmit()" class="modal-body">
       <div class="form-grid">
         <div class="form-group">
+          <label class="form-label">ID Hệ thống nguồn <span class="required">*</span></label>
+          <input
+            type="number"
+            formControlName="sourceSystemId"
+            class="form-input"
+            placeholder="Nhập ID hệ thống nguồn...">
+          @if (form.get('sourceSystemId')?.touched && form.get('sourceSystemId')?.errors?.['required']) {
+            <span class="form-error">ID hệ thống nguồn không được để trống</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Mã BN cục bộ <span class="required">*</span></label>
+          <input
+            type="text"
+            formControlName="localPatientCode"
+            class="form-input"
+            placeholder="Nhập mã bệnh nhân tại hệ thống nguồn...">
+          @if (form.get('localPatientCode')?.touched && form.get('localPatientCode')?.errors?.['required']) {
+            <span class="form-error">Mã bệnh nhân cục bộ không được để trống</span>
+          }
+        </div>
+
+        <div class="form-group form-group-full">
           <label class="form-label">Họ và tên <span class="required">*</span></label>
           <input
             type="text"
@@ -42,16 +66,13 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">Số CCCD <span class="required">*</span></label>
+          <label class="form-label">Số CCCD</label>
           <input
             type="text"
             formControlName="nationalId"
             class="form-input"
             placeholder="012345678901"
             maxlength="12">
-          @if (form.get('nationalId')?.touched && form.get('nationalId')?.errors?.['required']) {
-            <span class="form-error">Số CCCD không được để trống</span>
-          }
           @if (form.get('nationalId')?.touched && form.get('nationalId')?.errors?.['pattern']) {
             <span class="form-error">Số CCCD phải gồm 12 chữ số</span>
           }
@@ -80,12 +101,12 @@
         </div>
 
         <div class="form-group form-group-full">
-          <label class="form-label">Trạng thái</label>
-          <select formControlName="status" class="form-select">
-            @for (status of statusOptions; track status.value) {
-              <option [value]="status.value">{{ status.label }}</option>
-            }
-          </select>
+          <label class="form-label">Địa chỉ</label>
+          <textarea
+            formControlName="address"
+            class="form-input"
+            rows="2"
+            placeholder="Nhập địa chỉ..."></textarea>
         </div>
       </div>
 

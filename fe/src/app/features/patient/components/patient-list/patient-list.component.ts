@@ -4,15 +4,16 @@ import { DatePipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { PageMeta } from '../../../../shared/models';
-import { Gender } from '../../../../shared/enums';
+import { Gender, MatchStatus } from '../../../../shared/enums';
 import { ToastService } from '../../../../shared/components/toast/toast.service';
 import { PatientService } from '../../services/patient.service';
-import { Patient, PatientStatus } from '../../models/patient.model';
+import { Patient } from '../../models/patient.model';
 import { PatientSearchParams, defaultSearchParams } from '../../models/patient-search-params.model';
-import { GENDER_OPTIONS, STATUS_OPTIONS } from '../../models/patient.constants';
+import { GENDER_OPTIONS, MATCH_STATUS_OPTIONS } from '../../models/patient.constants';
 import { PatientFilterPanelComponent } from '../patient-filter-panel/patient-filter-panel.component';
 import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
 import { SearchService } from '../../../../shared/services/search.service';
+import { formatPhoneNumber } from '../../../../shared/validators/phone.validator';
 
 @Component({
   selector: 'app-patient-list',
@@ -45,8 +46,8 @@ export class PatientListComponent implements OnInit {
 
   private searchParams: PatientSearchParams = { ...defaultSearchParams };
 
-  activeCount = signal(0);
-  todayCount = signal(0);
+  pendingCount = signal(0);
+  matchedCount = signal(0);
 
   constructor() {
     effect(() => {
@@ -78,10 +79,12 @@ export class PatientListComponent implements OnInit {
           this.patients.set(response.data.result);
           this.pageMeta.set(response.data.meta);
 
-          this.activeCount.set(
-            response.data.result.filter((p: Patient) => p.status === PatientStatus.ACTIVE).length
+          this.pendingCount.set(
+            response.data.result.filter((p: Patient) => p.matchStatus === MatchStatus.PENDING).length
           );
-          this.todayCount.set(12);
+          this.matchedCount.set(
+            response.data.result.filter((p: Patient) => p.matchStatus === MatchStatus.MATCHED).length
+          );
         }
         this.isLoading.set(false);
       },
@@ -104,11 +107,11 @@ export class PatientListComponent implements OnInit {
     this.isFilterOpen.set(!this.isFilterOpen());
   }
 
-  onFilterChange(filters: { genders: Gender[]; statuses: PatientStatus[] }): void {
+  onFilterChange(filters: { genders: Gender[]; matchStatuses: MatchStatus[] }): void {
     this.searchParams = {
       ...this.searchParams,
       gender: filters.genders.length > 0 ? filters.genders[0] : undefined,
-      status: filters.statuses.length > 0 ? filters.statuses[0] : undefined,
+      matchStatus: filters.matchStatuses.length > 0 ? filters.matchStatuses[0] : undefined,
       page: 0
     };
     this.isFilterOpen.set(false);
@@ -150,7 +153,6 @@ export class PatientListComponent implements OnInit {
       case Gender.MALE: return 'male';
       case Gender.FEMALE: return 'female';
       case Gender.OTHER: return 'other';
-      default: return 'unknown';
     }
   }
 
@@ -158,12 +160,9 @@ export class PatientListComponent implements OnInit {
     return GENDER_OPTIONS.find(o => o.value === gender)?.label || gender;
   }
 
-  getStatusLabel(status: PatientStatus): string {
-    return STATUS_OPTIONS.find(o => o.value === status)?.label || status;
+  getMatchStatusLabel(status: MatchStatus): string {
+    return MATCH_STATUS_OPTIONS.find(o => o.value === status)?.label || status;
   }
 
-  formatPhone(phone: string): string {
-    if (!phone) return '-';
-    return phone.replace(/(\d{4})(\d{3})(\d{3})/, '$1 $2 $3');
-  }
+  formatPhone = formatPhoneNumber;
 }
