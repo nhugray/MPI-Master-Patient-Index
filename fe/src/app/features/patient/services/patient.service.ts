@@ -37,6 +37,9 @@ export class PatientService {
     if (params.phoneNumber) {
       httpParams = httpParams.set('phoneNumber', params.phoneNumber);
     }
+    if (params.sourceSystemId !== undefined) {
+      httpParams = httpParams.set('sourceSystemId', params.sourceSystemId.toString());
+    }
     if (params.page !== undefined) {
       httpParams = httpParams.set('page', params.page.toString());
     }

@@ -10,13 +10,15 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import com.mpi.demo.entity.Patient;
 
 public interface PatientRepository extends JpaRepository<Patient, Long>, JpaSpecificationExecutor<Patient> {
-    
-    // Kiểm tra trùng lặp theo sourceSystemId + localPatientCode (UNIQUE constraint trong DB)
+
     Boolean existsBySourceSystemIdAndLocalPatientCode(Long sourceSystemId, String localPatientCode);
 
     Page<Patient> findByFullNameContainingIgnoreCase(String fullName, Pageable pageable);
 
     Optional<Patient> findByNationalId(String nationalId);
-    
+
     Optional<Patient> findBySourceSystemIdAndLocalPatientCode(Long sourceSystemId, String localPatientCode);
+
+    Page<Patient> findBySourceSystemId(Long sourceSystemId, Pageable pageable);
+
 }

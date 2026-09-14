@@ -24,10 +24,10 @@ import lombok.Setter;
  */
 @Entity
 @Table(name = "source_system")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter 
+@Setter 
+@NoArgsConstructor 
+@AllArgsConstructor 
 public class SourceSystem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,4 +48,12 @@ public class SourceSystem {
 
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
+
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
 }

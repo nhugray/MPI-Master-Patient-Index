@@ -26,8 +26,8 @@ public class PatientServiceImpl implements PatientService {
     private final PatientRepository patientRepository;
     private final SourceSystemRepository sourceSystemRepository;
 
-    public PatientServiceImpl(PatientRepository patientRepository, 
-                               SourceSystemRepository sourceSystemRepository) {
+    public PatientServiceImpl(PatientRepository patientRepository,
+            SourceSystemRepository sourceSystemRepository) {
         this.patientRepository = patientRepository;
         this.sourceSystemRepository = sourceSystemRepository;
     }
@@ -49,16 +49,14 @@ public class PatientServiceImpl implements PatientService {
 
     @Override
     public PatientResponse create(CreatePatientRequest request) {
-        // Kiểm tra SourceSystem có tồn tại không
         SourceSystem sourceSystem = sourceSystemRepository.findById(request.getSourceSystemId())
                 .orElseThrow(() -> new ResourceNotFoundException("Hệ thống nguồn", "id", request.getSourceSystemId()));
 
-        // Kiểm tra trùng lặp theo sourceSystemId + localPatientCode
         if (this.patientRepository.existsBySourceSystemIdAndLocalPatientCode(
                 request.getSourceSystemId(), request.getLocalPatientCode())) {
-            throw new DuplicateResourceException("Bệnh nhân", 
-                "mã bệnh nhân cục bộ tại hệ thống nguồn", 
-                request.getLocalPatientCode());
+            throw new DuplicateResourceException("Bệnh nhân",
+                    "mã bệnh nhân cục bộ tại hệ thống nguồn",
+                    request.getLocalPatientCode());
         }
 
         Patient patient = new Patient();
@@ -71,10 +69,9 @@ public class PatientServiceImpl implements PatientService {
         patient.setHealthInsuranceNo(request.getHealthInsuranceNo());
         patient.setPhoneNumber(request.getPhoneNumber());
         patient.setAddress(request.getAddress());
-        
-        // Mặc định matchStatus = PENDING khi tạo mới
+
         patient.setMatchStatus(MatchStatusEnum.PENDING);
-        
+
         Patient saved = patientRepository.save(patient);
         return PatientResponse.fromEntity(saved);
     }
@@ -84,18 +81,16 @@ public class PatientServiceImpl implements PatientService {
         Patient patient = this.patientRepository.findById(request.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Bệnh nhân", "mã bệnh nhân", request.getId()));
 
-        // Kiểm tra SourceSystem có tồn tại không
         SourceSystem sourceSystem = sourceSystemRepository.findById(request.getSourceSystemId())
                 .orElseThrow(() -> new ResourceNotFoundException("Hệ thống nguồn", "id", request.getSourceSystemId()));
 
-        // Kiểm tra trùng lặp nếu thay đổi sourceSystemId hoặc localPatientCode
-        if (!patient.getSourceSystem().getId().equals(request.getSourceSystemId()) 
+        if (!patient.getSourceSystem().getId().equals(request.getSourceSystemId())
                 || !patient.getLocalPatientCode().equals(request.getLocalPatientCode())) {
             if (this.patientRepository.existsBySourceSystemIdAndLocalPatientCode(
                     request.getSourceSystemId(), request.getLocalPatientCode())) {
-                throw new DuplicateResourceException("Bệnh nhân", 
-                    "mã bệnh nhân cục bộ tại hệ thống nguồn", 
-                    request.getLocalPatientCode());
+                throw new DuplicateResourceException("Bệnh nhân",
+                        "mã bệnh nhân cục bộ tại hệ thống nguồn",
+                        request.getLocalPatientCode());
             }
         }
 
@@ -108,10 +103,7 @@ public class PatientServiceImpl implements PatientService {
         patient.setPhoneNumber(request.getPhoneNumber());
         patient.setNationalId(request.getNationalId());
         patient.setAddress(request.getAddress());
-        
-        // matchStatus và masterPatientId không được update qua API này
-        // Sẽ có API riêng để xử lý matching logic
-        
+
         Patient saved = patientRepository.save(patient);
         return PatientResponse.fromEntity(saved);
     }

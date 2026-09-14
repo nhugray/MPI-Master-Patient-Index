@@ -124,6 +124,7 @@ export class FacilityListComponent implements OnInit {
   resetFilters(): void {
     this.selectedType = 'ALL';
     this.selectedStatus = 'ALL';
+    this.searchService.clearQuery();
     this.searchParams = {
       ...defaultSearchParams,
       page: 0

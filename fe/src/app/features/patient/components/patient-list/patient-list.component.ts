@@ -10,10 +10,11 @@ import { PatientService } from '../../services/patient.service';
 import { Patient } from '../../models/patient.model';
 import { PatientSearchParams, defaultSearchParams } from '../../models/patient-search-params.model';
 import { GENDER_OPTIONS, MATCH_STATUS_OPTIONS } from '../../models/patient.constants';
-import { PatientFilterPanelComponent } from '../patient-filter-panel/patient-filter-panel.component';
 import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
 import { SearchService } from '../../../../shared/services/search.service';
 import { formatPhoneNumber } from '../../../../shared/validators/phone.validator';
+import { SourceSystemService } from '../../../source-system/services/source-system.service';
+import { SourceSystem } from '../../../source-system/models/source-system.model';
 
 @Component({
   selector: 'app-patient-list',
@@ -22,7 +23,6 @@ import { formatPhoneNumber } from '../../../../shared/validators/phone.validator
     DatePipe,
     DecimalPipe,
     FormsModule,
-    PatientFilterPanelComponent,
     PaginationComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -35,19 +35,30 @@ export class PatientListComponent implements OnInit {
   @Output() deletePatient = new EventEmitter<Patient>();
 
   private readonly patientService = inject(PatientService);
+  private readonly sourceSystemService = inject(SourceSystemService);
   private readonly toastService = inject(ToastService);
-  private readonly searchService = inject(SearchService);
+  readonly searchService = inject(SearchService);
   private readonly destroyRef = inject(DestroyRef);
 
   patients = signal<Patient[]>([]);
   pageMeta = signal<PageMeta | null>(null);
   isLoading = signal(false);
-  isFilterOpen = signal(false);
 
   private searchParams: PatientSearchParams = { ...defaultSearchParams };
 
   pendingCount = signal(0);
   matchedCount = signal(0);
+  totalCount = signal(0);
+
+  // Filter options
+  genderOptions = GENDER_OPTIONS;
+  matchStatusOptions = MATCH_STATUS_OPTIONS;
+  sourceSystems = signal<SourceSystem[]>([]);
+
+  // Selected filters
+  selectedGender: string = 'ALL';
+  selectedMatchStatus: string = 'ALL';
+  selectedSourceSystemId: number | null = null;
 
   constructor() {
     effect(() => {
@@ -62,7 +73,23 @@ export class PatientListComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.loadSourceSystems();
     this.loadPatients();
+  }
+
+  loadSourceSystems(): void {
+    this.sourceSystemService.search({ isActive: true, page: 0, size: 100 })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          if (response.statusCode === 200) {
+            this.sourceSystems.set(response.data.result);
+          }
+        },
+        error: (error) => {
+          console.error('Error loading source systems:', error);
+        }
+      });
   }
 
   reload(): void {
@@ -79,6 +106,8 @@ export class PatientListComponent implements OnInit {
           this.patients.set(response.data.result);
           this.pageMeta.set(response.data.meta);
 
+          const total = response.data.meta?.total || 0;
+          this.totalCount.set(total);
           this.pendingCount.set(
             response.data.result.filter((p: Patient) => p.matchStatus === MatchStatus.PENDING).length
           );
@@ -103,27 +132,42 @@ export class PatientListComponent implements OnInit {
     this.loadPatients();
   }
 
-  toggleFilter(): void {
-    this.isFilterOpen.set(!this.isFilterOpen());
-  }
-
-  onFilterChange(filters: { genders: Gender[]; matchStatuses: MatchStatus[] }): void {
+  onGenderFilterChange(): void {
     this.searchParams = {
       ...this.searchParams,
-      gender: filters.genders.length > 0 ? filters.genders[0] : undefined,
-      matchStatus: filters.matchStatuses.length > 0 ? filters.matchStatuses[0] : undefined,
+      gender: this.selectedGender !== 'ALL' ? this.selectedGender as Gender : undefined,
       page: 0
     };
-    this.isFilterOpen.set(false);
     this.loadPatients();
   }
 
-  onResetFilter(): void {
+  onMatchStatusFilterChange(): void {
+    this.searchParams = {
+      ...this.searchParams,
+      matchStatus: this.selectedMatchStatus !== 'ALL' ? this.selectedMatchStatus as MatchStatus : undefined,
+      page: 0
+    };
+    this.loadPatients();
+  }
+
+  onSourceSystemFilterChange(): void {
+    this.searchParams = {
+      ...this.searchParams,
+      sourceSystemId: this.selectedSourceSystemId || undefined,
+      page: 0
+    };
+    this.loadPatients();
+  }
+
+  resetFilters(): void {
+    this.selectedGender = 'ALL';
+    this.selectedMatchStatus = 'ALL';
+    this.selectedSourceSystemId = null;
+    this.searchService.clearQuery();
     this.searchParams = {
       ...defaultSearchParams,
       page: 0
     };
-    this.isFilterOpen.set(false);
     this.loadPatients();
   }
 

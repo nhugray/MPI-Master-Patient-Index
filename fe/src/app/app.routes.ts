@@ -25,6 +25,11 @@ export const routes: Routes = [
         path: 'facilities',
         loadComponent: () => import('./features/facility/pages/facilities-page.component')
           .then(m => m.FacilitiesPageComponent)
+      },
+      {
+        path: 'source-systems',
+        loadComponent: () => import('./features/source-system/pages/source-systems-page.component')
+          .then(m => m.SourceSystemsPageComponent)
       }
     ]
   }
