@@ -9,7 +9,8 @@ import { ToastService } from '../../../../shared/components/toast/toast.service'
 import { PatientService } from '../../services/patient.service';
 import { Patient } from '../../models/patient.model';
 import { PatientSearchParams, defaultSearchParams } from '../../models/patient-search-params.model';
-import { GENDER_OPTIONS, MATCH_STATUS_OPTIONS } from '../../models/patient.constants';
+import { GENDER_OPTIONS } from '../../../../shared/enums';
+import { MATCH_STATUS_OPTIONS } from '../../models/patient.constants';
 import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
 import { SearchService } from '../../../../shared/services/search.service';
 import { formatPhoneNumber } from '../../../../shared/validators/phone.validator';

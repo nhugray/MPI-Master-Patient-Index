@@ -6,13 +6,15 @@ import { FormsModule } from '@angular/forms';
 import { PageMeta } from '../../../../shared/models';
 import { ToastService } from '../../../../shared/components/toast/toast.service';
 import { PatientMasterService } from '../../services/patient-master.service';
-import { PatientMaster, PatientMasterSearchRequest } from '../../models/patient-master.model';
+import { PatientMaster, PatientMasterSearchRequest, defaultSearchParams } from '../../models/patient-master.model';
 import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
 import { SearchService } from '../../../../shared/services/search.service';
 import { Gender } from '../../../../shared/enums';
+import { GENDER_OPTIONS } from '../../../../shared/enums';
 import { SourceSystemService } from '../../../source-system/services/source-system.service';
 import { SourceSystem } from '../../../source-system/models/source-system.model';
-import { PatientMasterFilterPanelComponent, PatientMasterFilterState } from '../patient-master-filter-panel/patient-master-filter-panel.component';
+import { PATIENT_STATUS_OPTIONS, PatientMasterStatusEnum } from '../../models/patient-master.constants';
+
 
 @Component({
   selector: 'app-patient-master-list',
@@ -22,7 +24,6 @@ import { PatientMasterFilterPanelComponent, PatientMasterFilterState } from '../
     DecimalPipe,
     FormsModule,
     PaginationComponent,
-    PatientMasterFilterPanelComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './patient-master-list.component.html',
@@ -42,29 +43,16 @@ export class PatientMasterListComponent implements OnInit {
   pageMeta = signal<PageMeta | null>(null);
   isLoading = signal(false);
 
-  private searchParams: PatientMasterSearchRequest = {
-    page: 0,
-    size: 10
-  };
+  private searchParams = defaultSearchParams;
 
   activeCount = signal(0);
   mergedCount = signal(0);
   totalCount = signal(0);
 
   // Filter options
-  genderOptions = [
-    { value: 'ALL', label: 'Tất cả' },
-    { value: Gender.MALE, label: 'Nam' },
-    { value: Gender.FEMALE, label: 'Nữ' },
-    { value: Gender.OTHER, label: 'Khác' }
-  ];
+  genderOptions = GENDER_OPTIONS;
 
-  statusOptions = [
-    { value: 'ALL', label: 'Tất cả' },
-    { value: 'ACTIVE', label: 'Hoạt động' },
-    { value: 'INACTIVE', label: 'Ngừng hoạt động' },
-    { value: 'MERGED', label: 'Đã gộp' }
-  ];
+  statusOptions = PATIENT_STATUS_OPTIONS;
 
   sourceSystems = signal<SourceSystem[]>([]);
 
@@ -161,7 +149,7 @@ export class PatientMasterListComponent implements OnInit {
   onGenderFilterChange(): void {
     this.searchParams = {
       ...this.searchParams,
-      gender: this.selectedGender !== 'ALL' ? this.selectedGender : undefined,
+      gender: this.selectedGender !== 'ALL' ? this.selectedGender as Gender : undefined,
       page: 0
     };
     this.loadPatientMasters();
@@ -190,10 +178,7 @@ export class PatientMasterListComponent implements OnInit {
     this.selectedStatus = 'ALL';
     this.selectedSourceSystemId = null;
     this.searchService.clearQuery();
-    this.searchParams = {
-      page: 0,
-      size: 10
-    };
+    this.searchParams = defaultSearchParams;
     this.loadPatientMasters();
   }
 
@@ -215,30 +200,23 @@ export class PatientMasterListComponent implements OnInit {
     return (words[0].charAt(0) + words[words.length - 1].charAt(0)).toUpperCase();
   }
 
-  getAvatarColor(gender: string): string {
+  getAvatarColor(gender: Gender): string {
     switch (gender) {
-      case 'MALE': return 'male';
-      case 'FEMALE': return 'female';
+      case Gender.MALE: return 'male';
+      case Gender.FEMALE: return 'female';
+      case Gender.OTHER: return 'other';
       default: return 'other';
     }
   }
 
-  getGenderDisplay(gender: string): string {
-    switch (gender) {
-      case 'MALE': return 'Nam';
-      case 'FEMALE': return 'Nữ';
-      case 'OTHER': return 'Khác';
-      default: return '-';
-    }
+  getGenderDisplay(gender: Gender): string {
+    const option = GENDER_OPTIONS.find(o => o.value === gender);
+    return option ? option.label : '-';
   }
 
-  getStatusDisplay(status: string): string {
-    switch (status) {
-      case 'ACTIVE': return 'Hoạt động';
-      case 'INACTIVE': return 'Ngừng hoạt động';
-      case 'MERGED': return 'Đã gộp';
-      default: return status;
-    }
+  getStatusDisplay(status: PatientMasterStatusEnum): string {
+    const option = PATIENT_STATUS_OPTIONS.find(o => o.value === status);
+    return option ? option.label : '-';
   }
 
   getStatusClass(status: string): string {

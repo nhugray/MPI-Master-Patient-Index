@@ -1,12 +1,8 @@
-import { Gender } from '../../../shared/enums';
 import { MatchStatus } from '../../../shared/enums';
 import { PatientStatus } from './patient.model';
 
-export const GENDER_OPTIONS = [
-  { value: Gender.MALE, label: 'Nam' },
-  { value: Gender.FEMALE, label: 'Nữ' },
-  { value: Gender.OTHER, label: 'Khác' }
-];
+// GENDER_OPTIONS đã được di chuyển sang shared/constants/gender.constants.ts
+// Import từ: import { GENDER_OPTIONS } from '../../../shared/constants';
 
 export const MATCH_STATUS_OPTIONS = [
   { value: MatchStatus.PENDING, label: 'Chờ đối chiếu' },

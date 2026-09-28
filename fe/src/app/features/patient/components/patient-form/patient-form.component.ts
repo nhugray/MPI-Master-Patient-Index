@@ -11,7 +11,8 @@ import {
   CreatePatientRequest,
   UpdatePatientRequest
 } from '../../models/patient.model';
-import { GENDER_OPTIONS, MATCH_STATUS_OPTIONS } from '../../models/patient.constants';
+import { GENDER_OPTIONS } from '../../../../shared/enums';
+import { MATCH_STATUS_OPTIONS } from '../../models/patient.constants';
 import { phoneValidator } from '../../../../shared/validators/phone.validator';
 
 @Component({

@@ -10,14 +10,12 @@ import { PatientMaster } from '../models/patient-master.model';
   styleUrls: ['./patient-master-page.component.css']
 })
 export class PatientMasterPageComponent {
-  
+
   onViewDetail(master: PatientMaster): void {
     console.log('View detail:', master);
-    // TODO: Navigate to detail page or open modal
   }
 
   onEditMaster(master: PatientMaster): void {
     console.log('Edit master:', master);
-    // TODO: Open edit modal
   }
 }

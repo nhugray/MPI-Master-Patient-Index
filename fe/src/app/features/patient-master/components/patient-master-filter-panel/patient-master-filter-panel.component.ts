@@ -2,8 +2,8 @@ import { Component, EventEmitter, Output, Input, ChangeDetectionStrategy } from 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Gender } from '../../../../shared/enums';
-import { GENDER_OPTIONS } from '../../../patient/models/patient.constants';
-import { PatientStatusEnum } from '../../../patient/enums/patient-status.enum';
+import { GENDER_OPTIONS } from '../../../../shared/enums';
+import { PATIENT_STATUS_OPTIONS, PatientMasterStatusEnum } from '../../models/patient-master.constants';
 
 export interface SourceSystem {
   id: number;
@@ -12,7 +12,7 @@ export interface SourceSystem {
 
 export interface PatientMasterFilterState {
   genders: Gender[];
-  statuses: PatientStatusEnum[];
+  statuses: PatientMasterStatusEnum[];
   sourceSystemIds: number[];
 }
 
@@ -30,16 +30,11 @@ export class PatientMasterFilterPanelComponent {
   @Output() resetFilter = new EventEmitter<void>();
 
   selectedGenders = new Set<Gender>();
-  selectedStatuses = new Set<PatientStatusEnum>();
+  selectedStatuses = new Set<PatientMasterStatusEnum>();
   selectedSourceSystems = new Set<number>();
 
   genderOptions = GENDER_OPTIONS;
-  statusOptions = [
-    { value: PatientStatusEnum.ACTIVE, label: 'Đang hoạt động' },
-    { value: PatientStatusEnum.INACTIVE, label: 'Không hoạt động' },
-    { value: PatientStatusEnum.MERGED, label: 'Đã gộp' },
-    { value: PatientStatusEnum.DUPLICATE, label: 'Trùng lặp' }
-  ];
+  statusOptions = PATIENT_STATUS_OPTIONS;
 
   toggleGender(gender: Gender): void {
     if (this.selectedGenders.has(gender)) {
@@ -49,7 +44,7 @@ export class PatientMasterFilterPanelComponent {
     }
   }
 
-  toggleStatus(status: PatientStatusEnum): void {
+  toggleStatus(status: PatientMasterStatusEnum): void {
     if (this.selectedStatuses.has(status)) {
       this.selectedStatuses.delete(status);
     } else {

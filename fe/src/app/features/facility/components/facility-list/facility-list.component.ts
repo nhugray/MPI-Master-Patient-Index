@@ -17,7 +17,6 @@ import { formatPhoneNumber } from '../../../../shared/validators/phone.validator
   selector: 'app-facility-list',
   standalone: true,
   imports: [
-    DatePipe,
     DecimalPipe,
     FormsModule,
     PaginationComponent

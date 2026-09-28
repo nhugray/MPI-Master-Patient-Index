@@ -2,7 +2,8 @@ import { Component, EventEmitter, Output, ChangeDetectionStrategy } from '@angul
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Gender, MatchStatus } from '../../../../shared/enums';
-import { GENDER_OPTIONS, MATCH_STATUS_OPTIONS } from '../../models/patient.constants';
+import { GENDER_OPTIONS } from '../../../../shared/enums';
+import { MATCH_STATUS_OPTIONS } from '../../models/patient.constants';
 
 export interface FilterState {
   fullName: string;
