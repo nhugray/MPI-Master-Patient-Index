@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import com.mpi.demo.entity.Patient;
+import com.mpi.demo.entity.PatientMaster;
 
 public interface PatientRepository extends JpaRepository<Patient, Long>, JpaSpecificationExecutor<Patient> {
 
@@ -20,5 +21,7 @@ public interface PatientRepository extends JpaRepository<Patient, Long>, JpaSpec
     Optional<Patient> findBySourceSystemIdAndLocalPatientCode(Long sourceSystemId, String localPatientCode);
 
     Page<Patient> findBySourceSystemId(Long sourceSystemId, Pageable pageable);
+
+    Long countByMasterPatient(PatientMaster masterPatient);
 
 }

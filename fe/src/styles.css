@@ -117,20 +117,3 @@ input, select, textarea {
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: var(--outline);
 }
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0b1c30;
-    --surface: #213145;
-    --surface-container-low: #213145;
-    --surface-container: #2a3a52;
-    --surface-container-high: #324460;
-    --surface-container-highest: #3d4f6f;
-    --surface-container-lowest: #1a2a3d;
-    --on-background: #eaf1ff;
-    --on-surface: #eaf1ff;
-    --on-surface-variant: #bfc8ce;
-    --outline: #8a99aa;
-    --outline-variant: #4a5a6a;
-  }
-}

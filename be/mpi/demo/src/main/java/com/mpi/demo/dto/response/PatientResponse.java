@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import com.mpi.demo.constant.GenderEnum;
 import com.mpi.demo.constant.MatchStatusEnum;
 import com.mpi.demo.entity.Patient;
+import com.mpi.demo.entity.PatientMaster;
 
 public record PatientResponse(
         Long id,
@@ -18,7 +19,7 @@ public record PatientResponse(
         String phoneNumber,
         String address,
         String healthInsuranceNo,
-        Long masterPatientId,
+        PatientMaster masterPatient,
         MatchStatusEnum matchStatus) {
 
     public static PatientResponse fromEntity(Patient patient) {
@@ -34,7 +35,7 @@ public record PatientResponse(
                 patient.getPhoneNumber(),
                 patient.getAddress(),
                 patient.getHealthInsuranceNo(),
-                patient.getMasterPatientId(),
+                patient.getMasterPatient(),
                 patient.getMatchStatus());
     }
 }

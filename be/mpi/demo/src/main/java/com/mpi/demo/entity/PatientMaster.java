@@ -2,45 +2,27 @@ package com.mpi.demo.entity;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-
 import com.mpi.demo.constant.GenderEnum;
-import com.mpi.demo.constant.MatchStatusEnum;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.mpi.demo.constant.PatientStatusEnum;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
-@Table(name = "patient")
+@Table(name = "patient_master")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Patient {
+@Builder
+public class PatientMaster {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "source_system_id", nullable = false)
-    private SourceSystem sourceSystem;
-
-    @Column(name = "local_patient_code", nullable = false, length = 100)
-    private String localPatientCode;
+    @Column(name = "enterprise_id", unique = true, nullable = false, length = 30)
+    private String enterpriseId; // Format: EMPI-2026-000001
 
     @Column(name = "full_name", nullable = false, length = 255)
     private String fullName;
@@ -64,13 +46,13 @@ public class Patient {
     @Column(name = "address", length = 500)
     private String address;
 
-    @ManyToOne
-    @JoinColumn(name = "master_patient_id")
-    private PatientMaster masterPatient;
-
     @Enumerated(EnumType.STRING)
-    @Column(name = "match_status", nullable = false, length = 15)
-    private MatchStatusEnum matchStatus;
+    @Column(name = "status", nullable = false, length = 15)
+    @Builder.Default
+    private PatientStatusEnum status = PatientStatusEnum.ACTIVE;
+
+    @Column(name = "merged_into_id")
+    private Long mergedIntoId;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -79,5 +61,4 @@ public class Patient {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
-
 }
