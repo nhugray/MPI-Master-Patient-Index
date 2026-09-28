@@ -197,7 +197,7 @@
                   <button class="btn-action btn-view" (click)="onViewDetail(master)" title="Xem chi tiết">
                     <span class="material-symbols-outlined">visibility</span>
                   </button>
-                  <button class="btn-action btn-edit" (click)="onEditMaster(master)" title="Sửa">
+                  <button class="btn-action btn-edit" (click)="openEditModal(master)" title="Sửa">
                     <span class="material-symbols-outlined">edit</span>
                   </button>
                   <button class="btn-action btn-history" title="Lịch sử">
@@ -219,3 +219,11 @@
     </app-pagination>
   }
 </div>
+
+@if (editingPatient()) {
+  <app-patient-master-edit-modal
+    [patientMaster]="editingPatient()!"
+    (close)="closeEditModal()"
+    (saved)="onPatientUpdated($event)">
+  </app-patient-master-edit-modal>
+}

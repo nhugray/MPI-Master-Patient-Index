@@ -14,6 +14,7 @@ import { GENDER_OPTIONS } from '../../../../shared/enums';
 import { SourceSystemService } from '../../../source-system/services/source-system.service';
 import { SourceSystem } from '../../../source-system/models/source-system.model';
 import { PATIENT_STATUS_OPTIONS, PatientMasterStatusEnum } from '../../models/patient-master.constants';
+import { PatientMasterEditModalComponent } from '../patient-master-edit-modal/patient-master-edit-modal.component';
 
 
 @Component({
@@ -24,6 +25,7 @@ import { PATIENT_STATUS_OPTIONS, PatientMasterStatusEnum } from '../../models/pa
     DecimalPipe,
     FormsModule,
     PaginationComponent,
+    PatientMasterEditModalComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './patient-master-list.component.html',
@@ -31,7 +33,8 @@ import { PATIENT_STATUS_OPTIONS, PatientMasterStatusEnum } from '../../models/pa
 })
 export class PatientMasterListComponent implements OnInit {
   @Output() viewDetail = new EventEmitter<PatientMaster>();
-  @Output() editMaster = new EventEmitter<PatientMaster>();
+
+  editingPatient = signal<PatientMaster | null>(null);
 
   private readonly patientMasterService = inject(PatientMasterService);
   private readonly sourceSystemService = inject(SourceSystemService);
@@ -156,11 +159,18 @@ export class PatientMasterListComponent implements OnInit {
   }
 
   onStatusFilterChange(): void {
-    this.searchParams = {
+    const params: PatientMasterSearchRequest = {
       ...this.searchParams,
-      status: this.selectedStatus !== 'ALL' ? this.selectedStatus : undefined,
       page: 0
     };
+
+    if (this.selectedStatus !== 'ALL') {
+      params.status = this.selectedStatus;
+    } else {
+      delete params.status;
+    }
+
+    this.searchParams = params;
     this.loadPatientMasters();
   }
 
@@ -186,8 +196,22 @@ export class PatientMasterListComponent implements OnInit {
     this.viewDetail.emit(master);
   }
 
-  onEditMaster(master: PatientMaster): void {
-    this.editMaster.emit(master);
+  openEditModal(master: PatientMaster): void {
+    this.editingPatient.set(master);
+  }
+
+  closeEditModal(): void {
+    this.editingPatient.set(null);
+  }
+
+  onPatientUpdated(updatedPatient: PatientMaster): void {
+    // Update in the list
+    this.patientMasters.update(list =>
+      list.map(p => p.id === updatedPatient.id ? updatedPatient : p)
+    );
+
+    this.toastService.success('Thành công', 'Cập nhật hồ sơ gốc thành công');
+    this.editingPatient.set(null);
   }
 
   // Helper methods

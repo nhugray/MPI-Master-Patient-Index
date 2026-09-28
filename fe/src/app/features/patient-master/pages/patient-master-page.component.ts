@@ -14,8 +14,4 @@ export class PatientMasterPageComponent {
   onViewDetail(master: PatientMaster): void {
     console.log('View detail:', master);
   }
-
-  onEditMaster(master: PatientMaster): void {
-    console.log('Edit master:', master);
-  }
 }

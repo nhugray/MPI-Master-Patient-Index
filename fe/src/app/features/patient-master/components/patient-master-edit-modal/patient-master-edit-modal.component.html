@@ -1,0 +1,128 @@
+<div class="modal-backdrop active" (click)="onClose()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3 class="modal-title">Chỉnh sửa hồ sơ gốc</h3>
+      <button class="btn-close" (click)="onClose()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <form [formGroup]="editForm" (ngSubmit)="onSubmit()" class="modal-body">
+      <div class="form-container">
+        @if (errorMessage()) {
+          <div class="alert alert-error">
+            <span class="material-symbols-outlined">error</span>
+            {{ errorMessage() }}
+          </div>
+        }
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">EMPI <span class="label-badge">Không thể sửa</span></label>
+            <input type="text" class="form-input" [value]="patientMaster.enterpriseId" disabled>
+          </div>
+
+          <div class="form-group form-group-full">
+            <label class="form-label">Họ và tên <span class="required">*</span></label>
+            <input 
+              type="text" 
+              class="form-input" 
+              formControlName="fullName"
+              placeholder="Nhập họ và tên..."
+              [class.error]="getFieldError('fullName')">
+            @if (getFieldError('fullName')) {
+              <span class="form-error">{{ getFieldError('fullName') }}</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Ngày sinh <span class="required">*</span></label>
+            <input 
+              type="date" 
+              class="form-input" 
+              formControlName="dateOfBirth"
+              [class.error]="getFieldError('dateOfBirth')">
+            @if (getFieldError('dateOfBirth')) {
+              <span class="form-error">{{ getFieldError('dateOfBirth') }}</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Giới tính</label>
+            <select class="form-input" formControlName="gender">
+              @for (option of genderOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Số CCCD</label>
+            <input 
+              type="text" 
+              class="form-input" 
+              formControlName="nationalId"
+              placeholder="012345678901"
+              maxlength="12"
+              [class.error]="getFieldError('nationalId')">
+            @if (getFieldError('nationalId')) {
+              <span class="form-error">{{ getFieldError('nationalId') }}</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Mã số BHYT</label>
+            <input 
+              type="text" 
+              class="form-input" 
+              formControlName="healthInsuranceNo"
+              placeholder="GD4..."
+              maxlength="20"
+              [class.error]="getFieldError('healthInsuranceNo')">
+            @if (getFieldError('healthInsuranceNo')) {
+              <span class="form-error">{{ getFieldError('healthInsuranceNo') }}</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Số điện thoại</label>
+            <input 
+              type="tel" 
+              class="form-input" 
+              formControlName="phoneNumber"
+              placeholder="0..."
+              maxlength="10"
+              [class.error]="getFieldError('phoneNumber')">
+            @if (getFieldError('phoneNumber')) {
+              <span class="form-error">{{ getFieldError('phoneNumber') }}</span>
+            }
+          </div>
+
+          <div class="form-group form-group-full">
+            <label class="form-label">Địa chỉ</label>
+            <textarea 
+              class="form-input" 
+              formControlName="address"
+              placeholder="Nhập địa chỉ..."
+              rows="2"
+              maxlength="500"
+              [class.error]="getFieldError('address')"></textarea>
+            @if (getFieldError('address')) {
+              <span class="form-error">{{ getFieldError('address') }}</span>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-cancel" (click)="onClose()" [disabled]="isSubmitting()">Hủy</button>
+        <button type="submit" class="btn-submit" [disabled]="isSubmitting() || editForm.invalid">
+          @if (isSubmitting()) {
+            <span class="loading-spinner-small"></span>
+          }
+          {{ isSubmitting() ? 'Đang cập nhật...' : 'Cập nhật' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

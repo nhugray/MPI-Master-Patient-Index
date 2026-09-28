@@ -1,6 +1,5 @@
 package com.mpi.demo.service.impl;
 
-import java.time.LocalDate;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
@@ -9,17 +8,17 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.mpi.demo.constant.PatientStatusEnum;
 import com.mpi.demo.dto.request.PatientMasterSearchRequest;
+import com.mpi.demo.dto.request.UpdatePatientMasterRequest;
 import com.mpi.demo.dto.response.PatientMasterResponse;
 import com.mpi.demo.entity.Patient;
 import com.mpi.demo.entity.PatientMaster;
+import com.mpi.demo.exception.ResourceNotFoundException;
 import com.mpi.demo.helper.ResultPagination;
 import com.mpi.demo.repository.PatientMasterRepository;
 import com.mpi.demo.repository.PatientRepository;
 import com.mpi.demo.service.PatientMasterService;
-
-import jakarta.persistence.criteria.Predicate;
+import com.mpi.demo.specification.PatientMasterSpecification;
 
 @Service
 public class PatientMasterServiceImpl implements PatientMasterService {
@@ -74,86 +73,12 @@ public class PatientMasterServiceImpl implements PatientMasterService {
     }
 
     @Override
-    public Page<PatientMaster> searchMasters(String keyword, Pageable pageable) {
-        return patientMasterRepository.findAll(pageable);
-    }
-
-    @Override
     public ResultPagination searchMasters(PatientMasterSearchRequest request, Pageable pageable) {
-        Specification<PatientMaster> spec = (root, query, cb) -> {
-            Predicate predicate = cb.conjunction();
-
-            // Keyword search (enterpriseId, fullName, nationalId, healthInsuranceNo, phoneNumber)
-            if (request.keyword() != null && !request.keyword().isBlank()) {
-                String keywordPattern = "%" + request.keyword().trim().toUpperCase() + "%";
-                Predicate keywordPredicate = cb.or(
-                        cb.like(cb.upper(root.get("enterpriseId")), keywordPattern),
-                        cb.like(cb.upper(root.get("fullName")), keywordPattern),
-                        cb.like(cb.upper(root.get("nationalId")), keywordPattern),
-                        cb.like(cb.upper(root.get("healthInsuranceNo")), keywordPattern),
-                        cb.like(cb.upper(root.get("phoneNumber")), keywordPattern));
-                predicate = cb.and(predicate, keywordPredicate);
-            }
-
-            // Enterprise ID
-            if (request.enterpriseId() != null && !request.enterpriseId().isBlank()) {
-                predicate = cb.and(predicate,
-                        cb.equal(root.get("enterpriseId"), request.enterpriseId().trim()));
-            }
-
-            // National ID
-            if (request.nationalId() != null && !request.nationalId().isBlank()) {
-                predicate = cb.and(predicate,
-                        cb.equal(root.get("nationalId"), request.nationalId().trim()));
-            }
-
-            // Health Insurance No
-            if (request.healthInsuranceNo() != null && !request.healthInsuranceNo().isBlank()) {
-                predicate = cb.and(predicate,
-                        cb.equal(root.get("healthInsuranceNo"), request.healthInsuranceNo().trim()));
-            }
-
-            // Phone Number
-            if (request.phoneNumber() != null && !request.phoneNumber().isBlank()) {
-                predicate = cb.and(predicate,
-                        cb.equal(root.get("phoneNumber"), request.phoneNumber().trim()));
-            }
-
-            // Gender
-            if (request.gender() != null) {
-                predicate = cb.and(predicate, cb.equal(root.get("gender"), request.gender()));
-            }
-
-            // Status
-            if (request.status() != null) {
-                predicate = cb.and(predicate, cb.equal(root.get("status"), request.status()));
-            } else {
-                // Default: only show ACTIVE
-                predicate = cb.and(predicate, cb.equal(root.get("status"), PatientStatusEnum.ACTIVE));
-            }
-
-            // Age range filter
-            if (request.ageFrom() != null || request.ageTo() != null) {
-                LocalDate today = LocalDate.now();
-
-                if (request.ageTo() != null) {
-                    LocalDate minDob = today.minusYears(request.ageTo() + 1).plusDays(1);
-                    predicate = cb.and(predicate, cb.greaterThanOrEqualTo(root.get("dateOfBirth"), minDob));
-                }
-
-                if (request.ageFrom() != null) {
-                    LocalDate maxDob = today.minusYears(request.ageFrom());
-                    predicate = cb.and(predicate, cb.lessThanOrEqualTo(root.get("dateOfBirth"), maxDob));
-                }
-            }
-
-            return predicate;
-        };
-
+        Specification<PatientMaster> spec = PatientMasterSpecification.build(request);
         Page<PatientMaster> page = patientMasterRepository.findAll(spec, pageable);
-        Page<PatientMasterResponse> responsePage = page.map(this::toResponse);
+        Page<PatientMasterResponse> response = page.map(this::toResponse);
 
-        return ResultPagination.fromPage(responsePage);
+        return ResultPagination.fromPage(response);
     }
 
     @Override
@@ -161,6 +86,24 @@ public class PatientMasterServiceImpl implements PatientMasterService {
         PatientMaster master = patientMasterRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy hồ sơ gốc với ID: " + id));
         return toResponse(master);
+    }
+
+    @Override
+    @Transactional
+    public PatientMasterResponse update(UpdatePatientMasterRequest request) {
+        PatientMaster master = patientMasterRepository.findById(request.id())
+                .orElseThrow(() -> new ResourceNotFoundException("Hồ sơ gốc", "id", request.id()));
+
+        master.setFullName(request.fullName());
+        master.setDateOfBirth(request.dateOfBirth());
+        master.setGender(request.gender());
+        master.setNationalId(request.nationalId());
+        master.setHealthInsuranceNo(request.healthInsuranceNo());
+        master.setPhoneNumber(request.phoneNumber());
+        master.setAddress(request.address());
+
+        PatientMaster saved = patientMasterRepository.save(master);
+        return toResponse(saved);
     }
 
     public String generateEnterpriseId() {
