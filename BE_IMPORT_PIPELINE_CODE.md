@@ -26,6 +26,8 @@ src/main/java/com/mpi/demo/service/impl/FileValidationServiceImpl.java
 src/main/java/com/mpi/demo/dto/response/ImportJobDetailResponse.java
 ```
 
+
+
 ### File thay the noi dung
 
 ```text
@@ -33,6 +35,8 @@ src/main/java/com/mpi/demo/service/ImportService.java
 src/main/java/com/mpi/demo/service/impl/ImportServiceImpl.java
 src/main/java/com/mpi/demo/controller/ImportController.java
 ```
+
+
 
 ### File can bo sung/sua theo cac block cuoi tai lieu
 
@@ -48,7 +52,11 @@ pom.xml
 
 ---
 
+
+
 ## 1. File storage
+
+
 
 ### `service/StoredFile.java`
 
@@ -67,6 +75,8 @@ public record StoredFile(
         Path path) {
 }
 ```
+
+
 
 ### `service/FileStorageService.java`
 
@@ -93,6 +103,8 @@ public interface FileStorageService {
 }
 ```
 
+
+
 ### `exception/FileStorageException.java`
 
 ```java
@@ -108,6 +120,8 @@ public class FileStorageException extends RuntimeException {
     }
 }
 ```
+
+
 
 ### `service/impl/FileStorageServiceImpl.java`
 
@@ -225,7 +239,11 @@ public class FileStorageServiceImpl implements FileStorageService {
 
 ---
 
+
+
 ## 2. Parser CSV/XLSX
+
+
 
 ### `service/ParsedFileData.java`
 
@@ -244,6 +262,8 @@ public record ParsedFileData(
 }
 ```
 
+
+
 ### `service/FileParserService.java`
 
 ```java
@@ -258,6 +278,8 @@ public interface FileParserService {
     ParsedFileData parse(Path path, FileTypeEnum fileType) throws IOException;
 }
 ```
+
+
 
 ### `exception/FileParsingException.java`
 
@@ -274,6 +296,8 @@ public class FileParsingException extends RuntimeException {
     }
 }
 ```
+
+
 
 ### `service/impl/FileParserServiceImpl.java`
 
@@ -418,7 +442,11 @@ public class FileParserServiceImpl implements FileParserService {
 
 ---
 
+
+
 ## 3. File validation
+
+
 
 ### `service/FileValidationService.java`
 
@@ -431,6 +459,8 @@ public interface FileValidationService {
     FileValidationResponse validate(ParsedFileData data, Long sourceSystemId);
 }
 ```
+
+
 
 ### `service/impl/FileValidationServiceImpl.java`
 
@@ -590,7 +620,11 @@ public class FileValidationServiceImpl implements FileValidationService {
 
 ---
 
+
+
 ## 4. Async configuration
+
+
 
 ### `config/AsyncConfig.java`
 
@@ -620,6 +654,8 @@ public class AsyncConfig {
 }
 ```
 
+
+
 ### `service/AsyncImportProcessor.java`
 
 ```java
@@ -629,6 +665,8 @@ public interface AsyncImportProcessor {
     void process(Long importJobId);
 }
 ```
+
+
 
 ### `exception/ImportStateException.java`
 
@@ -641,6 +679,8 @@ public class ImportStateException extends RuntimeException {
     }
 }
 ```
+
+
 
 ### `service/impl/AsyncImportProcessorImpl.java`
 
@@ -865,9 +905,15 @@ public class AsyncImportProcessorImpl implements AsyncImportProcessor {
 
 > Luu y quan trong: `ImportJob.fileName` dang duoc dung lam token trong code tren. Nen them field `fileToken` vao entity va thay `job.getFileName()` bang `job.getFileToken()` de tach ten hien thi va token luu tru.
 
+
+
 ---
 
+
+
 ## 5. Import service
+
+
 
 ### `service/ImportService.java`
 
@@ -904,6 +950,8 @@ public interface ImportService {
     void retryFailedRows(Long jobId);
 }
 ```
+
+
 
 ### `dto/response/ImportJobDetailResponse.java`
 
@@ -943,6 +991,8 @@ public record ImportJobDetailResponse(
     }
 }
 ```
+
+
 
 ### `service/impl/ImportServiceImpl.java`
 
@@ -1177,9 +1227,15 @@ public class ImportServiceImpl implements ImportService {
 
 > `createdBy(0L)` chi la gia tri tam thoi do project hien tai chua co SecurityContext/User service. Khi co authentication, thay bang id user dang dang nhap.
 
+
+
 ---
 
+
+
 ## 6. Import controller
+
+
 
 ### `controller/ImportController.java`
 
@@ -1283,7 +1339,11 @@ public class ImportController {
 
 ---
 
+
+
 ## 7. Enum va repository can thay doi
+
+
 
 ### `constant/ImportRowStatusEnum.java`
 
@@ -1299,6 +1359,8 @@ public enum ImportRowStatusEnum {
     REQUIRES_REVIEW
 }
 ```
+
+
 
 ### Bo sung vao `ImportJob.java`
 
@@ -1341,6 +1403,8 @@ Neu hai method nay da ton tai thi giu nguyen, khong tao trung.
 
 ---
 
+
+
 ## 8. `application.yaml`
 
 Them vao file hien tai:
@@ -1374,6 +1438,8 @@ spring:
 
 ---
 
+
+
 ## 9. `pom.xml`
 
 Project da co POI va OpenCSV. Can dam bao co cac dependency sau trong `<dependencies>`:
@@ -1401,6 +1467,8 @@ Khong them lai dependency neu da co trong `pom.xml`.
 
 ---
 
+
+
 ## 10. Cac diem can sua truoc khi copy code vao project
 
 1. Them `fileToken` vao `ImportJob`; khong nen dung `fileName` de lam token.
@@ -1413,6 +1481,8 @@ Khong them lai dependency neu da co trong `pom.xml`.
 8. Them `@ExceptionHandler` cho `FileStorageException`, `FileParsingException`, `ImportStateException` vao `GlobalExceptionHandler`.
 9. Khong tra JPA entity truc tiep tu controller; code tren da dung `ImportJobResponse` va `ImportJobDetailResponse`.
 10. Chay compile/test sau khi copy tung nhom file; khong copy toan bo mot lan khi chua kiem tra cac contract enum/entity hien tai.
+
+
 
 ## 11. Exception handler bo sung
 
@@ -1437,6 +1507,8 @@ import com.mpi.demo.exception.FileParsingException;
 import com.mpi.demo.exception.FileStorageException;
 import com.mpi.demo.exception.ImportStateException;
 ```
+
+
 
 ## 12. Checklist sau khi ap dung
 

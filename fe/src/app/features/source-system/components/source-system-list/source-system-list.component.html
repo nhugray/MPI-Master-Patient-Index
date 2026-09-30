@@ -62,41 +62,9 @@
 </div>
 
 <div class="filter-toolbar">
-  <div class="search-box">
-    <span class="material-symbols-outlined">search</span>
-    <input type="text" placeholder="Tìm theo tên hệ thống, mã nguồn, cơ sở y tế..." class="search-input"
-      (input)="searchService.setQuery($any($event.target).value)">
-    <button class="btn-clear" (click)="searchService.clearQuery()">
-    </button>
-  </div>
-
-  <div class="filter-group">
-    <div class="filter-item">
-      <span class="filter-label">Cơ sở:</span>
-      <select [(ngModel)]="selectedFacilityId" (change)="onFacilityChange()" class="filter-select">
-        @for (facility of facilities(); track facility.id) {
-        <option [value]="facility.id">{{ facility.name }}</option>
-        }
-      </select>
-    </div>
-
-    <div class="filter-item">
-      <span class="filter-label">Trạng thái:</span>
-      <select [(ngModel)]="selectedStatus" (change)="onStatusFilterChange()" class="filter-select">
-        <option value="true">Đang hoạt động</option>
-        <option value="false">Không hoạt động</option>
-      </select>
-    </div>
-
-    <button class="btn-reset" (click)="resetFilters()" title="Làm mới bộ lọc">
-      <span class="material-symbols-outlined">refresh</span>
-    </button>
-
-    <button class="btn-export">
-      <span class="material-symbols-outlined">download</span>
-      Xuất Excel
-    </button>
-  </div>
+  <app-source-system-filter-panel [facilities]="facilities()" (facilityChange)="onFacilityFilterChange($event)"
+    (statusChange)="onStatusFilterChange($event)" (resetFilters)="resetFilters()">
+  </app-source-system-filter-panel>
 </div>
 
 <div class="table-card">

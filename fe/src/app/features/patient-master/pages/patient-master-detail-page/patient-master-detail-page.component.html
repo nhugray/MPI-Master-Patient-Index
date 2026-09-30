@@ -1,0 +1,207 @@
+<div class="content-container">
+  <div class="page-header">
+    <div>
+      <div class="breadcrumb">
+        <a class="breadcrumb-link" (click)="goBack()">Master</a>
+        <span class="material-symbols-outlined breadcrumb-icon">chevron_right</span>
+        <span class="breadcrumb-current">Chi tiết Hồ sơ Gốc</span>
+      </div>
+      <h2 class="page-title">
+        Hồ sơ Gốc: <span class="title-highlight">{{ patientMaster()?.enterpriseId || 'Đang tải...' }}</span>
+      </h2>
+    </div>
+    <div class="actions">
+      <button class="btn-secondary">
+        <span class="material-symbols-outlined">history</span>
+        Hoàn tác gộp
+      </button>
+      <button class="btn-primary" (click)="openEditModal()">
+        <span class="material-symbols-outlined">edit</span>
+        Sửa thông tin
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading()" class="loading-container">
+    <div class="loading-spinner"></div>
+    <p class="loading-text">Đang tải thông tin hồ sơ gốc...</p>
+  </div>
+
+  <!-- Content Grid -->
+  <div *ngIf="!isLoading() && patientMaster()" class="bento-grid">
+    <!-- Patient Summary Card (Full Width) -->
+    <div class="card card-full">
+      <div class="summary-layout">
+        <!-- Avatar/Initials -->
+        <div class="avatar-circle">
+          <span class="avatar-text">{{ getInitials(patientMaster()!.fullName) }}</span>
+        </div>
+
+        <!-- Core Info -->
+        <div class="core-info">
+          <div class="name-status-row">
+            <h3 class="patient-name">{{ patientMaster()!.fullName }}</h3>
+            <span class="status-badge status-active">
+              <span class="material-symbols-outlined status-icon">check_circle</span>
+              {{ getStatusDisplay(patientMaster()!.status) }}
+            </span>
+          </div>
+
+          <div class="info-grid">
+            <div class="info-item">
+              <div class="info-label">Ngày sinh (Tuổi)</div>
+              <div class="info-value">
+                <span class="material-symbols-outlined info-icon">calendar_today</span>
+                {{ formatDate(patientMaster()!.dateOfBirth) }} ({{ getAge(patientMaster()!.dateOfBirth) }}t)
+              </div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Giới tính</div>
+              <div class="info-value">
+                <span class="material-symbols-outlined info-icon">{{ getGenderIcon(patientMaster()!.gender) }}</span>
+                {{ getGenderDisplay(patientMaster()!.gender) }}
+              </div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">CCCD</div>
+              <div class="info-value">
+                <span class="material-symbols-outlined info-icon">badge</span>
+                {{ maskNationalId(patientMaster()!.nationalId) }}
+              </div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Số điện thoại</div>
+              <div class="info-value">
+                <span class="material-symbols-outlined info-icon">call</span>
+                {{ maskPhoneNumber(patientMaster()!.phoneNumber) }}
+              </div>
+            </div>
+            <div class="info-item info-item-wide">
+              <div class="info-label">Địa chỉ (Ghi nhận gần nhất)</div>
+              <div class="info-value info-value-address">
+                <span class="material-symbols-outlined info-icon">location_on</span>
+                {{ patientMaster()!.address || 'Chưa có thông tin' }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Golden Record Score -->
+        <div class="score-box">
+          <div class="score-label">Điểm tin cậy</div>
+          <div class="score-circle">
+            <span class="score-value">98%</span>
+          </div>
+          <div class="score-verified">
+            <span class="material-symbols-outlined verified-icon">verified</span>
+            Đã xác thực
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Left Column: Identifiers & Source Records -->
+    <div class="column-left">
+      <div class="card">
+        <div class="card-header card-header-with-count">
+          <h3 class="card-title">
+            <span class="material-symbols-outlined card-icon">source</span>
+            Hồ sơ nguồn (PatientRecord)
+          </h3>
+          <span class="record-count">{{ sourceRecords().length }} Hồ sơ</span>
+        </div>
+
+        <div *ngIf="isLoadingSourceRecords()" class="loading-container-small">
+          <div class="loading-spinner-small"></div>
+          <p class="loading-text-small">Đang tải hồ sơ nguồn...</p>
+        </div>
+
+        <div *ngIf="!isLoadingSourceRecords()" class="records-grid">
+          <div *ngFor="let record of sourceRecords()" class="record-card"
+            [class.record-card-primary]="record.matchStatus === 'AUTO_MERGED'"
+            [class.record-card-tertiary]="record.matchStatus !== 'AUTO_MERGED'">
+            <div class="record-header">
+              <div class="record-system">
+                <span class="system-badge">{{ record.sourceSystemName }}</span>
+                <span class="record-code">{{ record.localPatientCode }}</span>
+              </div>
+              <div class="record-date">
+                <span class="material-symbols-outlined date-icon">calendar_month</span>
+                Gộp: {{ formatDate(record.createdAt) }}
+              </div>
+            </div>
+            <div class="record-info">
+              {{ record.fullName }} • {{ formatDate(record.dateOfBirth) }} • {{ getGenderDisplay(record.gender) }}
+              <span *ngIf="record.phoneNumber"> • {{ record.phoneNumber }}</span>
+            </div>
+            <div class="record-tags">
+              <span class="tag tag-score">Score: {{ record.matchScore || 0 }}</span>
+              <span class="tag" [ngClass]="getMatchStatusBadgeClass(record.matchStatus)">
+                {{ getMatchStatusDisplay(record.matchStatus) }}
+              </span>
+            </div>
+          </div>
+
+          <div *ngIf="sourceRecords().length === 0" class="empty-state">
+            <span class="material-symbols-outlined empty-icon">database</span>
+            <p class="empty-text">Chưa có hồ sơ nguồn liên kết</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: History Timeline -->
+    <div class="column-right">
+      <div class="card card-history">
+        <div class="card-header">
+          <h3 class="card-title">
+            <span class="material-symbols-outlined card-icon">history_toggle_off</span>
+            Lịch sử gộp/tách (MatchDecisionLog)
+          </h3>
+        </div>
+        <div class="timeline-container">
+          <div class="timeline">
+            <!-- Timeline Items (Mock Data) -->
+            <div *ngFor="let item of mockHistory" class="timeline-item">
+              <div class="timeline-dot" [class.dot-brand-primary]="item.color === 'brand-primary'"
+                [class.dot-warning]="item.color === 'warning-high'"
+                [class.dot-success]="item.color === 'success-optimal'"></div>
+              <div class="timeline-content">
+                <div class="timeline-header">
+                  <div class="timeline-action">{{ item.action }}</div>
+                  <div class="timeline-date">{{ item.date }}</div>
+                </div>
+                <div class="timeline-by">
+                  Bởi: <span class="timeline-user">{{ item.by }}</span>
+                </div>
+                <div class="timeline-detail">
+                  {{ item.detail }}
+                </div>
+                <button class="timeline-link">
+                  <span class="material-symbols-outlined link-icon">visibility</span>
+                  Xem chi tiết log
+                </button>
+              </div>
+            </div>
+
+            <!-- Timeline End Indicator -->
+            <div class="timeline-item timeline-end">
+              <div class="timeline-dot-end"></div>
+              <div class="timeline-content">
+                <div class="timeline-end-text">Khởi tạo hồ sơ</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+@if (editingPatient()) {
+<app-patient-master-form [patientMaster]="editingPatient()!" (close)="closeEditModal()"
+  (saved)="onPatientUpdated($event)">
+</app-patient-master-form>
+}

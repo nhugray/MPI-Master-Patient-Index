@@ -19,4 +19,6 @@ public interface PatientService {
     void delete(Long id);
 
     ResultPagination search(PatientSearchRequest search, Pageable pageable);
+
+    ResultPagination getByMasterPatientId(Long masterPatientId, Pageable pageable);
 }

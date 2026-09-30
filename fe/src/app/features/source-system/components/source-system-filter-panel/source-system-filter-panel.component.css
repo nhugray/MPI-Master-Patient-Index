@@ -1,87 +1,158 @@
-.filter-panel {
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+.search-box {
+  position: relative;
+  flex: 1;
+  max-width: 400px;
 }
 
-.filter-section {
+.search-box .material-symbols-outlined {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--on-surface-variant);
+  font-size: 1.25rem;
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.75rem 2.75rem 0.75rem 3rem;
+  border: 1px solid var(--outline-variant);
+  border-radius: 0.5rem;
+  background: var(--surface-container);
+  color: var(--on-surface);
+  font-family: var(--font-body-md);
+  font-size: 0.875rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.search-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(0, 97, 148, 0.08);
+}
+
+.search-input::placeholder {
+  color: var(--on-surface-variant);
+}
+
+.btn-clear {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 0.25rem;
+  border: none;
+  background: transparent;
+  color: var(--on-surface-variant);
+  cursor: pointer;
+  border-radius: 0.25rem;
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.btn-clear:hover {
+  background: var(--surface-container-high);
+  color: var(--error);
+}
+
+.btn-clear .material-symbols-outlined {
+  font-size: 1.125rem;
+}
+
+.filter-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.filter-item {
+  display: flex;
+  align-items: center;
   gap: 0.5rem;
+  background: var(--surface-container);
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--outline-variant);
 }
 
 .filter-label {
   font-family: var(--font-label-sm);
-  font-size: 0.6875rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--on-surface-variant);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--on-surface-variant);
-  margin: 0;
+  white-space: nowrap;
 }
 
-.filter-options {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.5rem;
-}
-
-.filter-checkbox {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  cursor: pointer;
-}
-
-.filter-checkbox input {
-  border-radius: 0.25rem;
-  border: 1px solid var(--outline-variant);
-  width: 1rem;
-  height: 1rem;
-  accent-color: var(--primary);
-}
-
-.filter-checkbox span {
-  font-family: var(--font-body-md);
-  font-size: 0.875rem;
+.filter-select {
+  appearance: none;
+  border: none;
+  background: transparent;
   color: var(--on-surface);
-}
-
-.filter-actions {
-  display: flex;
-  justify-content: space-between;
-  gap: 0.5rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--outline-variant);
-}
-
-.btn-reset, .btn-apply {
-  flex: 1;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  font-family: var(--font-label-md);
-  font-size: 0.75rem;
+  font-family: var(--font-body-sm);
+  font-size: 0.875rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
+  outline: none;
+  padding: 0;
+  min-width: 120px;
+}
+
+.filter-select:hover {
+  color: var(--primary);
 }
 
 .btn-reset {
-  background: var(--surface);
-  border: 1px solid var(--outline-variant);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: none;
+  background: var(--surface-container);
+  border-radius: 0.5rem;
   color: var(--on-surface-variant);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid var(--outline-variant);
 }
 
 .btn-reset:hover {
+  background: var(--surface-container-high);
+  color: var(--primary);
+  transform: rotate(-90deg);
+}
+
+.btn-reset .material-symbols-outlined {
+  font-size: 1.25rem;
+}
+
+.btn-export {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: none;
   background: var(--surface-container);
+  border-radius: 0.5rem;
+  color: var(--on-surface);
+  font-family: var(--font-body-md);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid var(--outline-variant);
 }
 
-.btn-apply {
-  background: var(--primary);
-  border: 1px solid var(--primary);
-  color: var(--on-primary);
+.btn-export:hover {
+  background: var(--surface-container-high);
 }
 
-.btn-apply:hover {
-  background: var(--primary-container);
-  border-color: var(--primary-container);
+.btn-export .material-symbols-outlined {
+  font-size: 1.125rem;
 }

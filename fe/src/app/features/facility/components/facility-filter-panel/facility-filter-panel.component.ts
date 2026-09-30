@@ -1,30 +1,32 @@
-import { Component, EventEmitter, Output, Input, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, EventEmitter, Output, ChangeDetectionStrategy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { FacilityType } from '../../models/facility.model';
+import { FACILITY_TYPE_OPTIONS } from '../../models/facility.constants';
 import { SearchService } from '../../../../shared/services/search.service';
-import { Facility } from '../../../facility/models/facility.model';
 
 @Component({
-  selector: 'app-source-system-filter-panel',
+  selector: 'app-facility-filter-panel',
   standalone: true,
   imports: [CommonModule, FormsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: './source-system-filter-panel.component.html',
-  styleUrls: ['./source-system-filter-panel.component.css']
+  templateUrl: './facility-filter-panel.component.html',
+  styleUrls: ['./facility-filter-panel.component.css']
 })
-export class SourceSystemFilterPanelComponent {
+export class FacilityFilterPanelComponent {
   readonly searchService = inject(SearchService);
 
-  @Input() facilities: Facility[] = [];
-  @Output() facilityChange = new EventEmitter<number | null>();
+  @Output() typeChange = new EventEmitter<FacilityType | 'ALL'>();
   @Output() statusChange = new EventEmitter<string>();
   @Output() resetFilters = new EventEmitter<void>();
 
-  selectedFacilityId: number | null = null;
+  selectedType: FacilityType | 'ALL' = 'ALL';
   selectedStatus: string = 'ALL';
 
-  onFacilityChange(): void {
-    this.facilityChange.emit(this.selectedFacilityId);
+  facilityTypeOptions = FACILITY_TYPE_OPTIONS;
+
+  onTypeChange(): void {
+    this.typeChange.emit(this.selectedType);
   }
 
   onStatusChange(): void {
@@ -32,7 +34,7 @@ export class SourceSystemFilterPanelComponent {
   }
 
   onReset(): void {
-    this.selectedFacilityId = null;
+    this.selectedType = 'ALL';
     this.selectedStatus = 'ALL';
     this.searchService.clearQuery();
     this.resetFilters.emit();

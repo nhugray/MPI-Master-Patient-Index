@@ -4,7 +4,7 @@ import { DatePipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { PageMeta } from '../../../../shared/models';
-import { Gender, MatchStatus } from '../../../../shared/enums';
+import { Gender, MatchStatus, getGenderLabel } from '../../../../shared/enums';
 import { ToastService } from '../../../../shared/components/toast/toast.service';
 import { PatientService } from '../../services/patient.service';
 import { Patient } from '../../models/patient.model';
@@ -16,6 +16,7 @@ import { SearchService } from '../../../../shared/services/search.service';
 import { formatPhoneNumber } from '../../../../shared/validators/phone.validator';
 import { SourceSystemService } from '../../../source-system/services/source-system.service';
 import { SourceSystem } from '../../../source-system/models/source-system.model';
+import { PatientFilterPanelComponent } from '../patient-filter-panel/patient-filter-panel.component';
 
 @Component({
   selector: 'app-patient-list',
@@ -24,7 +25,8 @@ import { SourceSystem } from '../../../source-system/models/source-system.model'
     DatePipe,
     DecimalPipe,
     FormsModule,
-    PaginationComponent
+    PaginationComponent,
+    PatientFilterPanelComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './patient-list.component.html',
@@ -133,28 +135,31 @@ export class PatientListComponent implements OnInit {
     this.loadPatients();
   }
 
-  onGenderFilterChange(): void {
+  onGenderFilterChange(gender: string): void {
+    this.selectedGender = gender;
     this.searchParams = {
       ...this.searchParams,
-      gender: this.selectedGender !== 'ALL' ? this.selectedGender as Gender : undefined,
+      gender: gender !== 'ALL' ? gender as Gender : undefined,
       page: 0
     };
     this.loadPatients();
   }
 
-  onMatchStatusFilterChange(): void {
+  onMatchStatusFilterChange(matchStatus: string): void {
+    this.selectedMatchStatus = matchStatus;
     this.searchParams = {
       ...this.searchParams,
-      matchStatus: this.selectedMatchStatus !== 'ALL' ? this.selectedMatchStatus as MatchStatus : undefined,
+      matchStatus: matchStatus !== 'ALL' ? matchStatus as MatchStatus : undefined,
       page: 0
     };
     this.loadPatients();
   }
 
-  onSourceSystemFilterChange(): void {
+  onSourceSystemFilterChange(sourceSystemId: number | null): void {
+    this.selectedSourceSystemId = sourceSystemId;
     this.searchParams = {
       ...this.searchParams,
-      sourceSystemId: this.selectedSourceSystemId || undefined,
+      sourceSystemId: sourceSystemId || undefined,
       page: 0
     };
     this.loadPatients();
@@ -193,13 +198,7 @@ export class PatientListComponent implements OnInit {
     return parts[0].substring(0, 2).toUpperCase();
   }
 
-  getAvatarColor(gender: Gender): string {
-    switch (gender) {
-      case Gender.MALE: return 'male';
-      case Gender.FEMALE: return 'female';
-      case Gender.OTHER: return 'other';
-    }
-  }
+  getAvatarColor = getGenderLabel;
 
   getGenderLabel(gender: Gender): string {
     return GENDER_OPTIONS.find(o => o.value === gender)?.label || gender;

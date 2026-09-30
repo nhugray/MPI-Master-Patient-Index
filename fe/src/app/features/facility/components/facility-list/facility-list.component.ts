@@ -12,6 +12,7 @@ import { FACILITY_TYPE_OPTIONS } from '../../models/facility.constants';
 import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
 import { SearchService } from '../../../../shared/services/search.service';
 import { formatPhoneNumber } from '../../../../shared/validators/phone.validator';
+import { FacilityFilterPanelComponent } from '../facility-filter-panel/facility-filter-panel.component';
 
 @Component({
   selector: 'app-facility-list',
@@ -19,7 +20,8 @@ import { formatPhoneNumber } from '../../../../shared/validators/phone.validator
   imports: [
     DecimalPipe,
     FormsModule,
-    PaginationComponent
+    PaginationComponent,
+    FacilityFilterPanelComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './facility-list.component.html',
@@ -102,19 +104,21 @@ export class FacilityListComponent implements OnInit {
     this.loadFacilities();
   }
 
-  onTypeFilterChange(): void {
+  onTypeFilterChange(type: FacilityType | 'ALL'): void {
+    this.selectedType = type;
     this.searchParams = {
       ...this.searchParams,
-      facilityType: this.selectedType !== 'ALL' ? this.selectedType as FacilityType : undefined,
+      facilityType: type !== 'ALL' ? type as FacilityType : undefined,
       page: 0
     };
     this.loadFacilities();
   }
 
-  onStatusFilterChange(): void {
+  onStatusFilterChange(status: string): void {
+    this.selectedStatus = status;
     this.searchParams = {
       ...this.searchParams,
-      isActive: this.selectedStatus === 'ACTIVE' ? true : this.selectedStatus === 'INACTIVE' ? false : undefined,
+      isActive: status === 'ACTIVE' ? true : status === 'INACTIVE' ? false : undefined,
       page: 0
     };
     this.loadFacilities();

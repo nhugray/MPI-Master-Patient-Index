@@ -24,4 +24,6 @@ public interface PatientRepository extends JpaRepository<Patient, Long>, JpaSpec
 
     Long countByMasterPatient(PatientMaster masterPatient);
 
+    Page<Patient> findByMasterPatientId(Long masterPatientId, Pageable pageable);
+
 }

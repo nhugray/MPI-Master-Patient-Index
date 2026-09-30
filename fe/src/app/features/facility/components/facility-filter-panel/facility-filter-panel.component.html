@@ -1,7 +1,7 @@
 <div class="filter-group">
   <div class="search-box">
     <span class="material-symbols-outlined">search</span>
-    <input type="text" placeholder="Tìm hồ sơ gốc" class="search-input"
+    <input type="text" placeholder="Tìm cơ sở y tế" class="search-input"
       (input)="searchService.setQuery($any($event.target).value)">
     @if (searchService.searchQuery()) {
     <button class="btn-clear" (click)="searchService.clearQuery()">
@@ -10,10 +10,10 @@
     }
   </div>
   <div class="filter-item">
-    <span class="filter-label">Giới tính:</span>
-    <select [(ngModel)]="selectedGender" (change)="onGenderChange()" class="filter-select">
-      @for (gender of genderOptions; track gender.value) {
-      <option [value]="gender.value">{{ gender.label }}</option>
+    <span class="filter-label">Loại hình:</span>
+    <select [(ngModel)]="selectedType" (change)="onTypeChange()" class="filter-select">
+      @for (type of facilityTypeOptions; track type.value) {
+      <option [value]="type.value">{{ type.label }}</option>
       }
     </select>
   </div>
@@ -21,9 +21,9 @@
   <div class="filter-item">
     <span class="filter-label">Trạng thái:</span>
     <select [(ngModel)]="selectedStatus" (change)="onStatusChange()" class="filter-select">
-      @for (status of statusOptions; track status.value) {
-      <option [value]="status.value">{{ status.label }}</option>
-      }
+      <option value="ALL">Tất cả</option>
+      <option value="ACTIVE">Đang hoạt động</option>
+      <option value="INACTIVE">Ngừng hoạt động</option>
     </select>
   </div>
 

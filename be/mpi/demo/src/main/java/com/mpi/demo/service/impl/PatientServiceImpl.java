@@ -115,4 +115,11 @@ public class PatientServiceImpl implements PatientService {
         patientRepository.delete(existingPatient);
     }
 
+    @Override
+    public ResultPagination getByMasterPatientId(Long masterPatientId, Pageable pageable) {
+        Page<Patient> pageResult = patientRepository.findByMasterPatientId(masterPatientId, pageable);
+        Page<PatientResponse> responseResult = pageResult.map(PatientResponse::fromEntity);
+        return ResultPagination.fromPage(responseResult);
+    }
+
 }

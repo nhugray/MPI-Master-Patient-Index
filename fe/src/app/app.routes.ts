@@ -27,6 +27,11 @@ export const routes: Routes = [
           .then(m => m.PatientMasterPageComponent)
       },
       {
+        path: 'patient-masters/:id',
+        loadComponent: () => import('./features/patient-master/pages/patient-master-detail-page/patient-master-detail-page.component')
+          .then(m => m.PatientMasterDetailPageComponent)
+      },
+      {
         path: 'dashboard',
         loadComponent: () => import('./features/dashboard/pages/dashboard-page.component')
           .then(m => m.DashboardPageComponent)

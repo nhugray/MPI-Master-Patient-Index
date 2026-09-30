@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiResponse, PageResponse } from '../../../shared/models';
 import { PatientMaster, PatientMasterSearchRequest, UpdatePatientMasterRequest } from '../models/patient-master.model';
+import { PatientMasterDetail, LinkedIdentifier, SourceRecord, MergeHistoryLog } from '../models/patient-master-detail.model';
 import { environment } from '../../../../environments/environment';
 
 
@@ -37,6 +38,17 @@ export class PatientMasterService {
 
   getById(id: number): Observable<ApiResponse<PatientMaster>> {
     return this.http.get<ApiResponse<PatientMaster>>(`${this.apiUrl}${this.basePath}/${id}`);
+  }
+
+  getDetail(id: number): Observable<ApiResponse<PatientMasterDetail>> {
+    return this.http.get<ApiResponse<PatientMasterDetail>>(`${this.apiUrl}${this.basePath}/${id}`);
+  }
+
+  getLinkedPatients(masterId: number, page: number = 0, size: number = 10): Observable<ApiResponse<PageResponse<SourceRecord>>> {
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
+    return this.http.get<ApiResponse<PageResponse<SourceRecord>>>(`${this.apiUrl}${this.basePath}/${masterId}/patients`, { params });
   }
 
   update(data: UpdatePatientMasterRequest): Observable<ApiResponse<PatientMaster>> {

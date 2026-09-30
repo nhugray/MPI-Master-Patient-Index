@@ -12,6 +12,7 @@ import { PaginationComponent } from '../../../../shared/components/pagination/pa
 import { SearchService } from '../../../../shared/services/search.service';
 import { FacilityService } from '../../../facility/services/facility.service';
 import { Facility } from '../../../facility/models/facility.model';
+import { SourceSystemFilterPanelComponent } from '../source-system-filter-panel/source-system-filter-panel.component';
 
 @Component({
   selector: 'app-source-system-list',
@@ -19,7 +20,10 @@ import { Facility } from '../../../facility/models/facility.model';
   imports: [
     DecimalPipe,
     FormsModule,
-    PaginationComponent
+    PaginationComponent,
+    SourceSystemFilterPanelComponent,
+    PaginationComponent,
+    SourceSystemFilterPanelComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './source-system-list.component.html',
@@ -82,10 +86,11 @@ export class SourceSystemListComponent implements OnInit {
       });
   }
 
-  onFacilityChange(): void {
+  onFacilityFilterChange(facilityId: number | null): void {
+    this.selectedFacilityId = facilityId;
     this.searchParams = {
       ...this.searchParams,
-      facilityId: this.selectedFacilityId !== null ? this.selectedFacilityId : undefined,
+      facilityId: facilityId !== null ? facilityId : undefined,
       page: 0
     };
     this.loadSourceSystems();
@@ -132,10 +137,11 @@ export class SourceSystemListComponent implements OnInit {
     this.loadSourceSystems();
   }
 
-  onStatusFilterChange(): void {
+  onStatusFilterChange(status: string): void {
+    this.selectedStatus = status;
     this.searchParams = {
       ...this.searchParams,
-      isActive: this.selectedStatus === 'ALL' ? undefined : this.selectedStatus === 'true',
+      isActive: status === 'ACTIVE' ? true : status === 'INACTIVE' ? false : undefined,
       page: 0
     };
     this.loadSourceSystems();

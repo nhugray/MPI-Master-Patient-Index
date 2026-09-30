@@ -6,11 +6,11 @@ import { PatientMasterService } from '../../services/patient-master.service';
 import { Gender } from '../../../../shared/enums';
 
 @Component({
-  selector: 'app-patient-master-edit-modal',
+  selector: 'app-patient-master-form',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './patient-master-edit-modal.component.html',
-  styleUrls: ['./patient-master-edit-modal.component.css']
+  templateUrl: './patient-master-form.component.html',
+  styleUrls: ['./patient-master-form.component.css']
 })
 export class PatientMasterEditModalComponent implements OnInit {
   @Input() patientMaster!: PatientMaster;
@@ -22,7 +22,6 @@ export class PatientMasterEditModalComponent implements OnInit {
   errorMessage = signal<string | null>(null);
 
   genderOptions = [
-    { value: '', label: 'Chọn giới tính' },
     { value: Gender.MALE, label: 'Nam' },
     { value: Gender.FEMALE, label: 'Nữ' },
     { value: Gender.OTHER, label: 'Khác' }
@@ -31,7 +30,7 @@ export class PatientMasterEditModalComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private patientMasterService: PatientMasterService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.initForm();

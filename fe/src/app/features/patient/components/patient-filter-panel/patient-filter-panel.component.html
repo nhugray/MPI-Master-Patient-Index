@@ -1,36 +1,47 @@
-<div class="filter-panel">
-  <div class="filter-section">
-    <p class="filter-label">Giới tính</p>
-    <div class="filter-options">
+<div class="filter-group">
+  <div class="search-box">
+    <span class="material-symbols-outlined">search</span>
+    <input type="text" placeholder="Tìm bệnh nhân" class="search-input"
+      (input)="searchService.setQuery($any($event.target).value)">
+    @if (searchService.searchQuery()) {
+    <button class="btn-clear" (click)="searchService.clearQuery()">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+    }
+  </div>
+  <div class="filter-item">
+    <span class="filter-label">Giới tính:</span>
+    <select [(ngModel)]="selectedGender" (change)="onGenderChange()" class="filter-select">
       @for (gender of genderOptions; track gender.value) {
-        <label class="filter-checkbox">
-          <input
-            type="checkbox"
-            [checked]="selectedGenders.has(gender.value)"
-            (change)="toggleGender(gender.value)">
-          <span>{{ gender.label }}</span>
-        </label>
+      <option [value]="gender.value">{{ gender.label }}</option>
       }
-    </div>
+    </select>
   </div>
 
-  <div class="filter-section">
-    <p class="filter-label">Trạng thái đối chiếu</p>
-    <div class="filter-options">
+  <div class="filter-item">
+    <span class="filter-label">Trạng thái:</span>
+    <select [(ngModel)]="selectedMatchStatus" (change)="onMatchStatusChange()" class="filter-select">
       @for (status of matchStatusOptions; track status.value) {
-        <label class="filter-checkbox">
-          <input
-            type="checkbox"
-            [checked]="selectedMatchStatuses.has(status.value)"
-            (change)="toggleMatchStatus(status.value)">
-          <span>{{ status.label }}</span>
-        </label>
+      <option [value]="status.value">{{ status.label }}</option>
       }
-    </div>
+    </select>
   </div>
 
-  <div class="filter-actions">
-    <button class="btn-reset" (click)="reset()">Đặt lại</button>
-    <button class="btn-apply" (click)="apply()">Áp dụng</button>
+  <div class="filter-item">
+    <span class="filter-label">Hệ thống nguồn:</span>
+    <select [(ngModel)]="selectedSourceSystemId" (change)="onSourceSystemChange()" class="filter-select">
+      @for (system of sourceSystems; track system.id) {
+      <option [value]="system.id">{{ system.facilityName }} - {{ system.name }}</option>
+      }
+    </select>
   </div>
+
+  <button class="btn-reset" (click)="onReset()" title="Làm mới bộ lọc">
+    <span class="material-symbols-outlined">refresh</span>
+  </button>
+
+  <button class="btn-export">
+    <span class="material-symbols-outlined">download</span>
+    Xuất Excel
+  </button>
 </div>

@@ -2,6 +2,7 @@ import { Component, EventEmitter, Output, OnInit, inject, signal, computed, Dest
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 import { PageMeta } from '../../../../shared/models';
 import { ToastService } from '../../../../shared/components/toast/toast.service';
@@ -10,11 +11,10 @@ import { PatientMaster, PatientMasterSearchRequest, defaultSearchParams } from '
 import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
 import { SearchService } from '../../../../shared/services/search.service';
 import { Gender } from '../../../../shared/enums';
-import { GENDER_OPTIONS } from '../../../../shared/enums';
-import { SourceSystemService } from '../../../source-system/services/source-system.service';
-import { SourceSystem } from '../../../source-system/models/source-system.model';
+import { GENDER_OPTIONS, getGenderLabel } from '../../../../shared/enums';
 import { PATIENT_STATUS_OPTIONS, PatientMasterStatusEnum } from '../../models/patient-master.constants';
-import { PatientMasterEditModalComponent } from '../patient-master-edit-modal/patient-master-edit-modal.component';
+import { PatientMasterEditModalComponent } from '../patient-master-form/patient-master-form.component';
+import { PatientMasterFilterPanelComponent } from '../patient-master-filter-panel/patient-master-filter-panel.component';
 
 
 @Component({
@@ -26,6 +26,7 @@ import { PatientMasterEditModalComponent } from '../patient-master-edit-modal/pa
     FormsModule,
     PaginationComponent,
     PatientMasterEditModalComponent,
+    PatientMasterFilterPanelComponent
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './patient-master-list.component.html',
@@ -37,10 +38,10 @@ export class PatientMasterListComponent implements OnInit {
   editingPatient = signal<PatientMaster | null>(null);
 
   private readonly patientMasterService = inject(PatientMasterService);
-  private readonly sourceSystemService = inject(SourceSystemService);
   private readonly toastService = inject(ToastService);
   readonly searchService = inject(SearchService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly router = inject(Router);
 
   patientMasters = signal<PatientMaster[]>([]);
   pageMeta = signal<PageMeta | null>(null);
@@ -52,19 +53,6 @@ export class PatientMasterListComponent implements OnInit {
   mergedCount = signal(0);
   totalCount = signal(0);
 
-  // Filter options
-  genderOptions = GENDER_OPTIONS;
-
-  statusOptions = PATIENT_STATUS_OPTIONS;
-
-  sourceSystems = signal<SourceSystem[]>([]);
-
-  // Selected filters
-  selectedGender: string = 'ALL';
-  selectedStatus: string = 'ALL';
-  selectedSourceSystemId: number | null = null;
-
-  // Computed signals
   readonly totalMasters = computed(() => this.totalCount());
   readonly activeMasters = computed(() => this.activeCount());
   readonly mergedMasters = computed(() => this.mergedCount());
@@ -90,24 +78,10 @@ export class PatientMasterListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadSourceSystems();
     this.loadPatientMasters();
   }
 
-  loadSourceSystems(): void {
-    this.sourceSystemService.search({ isActive: true, page: 0, size: 100 })
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (response) => {
-          if (response.statusCode === 200) {
-            this.sourceSystems.set(response.data.result);
-          }
-        },
-        error: (error) => {
-          console.error('Error loading source systems:', error);
-        }
-      });
-  }
+
 
   reload(): void {
     this.loadPatientMasters();
@@ -149,23 +123,23 @@ export class PatientMasterListComponent implements OnInit {
     this.loadPatientMasters();
   }
 
-  onGenderFilterChange(): void {
+  onGenderFilterChange(gender: string): void {
     this.searchParams = {
       ...this.searchParams,
-      gender: this.selectedGender !== 'ALL' ? this.selectedGender as Gender : undefined,
+      gender: gender !== 'ALL' ? gender as Gender : undefined,
       page: 0
     };
     this.loadPatientMasters();
   }
 
-  onStatusFilterChange(): void {
+  onStatusFilterChange(status: string): void {
     const params: PatientMasterSearchRequest = {
       ...this.searchParams,
       page: 0
     };
 
-    if (this.selectedStatus !== 'ALL') {
-      params.status = this.selectedStatus;
+    if (status !== 'ALL') {
+      params.status = status;
     } else {
       delete params.status;
     }
@@ -174,26 +148,14 @@ export class PatientMasterListComponent implements OnInit {
     this.loadPatientMasters();
   }
 
-  onSourceSystemFilterChange(): void {
-    this.searchParams = {
-      ...this.searchParams,
-      sourceSystemIds: this.selectedSourceSystemId ? [this.selectedSourceSystemId] : undefined,
-      page: 0
-    };
-    this.loadPatientMasters();
-  }
-
   resetFilters(): void {
-    this.selectedGender = 'ALL';
-    this.selectedStatus = 'ALL';
-    this.selectedSourceSystemId = null;
     this.searchService.clearQuery();
     this.searchParams = defaultSearchParams;
     this.loadPatientMasters();
   }
 
   onViewDetail(master: PatientMaster): void {
-    this.viewDetail.emit(master);
+    this.router.navigate(['/patient-masters', master.id]);
   }
 
   openEditModal(master: PatientMaster): void {
@@ -224,14 +186,7 @@ export class PatientMasterListComponent implements OnInit {
     return (words[0].charAt(0) + words[words.length - 1].charAt(0)).toUpperCase();
   }
 
-  getAvatarColor(gender: Gender): string {
-    switch (gender) {
-      case Gender.MALE: return 'male';
-      case Gender.FEMALE: return 'female';
-      case Gender.OTHER: return 'other';
-      default: return 'other';
-    }
-  }
+  getAvatarColor = getGenderLabel;
 
   getGenderDisplay(gender: Gender): string {
     const option = GENDER_OPTIONS.find(o => o.value === gender);

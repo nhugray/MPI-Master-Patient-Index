@@ -1,20 +1,10 @@
-import { Component, EventEmitter, Output, Input, ChangeDetectionStrategy } from '@angular/core';
+import { Component, EventEmitter, Output, ChangeDetectionStrategy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Gender } from '../../../../shared/enums';
 import { GENDER_OPTIONS } from '../../../../shared/enums';
-import { PATIENT_STATUS_OPTIONS, PatientMasterStatusEnum } from '../../models/patient-master.constants';
-
-export interface SourceSystem {
-  id: number;
-  name: string;
-}
-
-export interface PatientMasterFilterState {
-  genders: Gender[];
-  statuses: PatientMasterStatusEnum[];
-  sourceSystemIds: number[];
-}
+import { PATIENT_STATUS_OPTIONS } from '../../models/patient-master.constants';
+import { SearchService } from '../../../../shared/services/search.service';
 
 @Component({
   selector: 'app-patient-master-filter-panel',
@@ -25,53 +15,29 @@ export interface PatientMasterFilterState {
   styleUrls: ['./patient-master-filter-panel.component.css']
 })
 export class PatientMasterFilterPanelComponent {
-  @Input() sourceSystems: SourceSystem[] = [];
-  @Output() filterChange = new EventEmitter<PatientMasterFilterState>();
-  @Output() resetFilter = new EventEmitter<void>();
+  readonly searchService = inject(SearchService);
 
-  selectedGenders = new Set<Gender>();
-  selectedStatuses = new Set<PatientMasterStatusEnum>();
-  selectedSourceSystems = new Set<number>();
+  @Output() genderChange = new EventEmitter<string>();
+  @Output() statusChange = new EventEmitter<string>();
+  @Output() resetFilters = new EventEmitter<void>();
+
+  selectedGender: string = 'ALL';
+  selectedStatus: string = 'ALL';
 
   genderOptions = GENDER_OPTIONS;
   statusOptions = PATIENT_STATUS_OPTIONS;
 
-  toggleGender(gender: Gender): void {
-    if (this.selectedGenders.has(gender)) {
-      this.selectedGenders.delete(gender);
-    } else {
-      this.selectedGenders.add(gender);
-    }
+  onGenderChange(): void {
+    this.genderChange.emit(this.selectedGender);
   }
 
-  toggleStatus(status: PatientMasterStatusEnum): void {
-    if (this.selectedStatuses.has(status)) {
-      this.selectedStatuses.delete(status);
-    } else {
-      this.selectedStatuses.add(status);
-    }
+  onStatusChange(): void {
+    this.statusChange.emit(this.selectedStatus);
   }
 
-  toggleSourceSystem(systemId: number): void {
-    if (this.selectedSourceSystems.has(systemId)) {
-      this.selectedSourceSystems.delete(systemId);
-    } else {
-      this.selectedSourceSystems.add(systemId);
-    }
-  }
-
-  apply(): void {
-    this.filterChange.emit({
-      genders: Array.from(this.selectedGenders),
-      statuses: Array.from(this.selectedStatuses),
-      sourceSystemIds: Array.from(this.selectedSourceSystems)
-    });
-  }
-
-  reset(): void {
-    this.selectedGenders.clear();
-    this.selectedStatuses.clear();
-    this.selectedSourceSystems.clear();
-    this.resetFilter.emit();
+  onReset(): void {
+    this.selectedGender = 'ALL';
+    this.selectedStatus = 'ALL';
+    this.resetFilters.emit();
   }
 }

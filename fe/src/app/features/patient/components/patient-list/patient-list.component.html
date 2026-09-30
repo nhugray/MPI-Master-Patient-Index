@@ -64,51 +64,10 @@
 </div>
 
 <div class="filter-toolbar">
-  <div class="search-box">
-    <span class="material-symbols-outlined">search</span>
-    <input type="text" placeholder="Tìm theo tên bệnh nhân, mã BN, số điện thoại..." class="search-input"
-      (input)="searchService.setQuery($any($event.target).value)">
-    <button class="btn-clear" (click)="searchService.clearQuery()">
-    </button>
-  </div>
-
-  <div class="filter-group">
-    <div class="filter-item">
-      <span class="filter-label">Giới tính:</span>
-      <select [(ngModel)]="selectedGender" (change)="onGenderFilterChange()" class="filter-select">
-        @for (gender of genderOptions; track gender.value) {
-        <option [value]="gender.value">{{ gender.label }}</option>
-        }
-      </select>
-    </div>
-
-    <div class="filter-item">
-      <span class="filter-label">Trạng thái:</span>
-      <select [(ngModel)]="selectedMatchStatus" (change)="onMatchStatusFilterChange()" class="filter-select">
-        @for (status of matchStatusOptions; track status.value) {
-        <option [value]="status.value">{{ status.label }}</option>
-        }
-      </select>
-    </div>
-
-    <div class="filter-item">
-      <span class="filter-label">Hệ thống nguồn:</span>
-      <select [(ngModel)]="selectedSourceSystemId" (change)="onSourceSystemFilterChange()" class="filter-select">
-        @for (system of sourceSystems(); track system.id) {
-        <option [value]="system.id">{{ system.facilityName }} - {{ system.name }}</option>
-        }
-      </select>
-    </div>
-
-    <button class="btn-reset" (click)="resetFilters()" title="Làm mới bộ lọc">
-      <span class="material-symbols-outlined">refresh</span>
-    </button>
-
-    <button class="btn-export">
-      <span class="material-symbols-outlined">download</span>
-      Xuất Excel
-    </button>
-  </div>
+  <app-patient-filter-panel [sourceSystems]="sourceSystems()" (genderChange)="onGenderFilterChange($event)"
+    (matchStatusChange)="onMatchStatusFilterChange($event)" (sourceSystemChange)="onSourceSystemFilterChange($event)"
+    (resetFilters)="resetFilters()">
+  </app-patient-filter-panel>
 </div>
 
 <div class="table-card">
