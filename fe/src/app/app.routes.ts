@@ -32,6 +32,16 @@ export const routes: Routes = [
           .then(m => m.PatientMasterDetailPageComponent)
       },
       {
+        path: 'review-queue',
+        loadComponent: () => import('./features/review-queue/pages/review-queue-page.component')
+          .then(m => m.ReviewQueuePageComponent)
+      },
+      {
+        path: 'review-queue/:id',
+        loadComponent: () => import('./features/review-queue/pages/review-queue-compare-page/review-queue-compare-page.component')
+          .then(m => m.ReviewQueueComparePageComponent)
+      },
+      {
         path: 'dashboard',
         loadComponent: () => import('./features/dashboard/pages/dashboard-page.component')
           .then(m => m.DashboardPageComponent)

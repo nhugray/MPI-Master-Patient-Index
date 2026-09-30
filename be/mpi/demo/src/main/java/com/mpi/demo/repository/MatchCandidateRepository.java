@@ -24,4 +24,6 @@ public interface MatchCandidateRepository extends JpaRepository<MatchCandidate, 
 
     @Query("SELECT COUNT(mc) FROM MatchCandidate mc WHERE mc.decision = 'PENDING'")
     long countPendingReviews();
+
+    long countByDecision(MatchDecisionEnum decision);
 }

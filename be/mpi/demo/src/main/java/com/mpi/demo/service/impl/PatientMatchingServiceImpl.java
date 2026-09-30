@@ -18,6 +18,7 @@ import java.text.Normalizer;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -99,8 +100,52 @@ public class PatientMatchingServiceImpl implements PatientMatchingService {
     }
 
     @Override
-    public void processMatchDecision(Long candidateId, MatchDecisionEnum decision, Long reviewerId) {
-        throw new UnsupportedOperationException("Not implemented yet");
+    public void processMatchDecision(Long candidateId, MatchDecisionEnum decision, Long reviewerId, String reviewNote) {
+        MatchCandidate candidate = matchCandidateRepository.findById(candidateId)
+                .orElseThrow(() -> new RuntimeException("Match candidate not found with id: " + candidateId));
+
+        candidate.setDecision(decision);
+        candidate.setReviewedAt(java.time.LocalDateTime.now());
+
+        // Note: reviewedBy cần UserRepository, tạm thời để null
+        // Nếu cần, tạo UserRepository sau
+        // User reviewer = userRepository.findById(reviewerId).orElse(null);
+        // candidate.setReviewedBy(reviewer);
+
+        matchCandidateRepository.save(candidate);
+
+        // Nếu decision là MANUAL_APPROVED, có thể tự động link patient vào master
+        if (decision == MatchDecisionEnum.MANUAL_APPROVED) {
+            Patient patient = candidate.getPatient();
+            PatientMaster master = candidate.getCandidateMaster();
+            patient.setMasterPatient(master);
+            // Lưu patient nếu cần (cần inject PatientRepository)
+        }
+    }
+
+    @Override
+    public Page<MatchCandidate> searchCandidates(MatchDecisionEnum decision, Pageable pageable) {
+        if (decision == null) {
+            return matchCandidateRepository.findAll(pageable);
+        }
+        return matchCandidateRepository.findByDecisionOrderByCreatedAtDesc(decision, pageable);
+    }
+
+    @Override
+    public MatchCandidate getCandidateById(Long candidateId) {
+        return matchCandidateRepository.findById(candidateId)
+                .orElseThrow(() -> new RuntimeException("Match candidate not found with id: " + candidateId));
+    }
+
+    @Override
+    public Map<String, Long> getDecisionCounts() {
+        Map<String, Long> counts = new java.util.HashMap<>();
+        counts.put("PENDING", matchCandidateRepository.countByDecision(MatchDecisionEnum.PENDING));
+        counts.put("AUTO_APPROVED", matchCandidateRepository.countByDecision(MatchDecisionEnum.AUTO_APPROVED));
+        counts.put("MANUAL_APPROVED", matchCandidateRepository.countByDecision(MatchDecisionEnum.MANUAL_APPROVED));
+        counts.put("REJECTED", matchCandidateRepository.countByDecision(MatchDecisionEnum.REJECTED));
+        counts.put("TOTAL", matchCandidateRepository.count());
+        return counts;
     }
 
     @Override

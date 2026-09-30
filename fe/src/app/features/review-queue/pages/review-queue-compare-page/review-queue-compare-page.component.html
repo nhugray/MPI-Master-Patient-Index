@@ -1,0 +1,108 @@
+<div class="compare-page" *ngIf="!isLoading() && candidate()">
+  <div class="page-header">
+    <button class="btn-back" (click)="goBack()">
+      <span class="material-symbols-outlined">arrow_back</span>
+      Quay lại
+    </button>
+    <div class="header-content">
+      <h2 class="page-title">Xử lý Hồ sơ Trùng</h2>
+      <p class="page-subtitle">Xem xét các hồ sơ nghi trùng để phê duyệt gộp</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-secondary" (click)="onReject()" [disabled]="isSubmitting()">
+        Từ chối
+      </button>
+      <button class="btn-primary" (click)="onApprove()" [disabled]="isSubmitting()">
+        <span *ngIf="!isSubmitting()">Duyệt gộp</span>
+        <span *ngIf="isSubmitting()">Đang xử lý...</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="compare-grid">
+    <!-- Column 1: Patient Record -->
+    <div class="record-card patient-card">
+      <div class="card-accent patient-accent"></div>
+      <div class="card-header">
+        <span class="material-symbols-outlined">fiber_new</span>
+        <h3>Hồ sơ Mới nhận</h3>
+        <span class="badge">{{ candidate()?.patient?.localPatientCode }}</span>
+      </div>
+      <div class="card-body">
+        <div class="field-row" *ngFor="let field of fieldComparisons()">
+          <div class="field-label">{{ field.label }}</div>
+          <div class="field-value" [ngClass]="{
+            'field-match': field.isMatch,
+            'field-mismatch': !field.isMatch && field.patientValue !== '[Trống]' && field.masterValue !== '[Trống]',
+            'field-empty': field.patientValue === '[Trống]'
+          }">
+            {{ field.patientValue }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Middle: Match Score Column -->
+    <div class="score-column">
+      <div class="score-card">
+        <div class="overall-score">
+          <div class="score-value">{{ overallScore() }}%</div>
+          <div class="score-label">Tỉ lệ Khớp Tổng thể</div>
+        </div>
+      </div>
+
+      <div class="breakdown-card">
+        <div class="breakdown-item" *ngFor="let field of fieldComparisons()">
+          <div class="breakdown-header">
+            <span class="breakdown-label">{{ field.label }}</span>
+            <span class="breakdown-percent" [ngClass]="{
+              'text-success': field.matchPercent === 100,
+              'text-primary': field.matchPercent > 0 && field.matchPercent < 100,
+              'text-error': field.matchPercent === 0
+            }">{{ field.matchPercent }}%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" [ngClass]="{
+              'fill-success': field.matchPercent === 100,
+              'fill-primary': field.matchPercent > 0 && field.matchPercent < 100,
+              'fill-error': field.matchPercent === 0
+            }" [style.width.%]="field.matchPercent"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="note-card">
+        <label class="note-label">Lý do Xử lý</label>
+        <textarea class="note-textarea" placeholder="Nhập lý do gộp hoặc từ chối..." [(ngModel)]="reviewNote"
+          [disabled]="isSubmitting()"></textarea>
+      </div>
+    </div>
+
+    <!-- Column 2: Master Record -->
+    <div class="record-card master-card">
+      <div class="card-accent master-accent"></div>
+      <div class="card-header">
+        <span class="material-symbols-outlined filled">star</span>
+        <h3>Hồ sơ Gốc Ứng viên</h3>
+        <span class="badge">{{ candidate()?.candidateMaster?.enterpriseId }}</span>
+      </div>
+      <div class="card-body">
+        <div class="field-row" *ngFor="let field of fieldComparisons()">
+          <div class="field-value" [ngClass]="{
+            'field-match': field.isMatch,
+            'field-mismatch': !field.isMatch && field.patientValue !== '[Trống]' && field.masterValue !== '[Trống]',
+            'field-empty': field.masterValue === '[Trống]'
+          }">
+            {{ field.masterValue }}
+          </div>
+          <div class="field-label">{{ field.label }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="loading-screen" *ngIf="isLoading()">
+  <div class="loading-spinner"></div>
+  <p>Đang tải dữ liệu so sánh...</p>
+</div>

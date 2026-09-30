@@ -1,0 +1,99 @@
+<div class="page-header">
+  <div class="page-header-content">
+    <h2 class="page-title">Duyệt hồ sơ</h2>
+    <p class="page-subtitle">Quản lý và xử lý các hồ sơ bệnh nhân có khả năng trùng lặp</p>
+  </div>
+</div>
+
+<div class="toolbar">
+  <div class="decision-tabs">
+    <button *ngFor="let option of decisionOptions" class="tab-btn" [class.active]="selectedDecision() === option.value"
+      (click)="onDecisionTabChange(option.value)">
+      {{ option.label }}
+      <span class="tab-count">({{ option.value === 'ALL' ? counts()['TOTAL'] : counts()[option.value] || 0 }})</span>
+    </button>
+  </div>
+</div>
+
+<div class="table-card">
+  <div class="table-wrapper">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Hồ sơ mới</th>
+          <th>Hồ sơ nghi trùng</th>
+          <th>Điểm khớp</th>
+          <th>Ngày tạo</th>
+          <th>Trạng thái</th>
+          <th class="text-right">Hành động</th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngIf="!isLoading() && candidates().length > 0">
+          <tr *ngFor="let candidate of candidates()">
+            <td>
+              <div class="cell-main">
+                <span class="cell-title">{{ candidate.patient.fullName }}</span>
+                <span class="cell-sub">
+                  DOB: {{ formatDate(candidate.patient.dateOfBirth) }} &bull; Mã: {{ candidate.patient.localPatientCode
+                  }}
+                </span>
+              </div>
+            </td>
+            <td>
+              <div class="cell-main">
+                <span class="cell-title">{{ candidate.candidateMaster.fullName }}</span>
+                <span class="cell-sub">
+                  DOB: {{ formatDate(candidate.candidateMaster.dateOfBirth) }} &bull; EMPI: {{
+                  candidate.candidateMaster.enterpriseId }}
+                </span>
+              </div>
+            </td>
+            <td>
+              <div class="score-cell">
+                <div class="score-badge" [ngClass]="'score-' + getScoreLevel(candidate.matchScore).color">
+                  {{ candidate.matchScore }}
+                </div>
+                <span class="score-label" [ngClass]="'text-' + getScoreLevel(candidate.matchScore).color">
+                  {{ getScoreLevel(candidate.matchScore).label }}
+                </span>
+              </div>
+            </td>
+            <td>
+              <span class="cell-date">{{ formatDate(candidate.createdAt) }}</span>
+            </td>
+            <td>
+              <span class="status-badge" [ngClass]="getDecisionClass(candidate.decision)">
+                {{ getDecisionLabel(candidate.decision) }}
+              </span>
+            </td>
+            <td class="text-right">
+              <button class="btn-compare" (click)="onCompareClick(candidate)">
+                <span class="material-symbols-outlined">compare_arrows</span>
+                So sánh &amp; Duyệt
+              </button>
+            </td>
+          </tr>
+        </ng-container>
+
+        <tr *ngIf="isLoading()">
+          <td colspan="6" class="loading-cell">
+            <div class="loading-spinner"></div>
+            <span>Đang tải dữ liệu...</span>
+          </td>
+        </tr>
+
+        <tr *ngIf="!isLoading() && candidates().length === 0">
+          <td colspan="6" class="empty-cell">
+            <span class="material-symbols-outlined empty-icon">inbox</span>
+            <span>Không có hồ sơ nào trong danh mục này</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <app-pagination *ngIf="pageMeta() && candidates().length > 0" [pageMeta]="pageMeta()"
+    (pageChange)="onPageChange($event)">
+  </app-pagination>
+</div>
