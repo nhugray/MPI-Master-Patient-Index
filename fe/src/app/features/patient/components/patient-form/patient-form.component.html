@@ -17,7 +17,7 @@
             class="form-input"
             placeholder="Nhập ID hệ thống nguồn...">
           @if (form.get('sourceSystemId')?.touched && form.get('sourceSystemId')?.errors?.['required']) {
-            <span class="form-error">ID hệ thống nguồn không được để trống</span>
+            <span class="form-error">{{ sourceSystemIdRequiredError }}</span>
           }
         </div>
 
@@ -29,7 +29,7 @@
             class="form-input"
             placeholder="Nhập mã bệnh nhân tại hệ thống nguồn...">
           @if (form.get('localPatientCode')?.touched && form.get('localPatientCode')?.errors?.['required']) {
-            <span class="form-error">Mã bệnh nhân cục bộ không được để trống</span>
+            <span class="form-error">{{ localPatientCodeRequiredError }}</span>
           }
         </div>
 
@@ -41,7 +41,7 @@
             class="form-input"
             placeholder="Nhập họ và tên...">
           @if (form.get('fullName')?.touched && form.get('fullName')?.errors?.['required']) {
-            <span class="form-error">Họ tên không được để trống</span>
+            <span class="form-error">{{ fullNameRequiredError }}</span>
           }
         </div>
 
@@ -73,8 +73,8 @@
             class="form-input"
             placeholder="012345678901"
             maxlength="12">
-          @if (form.get('nationalId')?.touched && form.get('nationalId')?.errors?.['pattern']) {
-            <span class="form-error">Số CCCD phải gồm 12 chữ số</span>
+          @if (form.get('nationalId')?.touched && form.get('nationalId')?.errors?.['invalidNationalId']) {
+            <span class="form-error">{{ nationalIdErrorMessage }}</span>
           }
         </div>
 
@@ -95,8 +95,8 @@
             class="form-input"
             placeholder="0..."
             maxlength="10">
-          @if (form.get('phoneNumber')?.touched && form.get('phoneNumber')?.errors?.['pattern']) {
-            <span class="form-error">Số điện thoại phải gồm 10 chữ số và bắt đầu bằng số 0</span>
+          @if (form.get('phoneNumber')?.touched && form.get('phoneNumber')?.errors?.['invalidPhone']) {
+            <span class="form-error">{{ phoneErrorMessage }}</span>
           }
         </div>
 

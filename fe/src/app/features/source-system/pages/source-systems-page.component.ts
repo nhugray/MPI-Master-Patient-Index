@@ -7,7 +7,8 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
 import { SourceSystemService } from '../services/source-system.service';
 import { ToastService } from '../../../shared/components/toast/toast.service';
 import { SourceSystem } from '../models/source-system.model';
-import { ApiResponse } from '../../../shared/models';
+import { ApiResponse, isSuccess } from '../../../shared/models';
+import { getApiErrorMessage } from '../../../shared/utils/http-error.util';
 
 @Component({
   selector: 'app-source-systems-page',
@@ -53,14 +54,14 @@ export class SourceSystemsPageComponent {
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: (response: ApiResponse<void>) => {
-        if (response.statusCode === 200) {
+        if (isSuccess(response)) {
           this.toastService.success('Thành công', 'Xóa hệ thống nguồn thành công');
           this.closeDeleteDialog();
           this.sourceSystemList.reload();
         }
       },
       error: (error: { error?: { message?: string } }) => {
-        this.toastService.error('Lỗi hệ thống', error?.error?.message || 'Đã xảy ra lỗi khi xóa hệ thống nguồn');
+        this.toastService.error('Lỗi hệ thống', getApiErrorMessage(error, 'Đã xảy ra lỗi khi xóa hệ thống nguồn'));
         this.closeDeleteDialog();
       }
     });

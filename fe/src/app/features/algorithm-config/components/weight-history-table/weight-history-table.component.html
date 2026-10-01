@@ -1,0 +1,46 @@
+<div class="history-card">
+  <div class="history-header">
+    <h3 class="history-title">Lịch sử Phiên bản</h3>
+  </div>
+
+  <div class="table-wrapper">
+    <table class="history-table">
+      <thead>
+        <tr>
+          <th>Version</th>
+          <th>Ngày tạo</th>
+          <th>Name / DOB / CCCD / Ph / Addr</th>
+          <th>Người thực hiện</th>
+          <th class="text-right">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngIf="!isLoading && configs.length > 0">
+          <tr *ngFor="let config of configs">
+            <td class="cell-version">{{ config.version }}</td>
+            <td class="cell-date">{{ formatDate(config.createdAt) }}</td>
+            <td><span class="weights-mono">{{ formatWeights(config) }}</span></td>
+            <td>{{ config.createdBy || 'System Admin' }}</td>
+            <td class="text-right">
+              <span class="status-badge status-current" *ngIf="config.isActive">CURRENT</span>
+              <button
+                class="btn-activate"
+                *ngIf="!config.isActive"
+                (click)="onActivate(config.id)">
+                Kích hoạt
+              </button>
+            </td>
+          </tr>
+        </ng-container>
+
+        <tr *ngIf="isLoading">
+          <td colspan="5" class="loading-cell">Đang tải lịch sử...</td>
+        </tr>
+
+        <tr *ngIf="!isLoading && configs.length === 0">
+          <td colspan="5" class="empty-cell">Chưa có phiên bản nào được lưu</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

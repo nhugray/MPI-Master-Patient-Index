@@ -13,6 +13,9 @@ import {
 } from '../../models/facility.model';
 import { FACILITY_TYPE_OPTIONS, FACILITY_STATUS_OPTIONS } from '../../models/facility.constants';
 import { phoneValidator } from '../../../../shared/validators/phone.validator';
+import { getApiErrorMessage } from '../../../../shared/utils/http-error.util';
+import { getRequiredErrorMessage } from '../../../../shared/utils/form-errors.util';
+import { isSuccess } from '../../../../shared/models';
 
 @Component({
   selector: 'app-facility-form',
@@ -42,6 +45,9 @@ export class FacilityFormComponent implements OnInit {
 
   facilityTypeOptions = FACILITY_TYPE_OPTIONS;
   facilityStatusOptions = FACILITY_STATUS_OPTIONS;
+
+  readonly codeRequiredError = getRequiredErrorMessage('Mã cơ sở');
+  readonly nameRequiredError = getRequiredErrorMessage('Tên cơ sở');
 
   ngOnInit(): void {
     this.initForm();
@@ -144,7 +150,7 @@ export class FacilityFormComponent implements OnInit {
   }
 
   private handleSuccess(response: { statusCode: number; data: Facility }): void {
-    if (response.statusCode === 200 || response.statusCode === 201) {
+    if (isSuccess(response)) {
       this.toastService.success(
         'Thành công',
         this.isEditMode ? 'Cập nhật thông tin cơ sở y tế thành công' : 'Thêm mới cơ sở y tế thành công'
@@ -158,7 +164,7 @@ export class FacilityFormComponent implements OnInit {
   private handleError(error: { error?: { message?: string } }): void {
     this.toastService.error(
       'Lỗi hệ thống',
-      error?.error?.message || 'Đã xảy ra lỗi. Vui lòng thử lại.'
+      getApiErrorMessage(error, 'Đã xảy ra lỗi. Vui lòng thử lại.')
     );
     this.isSubmitting = false;
   }

@@ -14,6 +14,10 @@ import { MATCH_STATUS_OPTIONS } from '../../models/patient.constants';
 import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
 import { SearchService } from '../../../../shared/services/search.service';
 import { formatPhoneNumber } from '../../../../shared/validators/phone.validator';
+import { getInitials } from '../../../../shared/utils/string.util';
+import { getApiErrorMessage } from '../../../../shared/utils/http-error.util';
+import { toApiPage } from '../../../../shared/utils/pagination.util';
+import { isSuccess } from '../../../../shared/models';
 import { SourceSystemService } from '../../../source-system/services/source-system.service';
 import { SourceSystem } from '../../../source-system/models/source-system.model';
 import { PatientFilterPanelComponent } from '../patient-filter-panel/patient-filter-panel.component';
@@ -85,7 +89,7 @@ export class PatientListComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response) => {
-          if (response.statusCode === 200) {
+          if (isSuccess(response)) {
             this.sourceSystems.set(response.data.result);
           }
         },
@@ -105,7 +109,7 @@ export class PatientListComponent implements OnInit {
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: (response) => {
-        if (response.statusCode === 200) {
+        if (isSuccess(response)) {
           this.patients.set(response.data.result);
           this.pageMeta.set(response.data.meta);
 
@@ -121,7 +125,7 @@ export class PatientListComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: (error: { error?: { message?: string } }) => {
-        this.toastService.error('Lỗi hệ thống', error?.error?.message || 'Không thể tải danh sách bệnh nhân');
+        this.toastService.error('Lỗi hệ thống', getApiErrorMessage(error, 'Không thể tải danh sách bệnh nhân'));
         this.isLoading.set(false);
       }
     });
@@ -130,7 +134,7 @@ export class PatientListComponent implements OnInit {
   onPageChange(page: number): void {
     this.searchParams = {
       ...this.searchParams,
-      page: page - 1
+      page: toApiPage(page)
     };
     this.loadPatients();
   }
@@ -189,18 +193,11 @@ export class PatientListComponent implements OnInit {
     this.deletePatient.emit(patient);
   }
 
-  getInitials(name: string): string {
-    if (!name) return '?';
-    const parts = name.trim().split(/\s+/);
-    if (parts.length >= 2) {
-      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-    }
-    return parts[0].substring(0, 2).toUpperCase();
-  }
+  getInitials = getInitials;
 
   getAvatarColor = getGenderLabel;
 
-  getGenderLabel(gender: Gender): string {
+  getGenderDisplayLabel(gender: Gender): string {
     return GENDER_OPTIONS.find(o => o.value === gender)?.label || gender;
   }
 

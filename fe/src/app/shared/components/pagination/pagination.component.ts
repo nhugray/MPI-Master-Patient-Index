@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output, computed, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PageMeta } from '../../../shared/models';
+import { computeDisplayRange } from '../../utils/pagination.util';
 
 @Component({
   selector: 'app-pagination',
@@ -32,12 +33,12 @@ export class PaginationComponent {
 
   get displayRangeStart(): number {
     if (!this.pageMeta) return 0;
-    return (this.pageMeta.page - 1) * this.pageMeta.pageSize + 1;
+    return computeDisplayRange(this.pageMeta).start;
   }
 
   get displayRangeEnd(): number {
     if (!this.pageMeta) return 0;
-    return Math.min(this.pageMeta.page * this.pageMeta.pageSize, this.pageMeta.total);
+    return computeDisplayRange(this.pageMeta).end;
   }
 
   visiblePages = computed(() => {

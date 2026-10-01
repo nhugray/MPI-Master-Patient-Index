@@ -17,6 +17,10 @@ import {
 } from '../models/import.model';
 import { SourceSystem } from '../../source-system/models/source-system.model';
 import { PageResponse } from '../../../shared/models';
+import { formatFileSize } from '../../../shared/utils/string.util';
+import { formatRelativeTime } from '../../../shared/utils/date.util';
+import { getApiErrorMessage } from '../../../shared/utils/http-error.util';
+import { isSuccess } from '../../../shared/models';
 
 interface ActiveJob {
   job: ImportJob;
@@ -69,7 +73,7 @@ export class PatientImportPageComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response) => {
-          if (response.statusCode === 200 && response.data) {
+          if (isSuccess(response) && response.data) {
             this.sourceSystems = response.data.result;
             if (this.sourceSystems.length > 0 && !this.selectedSourceSystemId) {
               this.selectedSourceSystemId = this.sourceSystems[0].id;
@@ -89,7 +93,7 @@ export class PatientImportPageComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response) => {
-          if (response.statusCode === 200 && response.data) {
+          if (isSuccess(response) && response.data) {
             this.activeJobs = response.data.result
               .slice(0, 5)
               .map((job: ImportJob) => this.mapToActiveJob(job));
@@ -112,7 +116,7 @@ export class PatientImportPageComponent implements OnInit {
       )
       .subscribe({
         next: (response) => {
-          if (response.statusCode === 200 && response.data) {
+          if (isSuccess(response) && response.data) {
             this.activeJobs = response.data.result
               .slice(0, 5)
               .map((job: ImportJob) => this.mapToActiveJob(job));
@@ -203,7 +207,7 @@ export class PatientImportPageComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response) => {
-          if (response.statusCode === 200 && response.data) {
+          if (isSuccess(response) && response.data) {
             this.validationResponse = response.data;
             this.toastService.success('Thành công', 'File đã được tải lên và xác thực');
             
@@ -217,7 +221,7 @@ export class PatientImportPageComponent implements OnInit {
           this.isUploading = false;
         },
         error: (error) => {
-          this.toastService.error('Lỗi', error?.error?.message || 'Không thể tải file lên');
+          this.toastService.error('Lỗi', getApiErrorMessage(error, 'Không thể tải file lên'));
           this.isUploading = false;
         }
       });
@@ -241,7 +245,7 @@ export class PatientImportPageComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response) => {
-          if (response.statusCode === 200) {
+          if (isSuccess(response)) {
             this.toastService.success('Thành công', 'Quá trình nhập dữ liệu đã bắt đầu');
             this.validationResponse = null;
             this.selectedFile = null;
@@ -250,7 +254,7 @@ export class PatientImportPageComponent implements OnInit {
           }
         },
         error: (error) => {
-          this.toastService.error('Lỗi', error?.error?.message || 'Không thể bắt đầu import');
+          this.toastService.error('Lỗi', getApiErrorMessage(error, 'Không thể bắt đầu import'));
         }
       });
   }
@@ -334,23 +338,9 @@ export class PatientImportPageComponent implements OnInit {
     }
   }
 
-  formatFileSize(bytes: number): string {
-    if (bytes < 1024) return bytes + ' B';
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
-  }
+  formatFileSize = formatFileSize;
 
-  formatDateTime(dateString: string): string {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-
-    if (diffMins < 1) return 'Vừa xong';
-    if (diffMins < 60) return `${diffMins} phút trước`;
-    if (diffMins < 1440) return `${Math.floor(diffMins / 60)} giờ trước`;
-    return date.toLocaleDateString('vi-VN');
-  }
+  formatDateTime = formatRelativeTime;
 
   removeFile(): void {
     this.selectedFile = null;

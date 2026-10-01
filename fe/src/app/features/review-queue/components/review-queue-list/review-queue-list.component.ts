@@ -6,14 +6,16 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ReviewQueueService } from '../../services/review-queue.service';
 import { MatchCandidate, ReviewQueueSearchRequest, MatchDecisionEnum, defaultReviewQueueSearchParams } from '../../models/match-candidate.model';
 import { MATCH_DECISION_OPTIONS, getScoreLevel, getDecisionLabel } from '../../models/match-candidate.constants';
-import { PageMeta } from '../../../../shared/models';
+import { PageMeta, isSuccess } from '../../../../shared/models';
 import { ToastService } from '../../../../shared/components/toast/toast.service';
 import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
+import { formatDateTime } from '../../../../shared/utils/date.util';
+import { toApiPage } from '../../../../shared/utils/pagination.util';
 
 @Component({
   selector: 'app-review-queue-list',
   standalone: true,
-  imports: [CommonModule, DatePipe, PaginationComponent],
+  imports: [CommonModule, PaginationComponent],
   templateUrl: './review-queue-list.component.html',
   styleUrls: ['./review-queue-list.component.css']
 })
@@ -50,7 +52,7 @@ export class ReviewQueueListComponent implements OnInit {
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: (response) => {
-        if (response.statusCode === 200) {
+        if (isSuccess(response)) {
           this.counts.set(response.data);
         }
       },
@@ -66,7 +68,7 @@ export class ReviewQueueListComponent implements OnInit {
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: (response) => {
-        if (response.statusCode === 200) {
+        if (isSuccess(response)) {
           this.candidates.set(response.data.result);
           this.pageMeta.set(response.data.meta);
         }
@@ -92,7 +94,7 @@ export class ReviewQueueListComponent implements OnInit {
   onPageChange(page: number): void {
     this.searchParams = {
       ...this.searchParams,
-      page: page - 1
+      page: toApiPage(page)
     };
     this.loadCandidates();
   }
@@ -104,16 +106,7 @@ export class ReviewQueueListComponent implements OnInit {
   getScoreLevel = getScoreLevel;
   getDecisionLabel = getDecisionLabel;
 
-  formatDate(dateString: string): string {
-    if (!dateString) return '-';
-    const date = new Date(dateString);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    return `${day}/${month}/${year} ${hours}:${minutes}`;
-  }
+  formatDate = formatDateTime;
 
   getDecisionClass(decision: MatchDecisionEnum): string {
     switch (decision) {

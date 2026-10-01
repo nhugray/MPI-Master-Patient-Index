@@ -1,0 +1,24 @@
+<div class="page-header">
+  <div class="page-header-content">
+    <h2 class="page-title">Cấu hình Trọng số Thuật toán</h2>
+    <p class="page-subtitle">Điều chỉnh trọng số khớp xác suất cho thuật toán khử trùng lặp MPI</p>
+  </div>
+  <div class="page-header-actions">
+    <div class="active-version-badge" *ngIf="activeConfig()">
+      <span class="pulse-dot"></span>
+      <span>Active: {{ activeConfig()?.version }}</span>
+    </div>
+  </div>
+</div>
+
+<div class="editor-column">
+  <app-weight-editor-panel [activeConfig]="activeConfig()" [isSaving]="isSaving()" (save)="onSave($event)">
+  </app-weight-editor-panel>
+</div>
+
+
+<div class="editor-column">
+  <app-weight-history-table [configs]="historyConfigs()" [isLoading]="isLoadingHistory()"
+    (activate)="onActivate($event)">
+  </app-weight-history-table>
+</div>

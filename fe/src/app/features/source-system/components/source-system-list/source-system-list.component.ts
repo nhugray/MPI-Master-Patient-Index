@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { PageMeta } from '../../../../shared/models';
+import { PageMeta, isSuccess } from '../../../../shared/models';
 import { ToastService } from '../../../../shared/components/toast/toast.service';
 import { SourceSystemService } from '../../services/source-system.service';
 import { SourceSystem } from '../../models/source-system.model';
@@ -13,6 +13,8 @@ import { SearchService } from '../../../../shared/services/search.service';
 import { FacilityService } from '../../../facility/services/facility.service';
 import { Facility } from '../../../facility/models/facility.model';
 import { SourceSystemFilterPanelComponent } from '../source-system-filter-panel/source-system-filter-panel.component';
+import { getApiErrorMessage } from '../../../../shared/utils/http-error.util';
+import { toApiPage } from '../../../../shared/utils/pagination.util';
 
 @Component({
   selector: 'app-source-system-list',
@@ -76,7 +78,7 @@ export class SourceSystemListComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response) => {
-          if (response.statusCode === 200) {
+          if (isSuccess(response)) {
             this.facilities.set(response.data.result);
           }
         },
@@ -107,7 +109,7 @@ export class SourceSystemListComponent implements OnInit {
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: (response) => {
-        if (response.statusCode === 200) {
+        if (isSuccess(response)) {
           this.sourceSystems.set(response.data.result);
           this.pageMeta.set(response.data.meta);
 
@@ -123,7 +125,7 @@ export class SourceSystemListComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: (error: { error?: { message?: string } }) => {
-        this.toastService.error('Lỗi hệ thống', error?.error?.message || 'Không thể tải danh sách hệ thống nguồn');
+        this.toastService.error('Lỗi hệ thống', getApiErrorMessage(error, 'Không thể tải danh sách hệ thống nguồn'));
         this.isLoading.set(false);
       }
     });
@@ -132,7 +134,7 @@ export class SourceSystemListComponent implements OnInit {
   onPageChange(page: number): void {
     this.searchParams = {
       ...this.searchParams,
-      page: page - 1
+      page: toApiPage(page)
     };
     this.loadSourceSystems();
   }

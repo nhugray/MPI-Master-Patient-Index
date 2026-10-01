@@ -12,6 +12,9 @@ import {
   UpdateSourceSystemRequest
 } from '../../models/source-system.model';
 import { Facility } from '../../../facility/models/facility.model';
+import { getApiErrorMessage } from '../../../../shared/utils/http-error.util';
+import { getRequiredErrorMessage } from '../../../../shared/utils/form-errors.util';
+import { isSuccess } from '../../../../shared/models';
 
 @Component({
   selector: 'app-source-system-form',
@@ -36,6 +39,9 @@ export class SourceSystemFormComponent implements OnInit {
   isSubmitting = false;
   isOpen = false;
   facilities: Facility[] = [];
+
+  readonly codeRequiredError = getRequiredErrorMessage('Mã nguồn');
+  readonly nameRequiredError = getRequiredErrorMessage('Tên hệ thống');
 
   get isEditMode(): boolean {
     return !!this.sourceSystem;
@@ -63,12 +69,12 @@ export class SourceSystemFormComponent implements OnInit {
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: (response) => {
-        if (response.statusCode === 200) {
+        if (isSuccess(response)) {
           this.facilities = response.data.result;
         }
       },
       error: (error: { error?: { message?: string } }) => {
-        this.toastService.error('Lỗi hệ thống', error?.error?.message || 'Không thể tải danh sách cơ sở y tế');
+        this.toastService.error('Lỗi hệ thống', getApiErrorMessage(error, 'Không thể tải danh sách cơ sở y tế'));
       }
     });
   }
@@ -153,7 +159,7 @@ export class SourceSystemFormComponent implements OnInit {
   }
 
   private handleSuccess(response: { statusCode: number; data: SourceSystem }): void {
-    if (response.statusCode === 200 || response.statusCode === 201) {
+    if (isSuccess(response)) {
       this.toastService.success(
         'Thành công',
         this.isEditMode ? 'Cập nhật thông tin hệ thống nguồn thành công' : 'Thêm mới hệ thống nguồn thành công'
@@ -167,7 +173,7 @@ export class SourceSystemFormComponent implements OnInit {
   private handleError(error: { error?: { message?: string } }): void {
     this.toastService.error(
       'Lỗi hệ thống',
-      error?.error?.message || 'Đã xảy ra lỗi. Vui lòng thử lại.'
+      getApiErrorMessage(error, 'Đã xảy ra lỗi. Vui lòng thử lại.')
     );
     this.isSubmitting = false;
   }

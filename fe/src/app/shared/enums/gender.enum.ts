@@ -20,7 +20,7 @@ export const getGenderLabel = (gender: Gender): string => {
   switch (gender) {
     case Gender.MALE: return 'male';
     case Gender.FEMALE: return 'female';
-    case Gender.OTHER: return 'other';
+    case Gender.OTHER: return 'transgender';
   }
 };
 export const GENDER_ALL_OPTION = { value: 'ALL', label: 'Tất cả' };

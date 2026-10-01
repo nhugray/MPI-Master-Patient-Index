@@ -30,7 +30,7 @@
             class="form-input"
             placeholder="HIS-CR-01">
           @if (form.get('code')?.touched && form.get('code')?.errors?.['required']) {
-            <span class="form-error">Mã nguồn không được để trống</span>
+            <span class="form-error">{{ codeRequiredError }}</span>
           }
         </div>
 
@@ -42,7 +42,7 @@
             class="form-input"
             placeholder="Nhập tên hệ thống nguồn...">
           @if (form.get('name')?.touched && form.get('name')?.errors?.['required']) {
-            <span class="form-error">Tên hệ thống không được để trống</span>
+            <span class="form-error">{{ nameRequiredError }}</span>
           }
         </div>
 

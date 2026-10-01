@@ -7,6 +7,10 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ReviewQueueService } from '../../services/review-queue.service';
 import { MatchCandidate, MatchDecisionEnum, ScoreBreakdownItem } from '../../models/match-candidate.model';
 import { ToastService } from '../../../../shared/components/toast/toast.service';
+import { formatDate } from '../../../../shared/utils/date.util';
+import { normalizeString } from '../../../../shared/utils/string.util';
+import { getApiErrorMessage } from '../../../../shared/utils/http-error.util';
+import { isSuccess } from '../../../../shared/models';
 
 interface FieldComparison {
   label: string;
@@ -47,7 +51,11 @@ export class ReviewQueueComparePageComponent implements OnInit {
 
     return [
       this.buildComparison('Họ và tên', patient.fullName, master.fullName),
-      this.buildComparison('Ngày sinh', this.formatDate(patient.dateOfBirth), this.formatDate(master.dateOfBirth)),
+      this.buildComparison(
+        'Ngày sinh',
+        patient.dateOfBirth ? this.formatDate(patient.dateOfBirth) : '',
+        master.dateOfBirth ? this.formatDate(master.dateOfBirth) : ''
+      ),
       this.buildComparison('CCCD/CMND', patient.nationalId || '', master.nationalId || ''),
       this.buildComparison('Số điện thoại', patient.phoneNumber || '', master.phoneNumber || ''),
       this.buildComparison('Địa chỉ', patient.address || '', master.address || ''),
@@ -76,7 +84,7 @@ export class ReviewQueueComparePageComponent implements OnInit {
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: (response) => {
-        if (response.statusCode === 200) {
+        if (isSuccess(response)) {
           this.candidate.set(response.data);
         }
         this.isLoading.set(false);
@@ -101,18 +109,9 @@ export class ReviewQueueComparePageComponent implements OnInit {
     };
   }
 
-  private normalizeValue(value: string): string {
-    return (value || '').trim().toLowerCase();
-  }
+  private normalizeValue = normalizeString;
 
-  formatDate(dateString: string): string {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-  }
+  formatDate = formatDate;
 
   goBack(): void {
     this.router.navigate(['/review-queue']);
@@ -141,14 +140,14 @@ export class ReviewQueueComparePageComponent implements OnInit {
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: (response) => {
-        if (response.statusCode === 200) {
+        if (isSuccess(response)) {
           this.toastService.success('Thành công', successMessage);
           this.router.navigate(['/review-queue']);
         }
         this.isSubmitting.set(false);
       },
       error: (error) => {
-        this.toastService.error('Lỗi hệ thống', error?.error?.message || 'Không thể xử lý quyết định duyệt');
+        this.toastService.error('Lỗi hệ thống', getApiErrorMessage(error, 'Không thể xử lý quyết định duyệt'));
         this.isSubmitting.set(false);
       }
     });

@@ -8,6 +8,10 @@ import { PatientMaster } from '../../models/patient-master.model';
 import { SourceRecord } from '../../models/patient-master-detail.model';
 import { ToastService } from '../../../../shared/components/toast/toast.service';
 import { PatientMasterEditModalComponent } from '../../components/patient-master-form/patient-master-form.component';
+import { getInitials, maskNationalId, maskPhoneNumber } from '../../../../shared/utils/string.util';
+import { calculateAge, formatDate } from '../../../../shared/utils/date.util';
+import { GENDER_OPTIONS, getGenderLabel, Gender } from '../../../../shared/enums';
+import { isSuccess } from '../../../../shared/models';
 
 @Component({
   selector: 'app-patient-master-detail-page',
@@ -74,7 +78,7 @@ export class PatientMasterDetailPageComponent implements OnInit {
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: (response) => {
-        if (response.statusCode === 200) {
+        if (isSuccess(response)) {
           this.patientMaster.set(response.data);
         }
         this.isLoading.set(false);
@@ -92,7 +96,7 @@ export class PatientMasterDetailPageComponent implements OnInit {
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: (response) => {
-        if (response.statusCode === 200) {
+        if (isSuccess(response)) {
           this.sourceRecords.set(response.data.result);
         }
         this.isLoadingSourceRecords.set(false);
@@ -108,56 +112,22 @@ export class PatientMasterDetailPageComponent implements OnInit {
     this.router.navigate(['/patient-masters']);
   }
 
-  getInitials(fullName: string): string {
-    if (!fullName) return '?';
-    const parts = fullName.trim().split(' ');
-    if (parts.length >= 2) {
-      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-    }
-    return fullName[0]?.toUpperCase() || '?';
-  }
+  getInitials = getInitials;
 
   getAge(dateOfBirth: string): number {
-    if (!dateOfBirth) return 0;
-    const today = new Date();
-    const birthDate = new Date(dateOfBirth);
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDiff = today.getMonth() - birthDate.getMonth();
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
-    return age;
+    return calculateAge(dateOfBirth);
   }
 
   getGenderDisplay(gender: string): string {
-    const map: Record<string, string> = {
-      'MALE': 'Nam',
-      'FEMALE': 'Nữ',
-      'OTHER': 'Khác'
-    };
-    return map[gender] || gender;
+    const option = GENDER_OPTIONS.find(o => o.value === gender);
+    return option ? option.label : gender;
   }
 
-  getGenderIcon(gender: string): string {
-    const map: Record<string, string> = {
-      'MALE': 'male',
-      'FEMALE': 'female',
-      'OTHER': 'transgender'
-    };
-    return map[gender] || 'help';
-  }
+  getGenderIcon = getGenderLabel;
 
-  maskNationalId(nationalId: string | null | undefined): string {
-    if (!nationalId) return '-';
-    if (nationalId.length <= 4) return nationalId;
-    return nationalId.substring(0, 3) + 'x'.repeat(nationalId.length - 7) + nationalId.substring(nationalId.length - 4);
-  }
+  maskNationalId = maskNationalId;
 
-  maskPhoneNumber(phoneNumber: string | null | undefined): string {
-    if (!phoneNumber) return '-';
-    if (phoneNumber.length <= 4) return phoneNumber;
-    return phoneNumber.substring(0, 3) + 'x'.repeat(phoneNumber.length - 6) + phoneNumber.substring(phoneNumber.length - 3);
-  }
+  maskPhoneNumber = maskPhoneNumber;
 
   getStatusDisplay(status: string): string {
     const map: Record<string, string> = {
@@ -186,14 +156,7 @@ export class PatientMasterDetailPageComponent implements OnInit {
     return map[matchStatus] || matchStatus;
   }
 
-  formatDate(dateString: string): string {
-    if (!dateString) return '-';
-    const date = new Date(dateString);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-  }
+  formatDate = formatDate;
 
   openEditModal(): void {
     const patient = this.patientMaster();

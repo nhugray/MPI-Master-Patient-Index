@@ -15,6 +15,11 @@ import { GENDER_OPTIONS, getGenderLabel } from '../../../../shared/enums';
 import { PATIENT_STATUS_OPTIONS, PatientMasterStatusEnum } from '../../models/patient-master.constants';
 import { PatientMasterEditModalComponent } from '../patient-master-form/patient-master-form.component';
 import { PatientMasterFilterPanelComponent } from '../patient-master-filter-panel/patient-master-filter-panel.component';
+import { getInitials, maskNationalId, maskHealthInsurance, maskPhoneNumber, truncate } from '../../../../shared/utils/string.util';
+import { isToday } from '../../../../shared/utils/date.util';
+import { getApiErrorMessage } from '../../../../shared/utils/http-error.util';
+import { toApiPage } from '../../../../shared/utils/pagination.util';
+import { isSuccess } from '../../../../shared/models';
 
 
 @Component({
@@ -57,12 +62,7 @@ export class PatientMasterListComponent implements OnInit {
   readonly activeMasters = computed(() => this.activeCount());
   readonly mergedMasters = computed(() => this.mergedCount());
   readonly todayNew = computed(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    return this.patientMasters().filter(m => {
-      const created = new Date(m.createdAt);
-      return created >= today;
-    }).length;
+    return this.patientMasters().filter(m => isToday(m.createdAt)).length;
   });
 
   constructor() {
@@ -93,7 +93,7 @@ export class PatientMasterListComponent implements OnInit {
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: (response) => {
-        if (response.statusCode === 200) {
+        if (isSuccess(response)) {
           this.patientMasters.set(response.data.result);
           this.pageMeta.set(response.data.meta);
 
@@ -109,7 +109,7 @@ export class PatientMasterListComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: (error: { error?: { message?: string } }) => {
-        this.toastService.error('Lỗi hệ thống', error?.error?.message || 'Không thể tải danh sách hồ sơ gốc');
+        this.toastService.error('Lỗi hệ thống', getApiErrorMessage(error, 'Không thể tải danh sách hồ sơ gốc'));
         this.isLoading.set(false);
       }
     });
@@ -118,7 +118,7 @@ export class PatientMasterListComponent implements OnInit {
   onPageChange(page: number): void {
     this.searchParams = {
       ...this.searchParams,
-      page: page - 1
+      page: toApiPage(page)
     };
     this.loadPatientMasters();
   }
@@ -177,14 +177,7 @@ export class PatientMasterListComponent implements OnInit {
   }
 
   // Helper methods
-  getInitials(fullName: string): string {
-    if (!fullName) return '?';
-    const words = fullName.trim().split(' ');
-    if (words.length === 1) {
-      return words[0].charAt(0).toUpperCase();
-    }
-    return (words[0].charAt(0) + words[words.length - 1].charAt(0)).toUpperCase();
-  }
+  getInitials = getInitials;
 
   getAvatarColor = getGenderLabel;
 
@@ -207,26 +200,13 @@ export class PatientMasterListComponent implements OnInit {
     }
   }
 
-  maskNationalId(id?: string): string {
-    if (!id) return '-';
-    if (id.length <= 4) return id;
-    return id.substring(0, 3) + '***' + id.substring(id.length - 3);
-  }
+  maskNationalId = maskNationalId;
 
-  maskHealthInsurance(insurance?: string): string {
-    if (!insurance) return '-';
-    if (insurance.length <= 6) return insurance;
-    return insurance.substring(0, 4) + '***' + insurance.substring(insurance.length - 4);
-  }
+  maskHealthInsurance = maskHealthInsurance;
 
-  maskPhoneNumber(phone?: string): string {
-    if (!phone) return '-';
-    if (phone.length <= 6) return phone;
-    return phone.substring(0, 3) + '***' + phone.substring(phone.length - 3);
-  }
+  maskPhoneNumber = maskPhoneNumber;
 
   getTruncatedAddress(address?: string): string {
-    if (!address) return '-';
-    return address.length > 50 ? address.substring(0, 50) + '...' : address;
+    return truncate(address, 50);
   }
 }

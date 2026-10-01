@@ -42,6 +42,11 @@ export const routes: Routes = [
           .then(m => m.ReviewQueueComparePageComponent)
       },
       {
+        path: 'algorithm-config',
+        loadComponent: () => import('./features/algorithm-config/pages/algorithm-config-page.component')
+          .then(m => m.AlgorithmConfigPageComponent)
+      },
+      {
         path: 'dashboard',
         loadComponent: () => import('./features/dashboard/pages/dashboard-page.component')
           .then(m => m.DashboardPageComponent)

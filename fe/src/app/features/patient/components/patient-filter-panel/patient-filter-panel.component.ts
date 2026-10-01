@@ -1,7 +1,7 @@
-import { Component, EventEmitter, Output, Input, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, EventEmitter, Output, Input, ChangeDetectionStrategy, inject, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Gender, MatchStatus } from '../../../../shared/enums';
+import { getGenderLabel } from '../../../../shared/enums';
 import { GENDER_OPTIONS } from '../../../../shared/enums';
 import { MATCH_STATUS_OPTIONS } from '../../models/patient.constants';
 import { SearchService } from '../../../../shared/services/search.service';
@@ -30,6 +30,82 @@ export class PatientFilterPanelComponent {
 
   genderOptions = GENDER_OPTIONS;
   matchStatusOptions = MATCH_STATUS_OPTIONS;
+
+  genderDropdownOpen = false;
+  statusDropdownOpen = false;
+  sourceDropdownOpen = false;
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    // Close all dropdowns when clicking outside
+    this.genderDropdownOpen = false;
+    this.statusDropdownOpen = false;
+    this.sourceDropdownOpen = false;
+  }
+
+  toggleGenderDropdown(event: Event): void {
+    event.stopPropagation();
+    this.genderDropdownOpen = !this.genderDropdownOpen;
+    this.statusDropdownOpen = false;
+    this.sourceDropdownOpen = false;
+  }
+
+  toggleStatusDropdown(event: Event): void {
+    event.stopPropagation();
+    this.statusDropdownOpen = !this.statusDropdownOpen;
+    this.genderDropdownOpen = false;
+    this.sourceDropdownOpen = false;
+  }
+
+  toggleSourceDropdown(event: Event): void {
+    event.stopPropagation();
+    this.sourceDropdownOpen = !this.sourceDropdownOpen;
+    this.genderDropdownOpen = false;
+    this.statusDropdownOpen = false;
+  }
+
+  selectGender(value: string): void {
+    this.selectedGender = value;
+    this.genderDropdownOpen = false;
+    this.onGenderChange();
+  }
+
+  selectStatus(value: string): void {
+    this.selectedMatchStatus = value;
+    this.statusDropdownOpen = false;
+    this.onMatchStatusChange();
+  }
+
+  selectSource(id: number | null): void {
+    this.selectedSourceSystemId = id;
+    this.sourceDropdownOpen = false;
+    this.onSourceSystemChange();
+  }
+
+  getGenderLabel(): string {
+    return this.genderOptions.find(g => g.value === this.selectedGender)?.label || 'Tất cả';
+  }
+
+  getStatusLabel(): string {
+    return this.matchStatusOptions.find(s => s.value === this.selectedMatchStatus)?.label || 'Tất cả';
+  }
+
+  getSourceLabel(): string {
+    if (!this.selectedSourceSystemId) return 'Tất cả';
+    const system = this.sourceSystems.find(s => s.id === this.selectedSourceSystemId);
+    return system ? `${system.facilityName} - ${system.name}` : 'Tất cả';
+  }
+
+  getGenderIcon = getGenderLabel;
+
+  getStatusIcon(value: string): string {
+    switch (value) {
+      case 'MATCHED': return 'check_circle';
+      case 'NO_MATCH': return 'cancel';
+      case 'PENDING_REVIEW': return 'schedule';
+      default: return 'list';
+    }
+  }
 
   onGenderChange(): void {
     this.genderChange.emit(this.selectedGender);

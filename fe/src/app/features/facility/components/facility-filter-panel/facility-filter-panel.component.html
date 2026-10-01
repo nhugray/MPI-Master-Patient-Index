@@ -9,22 +9,44 @@
     </button>
     }
   </div>
-  <div class="filter-item">
-    <span class="filter-label">Loại hình:</span>
-    <select [(ngModel)]="selectedType" (change)="onTypeChange()" class="filter-select">
-      @for (type of facilityTypeOptions; track type.value) {
-      <option [value]="type.value">{{ type.label }}</option>
-      }
-    </select>
+  <!-- Facility Type Filter -->
+  <div class="filter-dropdown" [class.open]="typeDropdownOpen">
+    <button class="filter-trigger" (click)="toggleTypeDropdown($event)">
+      <span class="material-symbols-outlined filter-icon">category</span>
+      <span class="filter-label">Loại hình:</span>
+      <span class="filter-value">{{ getTypeLabel() }}</span>
+      <span class="material-symbols-outlined arrow">expand_more</span>
+    </button>
+    <div class="filter-menu" *ngIf="typeDropdownOpen">
+      <div class="filter-menu-item"
+           *ngFor="let type of facilityTypeOptions"
+           [class.selected]="selectedType === type.value"
+           (click)="selectType(type.value)">
+        <span class="material-symbols-outlined item-icon">{{ getTypeIcon(type.value) }}</span>
+        <span class="item-label">{{ type.label }}</span>
+        <span class="material-symbols-outlined check-icon" *ngIf="selectedType === type.value">check</span>
+      </div>
+    </div>
   </div>
 
-  <div class="filter-item">
-    <span class="filter-label">Trạng thái:</span>
-    <select [(ngModel)]="selectedStatus" (change)="onStatusChange()" class="filter-select">
-      <option value="ALL">Tất cả</option>
-      <option value="ACTIVE">Đang hoạt động</option>
-      <option value="INACTIVE">Ngừng hoạt động</option>
-    </select>
+  <!-- Status Filter -->
+  <div class="filter-dropdown" [class.open]="statusDropdownOpen">
+    <button class="filter-trigger" (click)="toggleStatusDropdown($event)">
+      <span class="material-symbols-outlined filter-icon">toggle_on</span>
+      <span class="filter-label">Trạng thái:</span>
+      <span class="filter-value">{{ getStatusLabel() }}</span>
+      <span class="material-symbols-outlined arrow">expand_more</span>
+    </button>
+    <div class="filter-menu" *ngIf="statusDropdownOpen">
+      <div class="filter-menu-item"
+           *ngFor="let status of statusOptions"
+           [class.selected]="selectedStatus === status.value"
+           (click)="selectStatus(status.value)">
+        <span class="material-symbols-outlined item-icon">{{ getStatusIcon(status.value) }}</span>
+        <span class="item-label">{{ status.label }}</span>
+        <span class="material-symbols-outlined check-icon" *ngIf="selectedStatus === status.value">check</span>
+      </div>
+    </div>
   </div>
 
   <button class="btn-reset" (click)="onReset()" title="Làm mới bộ lọc">

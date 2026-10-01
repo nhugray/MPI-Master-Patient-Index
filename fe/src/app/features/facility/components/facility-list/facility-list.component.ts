@@ -3,7 +3,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { PageMeta } from '../../../../shared/models';
+import { PageMeta, isSuccess } from '../../../../shared/models';
 import { ToastService } from '../../../../shared/components/toast/toast.service';
 import { FacilityService } from '../../services/facility.service';
 import { Facility, FacilityType } from '../../models/facility.model';
@@ -12,6 +12,8 @@ import { FACILITY_TYPE_OPTIONS } from '../../models/facility.constants';
 import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
 import { SearchService } from '../../../../shared/services/search.service';
 import { formatPhoneNumber } from '../../../../shared/validators/phone.validator';
+import { getApiErrorMessage } from '../../../../shared/utils/http-error.util';
+import { toApiPage } from '../../../../shared/utils/pagination.util';
 import { FacilityFilterPanelComponent } from '../facility-filter-panel/facility-filter-panel.component';
 
 @Component({
@@ -78,7 +80,7 @@ export class FacilityListComponent implements OnInit {
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: (response) => {
-        if (response.statusCode === 200) {
+        if (isSuccess(response)) {
           this.facilities.set(response.data.result);
           this.pageMeta.set(response.data.meta);
 
@@ -90,7 +92,7 @@ export class FacilityListComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: (error: { error?: { message?: string } }) => {
-        this.toastService.error('Lỗi hệ thống', error?.error?.message || 'Không thể tải danh sách cơ sở y tế');
+        this.toastService.error('Lỗi hệ thống', getApiErrorMessage(error, 'Không thể tải danh sách cơ sở y tế'));
         this.isLoading.set(false);
       }
     });
@@ -99,7 +101,7 @@ export class FacilityListComponent implements OnInit {
   onPageChange(page: number): void {
     this.searchParams = {
       ...this.searchParams,
-      page: page - 1
+      page: toApiPage(page)
     };
     this.loadFacilities();
   }

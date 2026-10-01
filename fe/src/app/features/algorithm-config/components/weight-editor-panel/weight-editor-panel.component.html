@@ -1,0 +1,50 @@
+<div class="weight-editor-card">
+  <div class="editor-header">
+    <h2 class="editor-title">
+      <span class="material-symbols-outlined">tune</span>
+      Mô hình Trọng số Hiện tại
+    </h2>
+    <span class="threshold-badge">Threshold: {{ autoApprovalThreshold() }}%</span>
+  </div>
+
+  <div class="sliders-list">
+    <div class="slider-item" *ngFor="let field of weightFields">
+      <div class="slider-row">
+        <label class="slider-label">{{ field.label }}</label>
+        <span class="slider-value" [ngClass]="field.colorClass">{{ getWeight(field.key) }}%</span>
+      </div>
+      <input
+        class="slider-input"
+        type="range"
+        min="0"
+        max="100"
+        [value]="getWeight(field.key)"
+        (input)="onSliderInput(field.key, $event)" />
+      <p class="slider-description">{{ field.description }}</p>
+    </div>
+  </div>
+
+  <div class="total-indicator" [class.total-invalid]="!isTotalValid()">
+    <span class="total-label">Tổng Phân bổ Trọng số</span>
+    <span class="total-value">{{ totalWeight() }}%</span>
+  </div>
+
+  <div class="description-field">
+    <label class="description-label">Mô tả thay đổi</label>
+    <textarea
+      class="description-textarea"
+      placeholder="Ghi chú lý do thay đổi trọng số..."
+      [(ngModel)]="description"></textarea>
+  </div>
+
+  <div class="editor-actions">
+    <button
+      class="btn-save"
+      [disabled]="!isTotalValid() || isSaving"
+      (click)="onSave()">
+      <span class="material-symbols-outlined">save</span>
+      <span *ngIf="!isSaving">Lưu Phiên bản Mới</span>
+      <span *ngIf="isSaving">Đang lưu...</span>
+    </button>
+  </div>
+</div>

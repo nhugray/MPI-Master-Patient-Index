@@ -7,7 +7,8 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
 import { PatientService } from '../services/patient.service';
 import { ToastService } from '../../../shared/components/toast/toast.service';
 import { Patient } from '../models/patient.model';
-import { ApiResponse } from '../../../shared/models';
+import { ApiResponse, isSuccess } from '../../../shared/models';
+import { getApiErrorMessage } from '../../../shared/utils/http-error.util';
 
 @Component({
   selector: 'app-patients-page',
@@ -53,14 +54,14 @@ export class PatientsPageComponent {
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: (response: ApiResponse<void>) => {
-        if (response.statusCode === 200) {
+        if (isSuccess(response)) {
           this.toastService.success('Thành công', 'Xóa bệnh nhân thành công');
           this.closeDeleteDialog();
           this.patientList.reload();
         }
       },
       error: (error: { error?: { message?: string } }) => {
-        this.toastService.error('Lỗi hệ thống', error?.error?.message || 'Đã xảy ra lỗi khi xóa bệnh nhân');
+        this.toastService.error('Lỗi hệ thống', getApiErrorMessage(error, 'Đã xảy ra lỗi khi xóa bệnh nhân'));
         this.closeDeleteDialog();
       }
     });

@@ -13,7 +13,11 @@ import {
 } from '../../models/patient.model';
 import { GENDER_OPTIONS } from '../../../../shared/enums';
 import { MATCH_STATUS_OPTIONS } from '../../models/patient.constants';
-import { phoneValidator } from '../../../../shared/validators/phone.validator';
+import { phoneValidator, PHONE_ERROR_MESSAGE } from '../../../../shared/validators/phone.validator';
+import { nationalIdValidator, NATIONAL_ID_ERROR_MESSAGE } from '../../../../shared/validators/national-id.validator';
+import { getApiErrorMessage } from '../../../../shared/utils/http-error.util';
+import { getRequiredErrorMessage } from '../../../../shared/utils/form-errors.util';
+import { isSuccess } from '../../../../shared/models';
 
 @Component({
   selector: 'app-patient-form',
@@ -44,6 +48,13 @@ export class PatientFormComponent implements OnInit {
   genderOptions = GENDER_OPTIONS;
   matchStatusOptions = MATCH_STATUS_OPTIONS;
 
+  readonly nationalIdErrorMessage = NATIONAL_ID_ERROR_MESSAGE;
+  readonly phoneErrorMessage = PHONE_ERROR_MESSAGE;
+
+  readonly sourceSystemIdRequiredError = getRequiredErrorMessage('ID hệ thống nguồn');
+  readonly localPatientCodeRequiredError = getRequiredErrorMessage('Mã bệnh nhân cục bộ');
+  readonly fullNameRequiredError = getRequiredErrorMessage('Họ tên');
+
   ngOnInit(): void {
     this.initForm();
   }
@@ -57,7 +68,7 @@ export class PatientFormComponent implements OnInit {
       fullName: [patient?.fullName || '', Validators.required],
       dateOfBirth: [patient?.dateOfBirth || ''],
       gender: [patient?.gender || Gender.MALE],
-      nationalId: [patient?.nationalId || '', Validators.pattern(/^\d{12}$/)],
+      nationalId: [patient?.nationalId || '', nationalIdValidator()],
       healthInsuranceNo: [patient?.healthInsuranceNo || ''],
       phoneNumber: [patient?.phoneNumber || '', phoneValidator()],
       address: [patient?.address || '']
@@ -160,7 +171,7 @@ export class PatientFormComponent implements OnInit {
   }
 
   private handleSuccess(response: { statusCode: number; data: Patient }): void {
-    if (response.statusCode === 200 || response.statusCode === 201) {
+    if (isSuccess(response)) {
       this.toastService.success(
         'Thành công',
         this.isEditMode ? 'Cập nhật thông tin bệnh nhân thành công' : 'Thêm mới bệnh nhân thành công'
@@ -174,7 +185,7 @@ export class PatientFormComponent implements OnInit {
   private handleError(error: { error?: { message?: string } }): void {
     this.toastService.error(
       'Lỗi hệ thống',
-      error?.error?.message || 'Đã xảy ra lỗi. Vui lòng thử lại.'
+      getApiErrorMessage(error, 'Đã xảy ra lỗi. Vui lòng thử lại.')
     );
     this.isSubmitting = false;
   }

@@ -7,7 +7,8 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
 import { FacilityService } from '../services/facility.service';
 import { ToastService } from '../../../shared/components/toast/toast.service';
 import { Facility } from '../models/facility.model';
-import { ApiResponse } from '../../../shared/models';
+import { ApiResponse, isSuccess } from '../../../shared/models';
+import { getApiErrorMessage } from '../../../shared/utils/http-error.util';
 
 @Component({
   selector: 'app-facilities-page',
@@ -53,14 +54,14 @@ export class FacilitiesPageComponent {
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
       next: (response: ApiResponse<void>) => {
-        if (response.statusCode === 200) {
+        if (isSuccess(response)) {
           this.toastService.success('Thành công', 'Xóa cơ sở y tế thành công');
           this.closeDeleteDialog();
           this.facilityList.reload();
         }
       },
       error: (error: { error?: { message?: string } }) => {
-        this.toastService.error('Lỗi hệ thống', error?.error?.message || 'Đã xảy ra lỗi khi xóa cơ sở y tế');
+        this.toastService.error('Lỗi hệ thống', getApiErrorMessage(error, 'Đã xảy ra lỗi khi xóa cơ sở y tế'));
         this.closeDeleteDialog();
       }
     });

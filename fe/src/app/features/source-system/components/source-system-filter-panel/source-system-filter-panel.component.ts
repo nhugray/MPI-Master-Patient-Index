@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, Input, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, EventEmitter, Output, Input, ChangeDetectionStrategy, inject, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SearchService } from '../../../../shared/services/search.service';
@@ -22,6 +22,64 @@ export class SourceSystemFilterPanelComponent {
 
   selectedFacilityId: number | null = null;
   selectedStatus: string = 'ALL';
+
+  statusOptions = [
+    { value: 'ALL', label: 'Tất cả' },
+    { value: 'ACTIVE', label: 'Đang hoạt động' },
+    { value: 'INACTIVE', label: 'Không hoạt động' }
+  ];
+
+  // Dropdown states
+  facilityDropdownOpen = false;
+  statusDropdownOpen = false;
+
+  @HostListener('document:click')
+  onDocumentClick(): void {
+    this.facilityDropdownOpen = false;
+    this.statusDropdownOpen = false;
+  }
+
+  toggleFacilityDropdown(event: Event): void {
+    event.stopPropagation();
+    this.facilityDropdownOpen = !this.facilityDropdownOpen;
+    this.statusDropdownOpen = false;
+  }
+
+  toggleStatusDropdown(event: Event): void {
+    event.stopPropagation();
+    this.statusDropdownOpen = !this.statusDropdownOpen;
+    this.facilityDropdownOpen = false;
+  }
+
+  selectFacility(id: number | null): void {
+    this.selectedFacilityId = id;
+    this.facilityDropdownOpen = false;
+    this.onFacilityChange();
+  }
+
+  selectStatus(value: string): void {
+    this.selectedStatus = value;
+    this.statusDropdownOpen = false;
+    this.onStatusChange();
+  }
+
+  getFacilityLabel(): string {
+    if (this.selectedFacilityId === null) return 'Tất cả cơ sở';
+    const facility = this.facilities.find(f => f.id === this.selectedFacilityId);
+    return facility ? facility.name : 'Tất cả cơ sở';
+  }
+
+  getStatusLabel(): string {
+    return this.statusOptions.find(s => s.value === this.selectedStatus)?.label || 'Tất cả';
+  }
+
+  getStatusIcon(value: string): string {
+    switch (value) {
+      case 'ACTIVE': return 'check_circle';
+      case 'INACTIVE': return 'cancel';
+      default: return 'list';
+    }
+  }
 
   onFacilityChange(): void {
     this.facilityChange.emit(this.selectedFacilityId);

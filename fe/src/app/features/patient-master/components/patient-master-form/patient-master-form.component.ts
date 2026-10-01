@@ -4,6 +4,10 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { PatientMaster, UpdatePatientMasterRequest } from '../../models/patient-master.model';
 import { PatientMasterService } from '../../services/patient-master.service';
 import { Gender } from '../../../../shared/enums';
+import { phoneValidator, PHONE_ERROR_MESSAGE } from '../../../../shared/validators/phone.validator';
+import { nationalIdValidator, NATIONAL_ID_ERROR_MESSAGE } from '../../../../shared/validators/national-id.validator';
+import { getApiErrorMessage } from '../../../../shared/utils/http-error.util';
+import { REQUIRED_ERROR_MESSAGE } from '../../../../shared/utils/form-errors.util';
 
 @Component({
   selector: 'app-patient-master-form',
@@ -41,9 +45,9 @@ export class PatientMasterEditModalComponent implements OnInit {
       fullName: [this.patientMaster.fullName, [Validators.required, Validators.maxLength(255)]],
       dateOfBirth: [this.patientMaster.dateOfBirth, [Validators.required]],
       gender: [this.patientMaster.gender || ''],
-      nationalId: [this.patientMaster.nationalId || '', [Validators.pattern(/^\d{12}$/)]],
+      nationalId: [this.patientMaster.nationalId || '', [nationalIdValidator()]],
       healthInsuranceNo: [this.patientMaster.healthInsuranceNo || '', [Validators.maxLength(20)]],
-      phoneNumber: [this.patientMaster.phoneNumber || '', [Validators.pattern(/^0\d{9}$/)]],
+      phoneNumber: [this.patientMaster.phoneNumber || '', [phoneValidator()]],
       address: [this.patientMaster.address || '', [Validators.maxLength(500)]]
     });
   }
@@ -69,7 +73,7 @@ export class PatientMasterEditModalComponent implements OnInit {
       },
       error: (error) => {
         this.isSubmitting.set(false);
-        this.errorMessage.set(error.error?.message || 'Có lỗi xảy ra khi cập nhật');
+        this.errorMessage.set(getApiErrorMessage(error, 'Có lỗi xảy ra khi cập nhật'));
       }
     });
   }
@@ -81,12 +85,10 @@ export class PatientMasterEditModalComponent implements OnInit {
   getFieldError(fieldName: string): string | null {
     const field = this.editForm.get(fieldName);
     if (field?.invalid && field?.touched) {
-      if (field.errors?.['required']) return 'Trường này là bắt buộc';
+      if (field.errors?.['required']) return REQUIRED_ERROR_MESSAGE;
       if (field.errors?.['maxLength']) return `Tối đa ${field.errors?.['maxLength'].requiredLength} ký tự`;
-      if (field.errors?.['pattern']) {
-        if (fieldName === 'nationalId') return 'CCCD phải gồm 12 chữ số';
-        if (fieldName === 'phoneNumber') return 'Số ĐT phải gồm 10 chữ số và bắt đầu bằng 0';
-      }
+      if (field.errors?.['invalidNationalId']) return NATIONAL_ID_ERROR_MESSAGE;
+      if (field.errors?.['invalidPhone']) return PHONE_ERROR_MESSAGE;
     }
     return null;
   }

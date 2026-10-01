@@ -9,22 +9,44 @@
     </button>
     }
   </div>
-  <div class="filter-item">
-    <span class="filter-label">Giới tính:</span>
-    <select [(ngModel)]="selectedGender" (change)="onGenderChange()" class="filter-select">
-      @for (gender of genderOptions; track gender.value) {
-      <option [value]="gender.value">{{ gender.label }}</option>
-      }
-    </select>
+  <!-- Gender Filter -->
+  <div class="filter-dropdown" [class.open]="genderDropdownOpen">
+    <button class="filter-trigger" (click)="toggleGenderDropdown($event)">
+      <span class="material-symbols-outlined filter-icon">person</span>
+      <span class="filter-label">Giới tính:</span>
+      <span class="filter-value">{{ getGenderLabel() }}</span>
+      <span class="material-symbols-outlined arrow">expand_more</span>
+    </button>
+    <div class="filter-menu" *ngIf="genderDropdownOpen">
+      <div class="filter-menu-item"
+           *ngFor="let gender of genderOptions"
+           [class.selected]="selectedGender === gender.value"
+           (click)="selectGender(gender.value)">
+        <span class="material-symbols-outlined item-icon">{{ getGenderIcon(gender.value) }}</span>
+        <span class="item-label">{{ gender.label }}</span>
+        <span class="material-symbols-outlined check-icon" *ngIf="selectedGender === gender.value">check</span>
+      </div>
+    </div>
   </div>
 
-  <div class="filter-item">
-    <span class="filter-label">Trạng thái:</span>
-    <select [(ngModel)]="selectedStatus" (change)="onStatusChange()" class="filter-select">
-      @for (status of statusOptions; track status.value) {
-      <option [value]="status.value">{{ status.label }}</option>
-      }
-    </select>
+  <!-- Status Filter -->
+  <div class="filter-dropdown" [class.open]="statusDropdownOpen">
+    <button class="filter-trigger" (click)="toggleStatusDropdown($event)">
+      <span class="material-symbols-outlined filter-icon">verified</span>
+      <span class="filter-label">Trạng thái:</span>
+      <span class="filter-value">{{ getStatusLabel() }}</span>
+      <span class="material-symbols-outlined arrow">expand_more</span>
+    </button>
+    <div class="filter-menu" *ngIf="statusDropdownOpen">
+      <div class="filter-menu-item"
+           *ngFor="let status of statusOptions"
+           [class.selected]="selectedStatus === status.value"
+           (click)="selectStatus(status.value)">
+        <span class="material-symbols-outlined item-icon">{{ getStatusIcon(status.value) }}</span>
+        <span class="item-label">{{ status.label }}</span>
+        <span class="material-symbols-outlined check-icon" *ngIf="selectedStatus === status.value">check</span>
+      </div>
+    </div>
   </div>
 
   <button class="btn-reset" (click)="onReset()" title="Làm mới bộ lọc">

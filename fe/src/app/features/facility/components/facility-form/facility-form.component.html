@@ -17,7 +17,7 @@
             class="form-input"
             placeholder="BV-CR-01">
           @if (form.get('code')?.touched && form.get('code')?.errors?.['required']) {
-            <span class="form-error">Mã cơ sở không được để trống</span>
+            <span class="form-error">{{ codeRequiredError }}</span>
           }
         </div>
 
@@ -29,7 +29,7 @@
             class="form-input"
             placeholder="Nhập tên cơ sở y tế...">
           @if (form.get('name')?.touched && form.get('name')?.errors?.['required']) {
-            <span class="form-error">Tên cơ sở không được để trống</span>
+            <span class="form-error">{{ nameRequiredError }}</span>
           }
         </div>
 
