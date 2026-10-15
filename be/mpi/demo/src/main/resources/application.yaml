@@ -10,3 +10,31 @@ spring:
     hibernate:
       ddl-auto: none
     show-sql: false
+  servlet:
+    multipart:
+      max-file-size: 500MB
+      max-request-size: 500MB
+  
+
+file:
+  upload:
+    dir: "./uploads/imports"
+    max-size: 524288000
+jwt:
+  secret: "vodinhnhuvodinhnhuvodinhnhuvodinhnhu"
+  access-token-expiration: 5
+  refresh-expiration: 604800000  
+springdoc:
+    swagger-ui:
+        persist-authorization: true
+        enabled: true
+    openapi:
+        components:
+            securitySchemes:
+                bearerAuth:
+                    type: http
+                    scheme: bearer
+                    bearerFormat: JWT
+                    description: "Nhập chuỗi Access Token (JWT) của bạn vào đây (Không cần gõ chữ 'Bearer')"
+        security:
+            - bearerAuth: []

@@ -22,8 +22,7 @@ public class PatientMaster {
     private Long id;
 
     @Column(name = "enterprise_id", unique = true, nullable = false, length = 30)
-    private String enterpriseId; // Format: EMPI-2026-000001
-
+    private String enterpriseId;
     @Column(name = "full_name", nullable = false, length = 255)
     private String fullName;
 

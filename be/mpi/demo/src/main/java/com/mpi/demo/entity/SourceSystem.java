@@ -13,21 +13,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * Entity đại diện cho hệ thống nguồn (Source System)
- * Mỗi facility có thể có nhiều source system
- */
 @Entity
 @Table(name = "source_system")
-@Getter 
-@Setter 
-@NoArgsConstructor 
-@AllArgsConstructor 
+@Getter
+@Setter
+@NoArgsConstructor
 public class SourceSystem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -4,27 +4,30 @@ export interface UploadFileRequest {
 }
 
 export interface FileValidationResponse {
+  isValid: boolean;
   fileToken: string;
   fileName: string;
   fileSize: number;
-  rowCount: number;
-  columnCount: number;
+  totalRows: number;
+  validRows: number;
+  invalidRows: number;
   detectedColumns: string[];
-  validationErrors: ValidationError[];
-  isValid: boolean;
+  suggestedMappings: Record<string, string>;
+  errors: ValidationError[];
+  preview: PreviewRow[];
 }
 
 export interface ValidationError {
-  row: number;
+  rowNumber: number;
   column: string;
-  errorMessage: string;
-  severity: 'ERROR' | 'WARNING';
+  message: string;
+  severity: string;
 }
 
 export interface PreviewRow {
   rowNumber: number;
   data: Record<string, any>;
-  validationStatus: 'VALID' | 'WARNING' | 'ERROR';
+  validationStatus: 'VALID' | 'INVALID' | 'WARNING' | 'ERROR';
   validationMessages: string[];
   estimatedMatchScore?: number;
   matchStatus?: 'HIGH_MATCH' | 'MEDIUM_MATCH' | 'LOW_MATCH' | 'NEW_RECORD' | 'ERROR';

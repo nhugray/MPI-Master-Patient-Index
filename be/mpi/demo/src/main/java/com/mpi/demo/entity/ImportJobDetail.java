@@ -39,7 +39,7 @@ public class ImportJobDetail {
     @JoinColumn(name = "import_job_id", nullable = false)
     private ImportJob importJob;
     
-    @Column(name = "row_number", nullable = false)
+    @Column(name = "`row_number`", nullable = false)
     private Integer rowNumber;
     
     @Column(name = "row_data", columnDefinition = "JSON", nullable = false)

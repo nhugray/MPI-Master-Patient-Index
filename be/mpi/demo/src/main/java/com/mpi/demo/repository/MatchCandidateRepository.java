@@ -1,6 +1,7 @@
 package com.mpi.demo.repository;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -13,6 +14,8 @@ import com.mpi.demo.entity.MatchCandidate;
 public interface MatchCandidateRepository extends JpaRepository<MatchCandidate, Long> {
 
     List<MatchCandidate> findByPatientId(Long patientId);
+
+    List<MatchCandidate> findByPatientIdInAndCandidateMasterId(Collection<Long> patientIds, Long masterId);
 
     Page<MatchCandidate> findByDecisionOrderByCreatedAtDesc(MatchDecisionEnum decision, Pageable pageable);
 

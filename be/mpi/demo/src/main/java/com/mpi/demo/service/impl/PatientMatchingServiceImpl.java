@@ -1,7 +1,9 @@
 package com.mpi.demo.service.impl;
 
 import com.mpi.demo.constant.MatchDecisionEnum;
+import com.mpi.demo.entity.AlgorithmWeightConfig;
 import com.mpi.demo.entity.MatchCandidate;
+import com.mpi.demo.repository.AlgorithmWeightConfigRepository;
 import com.mpi.demo.entity.Patient;
 import com.mpi.demo.entity.PatientMaster;
 import com.mpi.demo.repository.MatchCandidateRepository;
@@ -16,6 +18,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.Normalizer;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -26,15 +29,25 @@ import java.util.stream.Collectors;
 public class PatientMatchingServiceImpl implements PatientMatchingService {
     private final PatientMasterRepository patientMasterRepository;
     private final MatchCandidateRepository matchCandidateRepository;
+    private final AlgorithmWeightConfigRepository weightConfigRepository;
 
     public PatientMatchingServiceImpl(PatientMasterRepository patientMasterRepository,
-            MatchCandidateRepository matchCandidateRepository) {
+            MatchCandidateRepository matchCandidateRepository,
+            AlgorithmWeightConfigRepository weightConfigRepository) {
         this.patientMasterRepository = patientMasterRepository;
         this.matchCandidateRepository = matchCandidateRepository;
+        this.weightConfigRepository = weightConfigRepository;
+    }
+
+    private AlgorithmWeightConfig loadActiveConfig() {
+        return weightConfigRepository.findByIsActiveTrue()
+                .orElseThrow(() -> new IllegalStateException(
+                        "Chưa có phiên bản cấu hình trọng số nào đang được kích hoạt"));
     }
 
     @Override
     public List<MatchCandidate> findMatchCandidates(Patient patient) {
+        AlgorithmWeightConfig config = loadActiveConfig();
         Set<PatientMaster> masterCandidates = new HashSet<>();
 
         if (patient.getDateOfBirth() != null && patient.getFullName() != null && patient.getFullName().length() >= 3) {
@@ -54,7 +67,7 @@ public class PatientMatchingServiceImpl implements PatientMatchingService {
         }
 
         return masterCandidates.stream()
-                .map(master -> buildMatchCandidate(patient, master))
+                .map(master -> buildMatchCandidate(patient, master, config))
                 .filter(mc -> mc.getMatchScore().compareTo(new BigDecimal("30.00")) >= 0)
                 .sorted(Comparator.comparing(MatchCandidate::getMatchScore).reversed())
                 .collect(Collectors.toList());
@@ -62,27 +75,32 @@ public class PatientMatchingServiceImpl implements PatientMatchingService {
 
     @Override
     public BigDecimal calculateMatchScore(Patient patient, PatientMaster master) {
+        return calculateMatchScore(patient, master, loadActiveConfig());
+    }
+
+    private BigDecimal calculateMatchScore(Patient patient, PatientMaster master, AlgorithmWeightConfig config) {
         BigDecimal score = BigDecimal.ZERO;
 
         if (isExactMatch(patient.getNationalId(), master.getNationalId())) {
-            score = score.add(new BigDecimal("40.00"));
+            score = score.add(config.getNationalIdWeight());
         }
 
         if (patient.getFullName() != null && master.getFullName() != null) {
             double nameSimilarity = calculateStringSimilarity(patient.getFullName(), master.getFullName());
-            score = score.add(BigDecimal.valueOf(nameSimilarity * 25));
+            score = score.add(config.getNameWeight().multiply(BigDecimal.valueOf(nameSimilarity)));
         }
 
         if (patient.getDateOfBirth() != null && patient.getDateOfBirth().equals(master.getDateOfBirth())) {
-            score = score.add(new BigDecimal("20.00"));
+            score = score.add(config.getDobWeight());
         }
 
         if (isExactMatch(patient.getPhoneNumber(), master.getPhoneNumber())) {
-            score = score.add(new BigDecimal("10.00"));
+            score = score.add(config.getPhoneWeight());
         }
 
-        if (patient.getGender() != null && patient.getGender() == master.getGender()) {
-            score = score.add(new BigDecimal("5.00"));
+        if (patient.getAddress() != null && master.getAddress() != null) {
+            double addressSimilarity = calculateStringSimilarity(patient.getAddress(), master.getAddress());
+            score = score.add(config.getAddressWeight().multiply(BigDecimal.valueOf(addressSimilarity)));
         }
 
         return score.setScale(2, RoundingMode.HALF_UP);
@@ -90,10 +108,14 @@ public class PatientMatchingServiceImpl implements PatientMatchingService {
 
     @Override
     public MatchDecisionEnum getAutoDecision(BigDecimal matchScore) {
-        if (matchScore.compareTo(new BigDecimal("85.00")) >= 0) {
+        return getAutoDecision(matchScore, loadActiveConfig());
+    }
+
+    private MatchDecisionEnum getAutoDecision(BigDecimal matchScore, AlgorithmWeightConfig config) {
+        if (matchScore.compareTo(config.getAutoApprovalThreshold()) >= 0) {
             return MatchDecisionEnum.AUTO_APPROVED;
         }
-        if (matchScore.compareTo(new BigDecimal("50.00")) >= 0) {
+        if (matchScore.compareTo(config.getManualReviewThreshold()) >= 0) {
             return MatchDecisionEnum.PENDING;
         }
         return MatchDecisionEnum.REJECTED;
@@ -102,24 +124,17 @@ public class PatientMatchingServiceImpl implements PatientMatchingService {
     @Override
     public void processMatchDecision(Long candidateId, MatchDecisionEnum decision, Long reviewerId, String reviewNote) {
         MatchCandidate candidate = matchCandidateRepository.findById(candidateId)
-                .orElseThrow(() -> new RuntimeException("Match candidate not found with id: " + candidateId));
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy hồ sơ duyệt."));
 
         candidate.setDecision(decision);
         candidate.setReviewedAt(java.time.LocalDateTime.now());
 
-        // Note: reviewedBy cần UserRepository, tạm thời để null
-        // Nếu cần, tạo UserRepository sau
-        // User reviewer = userRepository.findById(reviewerId).orElse(null);
-        // candidate.setReviewedBy(reviewer);
-
         matchCandidateRepository.save(candidate);
 
-        // Nếu decision là MANUAL_APPROVED, có thể tự động link patient vào master
         if (decision == MatchDecisionEnum.MANUAL_APPROVED) {
             Patient patient = candidate.getPatient();
             PatientMaster master = candidate.getCandidateMaster();
             patient.setMasterPatient(master);
-            // Lưu patient nếu cần (cần inject PatientRepository)
         }
     }
 
@@ -134,12 +149,12 @@ public class PatientMatchingServiceImpl implements PatientMatchingService {
     @Override
     public MatchCandidate getCandidateById(Long candidateId) {
         return matchCandidateRepository.findById(candidateId)
-                .orElseThrow(() -> new RuntimeException("Match candidate not found with id: " + candidateId));
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy hồ sơ duyệt."));
     }
 
     @Override
     public Map<String, Long> getDecisionCounts() {
-        Map<String, Long> counts = new java.util.HashMap<>();
+        Map<String, Long> counts = new HashMap<>();
         counts.put("PENDING", matchCandidateRepository.countByDecision(MatchDecisionEnum.PENDING));
         counts.put("AUTO_APPROVED", matchCandidateRepository.countByDecision(MatchDecisionEnum.AUTO_APPROVED));
         counts.put("MANUAL_APPROVED", matchCandidateRepository.countByDecision(MatchDecisionEnum.MANUAL_APPROVED));
@@ -153,16 +168,16 @@ public class PatientMatchingServiceImpl implements PatientMatchingService {
         return matchCandidateRepository.findByDecisionOrderByCreatedAtDesc(MatchDecisionEnum.PENDING, pageable);
     }
 
-    private MatchCandidate buildMatchCandidate(Patient patient, PatientMaster master) {
-        BigDecimal score = calculateMatchScore(patient, master);
-        MatchDecisionEnum decision = getAutoDecision(score);
+    private MatchCandidate buildMatchCandidate(Patient patient, PatientMaster master, AlgorithmWeightConfig config) {
+        BigDecimal score = calculateMatchScore(patient, master, config);
+        MatchDecisionEnum decision = getAutoDecision(score, config);
 
         return MatchCandidate.builder()
                 .patient(patient)
                 .candidateMaster(master)
                 .matchScore(score)
                 .decision(decision)
-                .weightVersion("v1")
+                .weightVersion(config.getVersion())
                 .build();
     }
 

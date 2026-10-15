@@ -31,8 +31,7 @@ public class AlgorithmWeightConfig {
     private Long id;
 
     @Column(name = "version", unique = true, nullable = false, length = 20)
-    private String version; // Format: v2.4, v2.5...
-
+    private String version;
     @Column(name = "name_weight", nullable = false, precision = 5, scale = 2)
     private BigDecimal nameWeight;
 

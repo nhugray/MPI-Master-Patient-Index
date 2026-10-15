@@ -8,6 +8,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.mpi.demo.constant.MatchStatusEnum;
 import com.mpi.demo.dto.request.PatientMasterSearchRequest;
 import com.mpi.demo.dto.request.UpdatePatientMasterRequest;
 import com.mpi.demo.dto.response.PatientMasterResponse;
@@ -47,6 +48,7 @@ public class PatientMasterServiceImpl implements PatientMasterService {
         patientMasterRepository.save(master);
 
         patient.setMasterPatient(master);
+        patient.setMatchStatus(MatchStatusEnum.NEW_MASTER);
         patientRepository.save(patient);
 
         return master;
@@ -60,6 +62,7 @@ public class PatientMasterServiceImpl implements PatientMasterService {
                 .orElseThrow(() -> new RuntimeException("Không tiềm thấy mã bệnh nhân đích: " + masterId));
 
         patient.setMasterPatient(master);
+        patient.setMatchStatus(MatchStatusEnum.MATCHED);
         patientRepository.save(patient);
     }
 

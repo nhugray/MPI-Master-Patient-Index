@@ -18,6 +18,8 @@ public interface ImportService {
     Page<PreviewRowDto> previewImportData(Long jobId, Pageable pageable);
 
     ImportJobResponse startImport(StartImportRequest request);
+    
+    ImportJobResponse createImportJobOnly(StartImportRequest request);
 
     ImportJobResponse getImportJobStatus(Long jobId);
 

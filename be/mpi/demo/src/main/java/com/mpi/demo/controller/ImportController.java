@@ -14,8 +14,8 @@ import com.mpi.demo.dto.response.ImportJobResponse;
 import com.mpi.demo.dto.response.PreviewRowDto;
 import com.mpi.demo.helper.ApiResponse;
 import com.mpi.demo.service.ImportService;
+import com.mpi.demo.service.impl.ImportJobOrchestrator;
 
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.validation.Valid;
 
 import org.springdoc.core.annotations.ParameterObject;
@@ -26,14 +26,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("/api/v1/imports")
 public class ImportController {
     private final ImportService importService;
+    private final ImportJobOrchestrator importJobOrchestrator;
 
-    public ImportController(ImportService importService) {
+    public ImportController(ImportService importService, ImportJobOrchestrator importJobOrchestrator) {
         this.importService = importService;
+        this.importJobOrchestrator = importJobOrchestrator;
     }
 
     @PostMapping("/upload")
@@ -54,7 +57,8 @@ public class ImportController {
     @PostMapping("/start")
     public ResponseEntity<ApiResponse<ImportJobResponse>> start(
             @Valid @RequestBody StartImportRequest request) {
-        return ResponseEntity.ok(ApiResponse.success("Đã khởi động tải tệp", importService.startImport(request)));
+        return ResponseEntity.ok(ApiResponse.success("Đã khởi động tải tệp", 
+            importJobOrchestrator.startImportWithAsyncProcessing(request)));
     }
 
     @GetMapping("/{jobId}")

@@ -43,6 +43,9 @@ public class ImportJob {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
+    @Column(name = "file_token", length = 100)
+    private String fileToken;
+    
     @Column(name = "file_name", nullable = false, length = 255)
     private String fileName;
     

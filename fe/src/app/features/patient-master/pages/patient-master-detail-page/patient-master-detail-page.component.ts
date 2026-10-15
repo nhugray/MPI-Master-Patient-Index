@@ -31,6 +31,22 @@ export class PatientMasterDetailPageComponent implements OnInit {
 
   patientMaster = signal<PatientMaster | null>(null);
   sourceRecords = signal<SourceRecord[]>([]);
+  // Điểm tin cậy: thấp nhất trong các hồ sơ nguồn có điểm match.
+  // Hồ sơ tạo master mới (không match ai) không có điểm -> hiện "Hồ sơ mới".
+  confidence = computed(() => {
+    const records = this.sourceRecords();
+    const scores = records
+      .map(r => r.matchScore)
+      .filter((s): s is number => s !== null && s !== undefined);
+    if (scores.length > 0) {
+      const min = Math.min(...scores);
+      return { text: `${Math.round(min)}%`, verified: min >= 85 };
+    }
+    if (records.some(r => r.matchStatus === 'NEW_MASTER')) {
+      return { text: 'Hồ sơ mới', verified: false };
+    }
+    return { text: '—', verified: false };
+  });
   isLoading = signal(true);
   isLoadingSourceRecords = signal(false);
 
@@ -140,8 +156,9 @@ export class PatientMasterDetailPageComponent implements OnInit {
 
   getMatchStatusBadgeClass(matchStatus: string): string {
     const map: Record<string, string> = {
-      'AUTO_MERGED': 'status-auto-merged',
-      'MANUAL_MERGED': 'status-manual-merged',
+      'MATCHED': 'status-auto-merged',
+      'NEW_MASTER': 'status-auto-merged',
+      'REJECTED': 'status-manual-merged',
       'PENDING': 'status-pending'
     };
     return map[matchStatus] || '';
@@ -149,9 +166,10 @@ export class PatientMasterDetailPageComponent implements OnInit {
 
   getMatchStatusDisplay(matchStatus: string): string {
     const map: Record<string, string> = {
-      'AUTO_MERGED': 'Auto-merged',
-      'MANUAL_MERGED': 'Manual-merged',
-      'PENDING': 'Pending'
+      'MATCHED': 'Đã gộp',
+      'NEW_MASTER': 'Hồ sơ mới',
+      'REJECTED': 'Từ chối',
+      'PENDING': 'Chờ xử lý'
     };
     return map[matchStatus] || matchStatus;
   }

@@ -209,14 +209,13 @@ export class PatientImportPageComponent implements OnInit {
         next: (response) => {
           if (isSuccess(response) && response.data) {
             this.validationResponse = response.data;
-            this.toastService.success('Thành công', 'File đã được tải lên và xác thực');
             
-            // Load preview data if validation passed
-            if (response.data.isValid) {
-              // Note: Backend needs to provide jobId in FileValidationResponse
-              // For now, we'll skip preview loading
-              // this.loadPreviewData(response.data.jobId);
+            if (response.data.preview && response.data.preview.length > 0) {
+              this.previewData = response.data.preview.slice(0, 50);
+              this.previewTotalRows = response.data.totalRows;
             }
+            
+            this.toastService.success('Thành công', 'File đã được tải lên và xác thực');
           }
           this.isUploading = false;
         },
@@ -233,13 +232,25 @@ export class PatientImportPageComponent implements OnInit {
       return;
     }
 
+    const columnMappings = this.getDefaultColumnMappings();
+    
+    // Debug logging
+    console.log('=== START IMPORT DEBUG ===');
+    console.log('ValidationResponse:', this.validationResponse);
+    console.log('SuggestedMappings:', this.validationResponse.suggestedMappings);
+    console.log('ColumnMappings:', columnMappings);
+    console.log('ColumnMappings keys:', Object.keys(columnMappings));
+    console.log('ColumnMappings values:', Object.values(columnMappings));
+    
     const request: StartImportRequest = {
       sourceSystemId: this.selectedSourceSystemId,
       fileToken: this.validationResponse.fileToken,
-      columnMappings: this.getDefaultColumnMappings(),
+      columnMappings: columnMappings,
       skipDuplicates: this.skipDuplicates,
       duplicateThreshold: this.duplicateThreshold
     };
+    
+    console.log('StartImportRequest:', request);
 
     this.importService.startImport(request)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -254,39 +265,24 @@ export class PatientImportPageComponent implements OnInit {
           }
         },
         error: (error) => {
+          console.error('StartImport Error:', error);
           this.toastService.error('Lỗi', getApiErrorMessage(error, 'Không thể bắt đầu import'));
         }
       });
   }
 
   private getDefaultColumnMappings(): Record<string, string> {
-    // Auto-map columns based on detected column names
-    const mappings: Record<string, string> = {};
-    
-    if (this.validationResponse) {
-      this.validationResponse.detectedColumns.forEach(col => {
-        const lowerCol = col.toLowerCase();
-        if (lowerCol.includes('name') || lowerCol.includes('tên')) {
-          mappings[col] = 'fullName';
-        } else if (lowerCol.includes('dob') || lowerCol.includes('birth') || lowerCol.includes('sinh')) {
-          mappings[col] = 'dateOfBirth';
-        } else if (lowerCol.includes('gender') || lowerCol.includes('sex') || lowerCol.includes('giới')) {
-          mappings[col] = 'gender';
-        } else if (lowerCol.includes('phone') || lowerCol.includes('điện')) {
-          mappings[col] = 'phoneNumber';
-        } else if (lowerCol.includes('national') || lowerCol.includes('cccd') || lowerCol.includes('cmnd')) {
-          mappings[col] = 'nationalId';
-        } else if (lowerCol.includes('insurance') || lowerCol.includes('bhyt')) {
-          mappings[col] = 'healthInsuranceNo';
-        } else if (lowerCol.includes('address') || lowerCol.includes('địa')) {
-          mappings[col] = 'address';
-        } else if (lowerCol.includes('code') || lowerCol.includes('mrn') || lowerCol.includes('mã')) {
-          mappings[col] = 'localPatientCode';
-        }
-      });
+    // Use suggested mappings from backend validation
+    if (this.validationResponse?.suggestedMappings && 
+        Object.keys(this.validationResponse.suggestedMappings).length > 0) {
+      return this.validationResponse.suggestedMappings;
     }
-
-    return mappings;
+    
+    // Log warning if no mappings found
+    console.warn('No suggested mappings found in validation response');
+    
+    // Fallback to empty mappings (backend will reject if invalid)
+    return {};
   }
 
   getStatusBadgeClass(status: ImportJobStatus): string {

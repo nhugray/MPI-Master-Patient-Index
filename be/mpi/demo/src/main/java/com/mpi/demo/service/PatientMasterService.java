@@ -14,8 +14,6 @@ public interface PatientMasterService {
 
     void linkToMaster(Long patientId, Long masterId);
 
-    // PatientMaster mergeMasters(Long sourceId, Long targetId, Long userId);
-
     void unlinkPatient(Long patientId);
 
     String generateEnterpriseId();

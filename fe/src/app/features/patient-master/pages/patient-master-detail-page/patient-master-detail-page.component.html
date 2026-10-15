@@ -91,9 +91,9 @@
         <div class="score-box">
           <div class="score-label">Điểm tin cậy</div>
           <div class="score-circle">
-            <span class="score-value">98%</span>
+            <span class="score-value">{{ confidence().text }}</span>
           </div>
-          <div class="score-verified">
+          <div class="score-verified" *ngIf="confidence().verified">
             <span class="material-symbols-outlined verified-icon">verified</span>
             Đã xác thực
           </div>
@@ -119,8 +119,8 @@
 
         <div *ngIf="!isLoadingSourceRecords()" class="records-grid">
           <div *ngFor="let record of sourceRecords()" class="record-card"
-            [class.record-card-primary]="record.matchStatus === 'AUTO_MERGED'"
-            [class.record-card-tertiary]="record.matchStatus !== 'AUTO_MERGED'">
+            [class.record-card-primary]="record.matchStatus === 'MATCHED' || record.matchStatus === 'NEW_MASTER'"
+            [class.record-card-tertiary]="record.matchStatus !== 'MATCHED' && record.matchStatus !== 'NEW_MASTER'">
             <div class="record-header">
               <div class="record-system">
                 <span class="system-badge">{{ record.sourceSystemName }}</span>
@@ -136,7 +136,7 @@
               <span *ngIf="record.phoneNumber"> • {{ record.phoneNumber }}</span>
             </div>
             <div class="record-tags">
-              <span class="tag tag-score">Score: {{ record.matchScore || 0 }}</span>
+              <span class="tag tag-score" *ngIf="record.matchScore !== null && record.matchScore !== undefined">Score: {{ record.matchScore }}</span>
               <span class="tag" [ngClass]="getMatchStatusBadgeClass(record.matchStatus)">
                 {{ getMatchStatusDisplay(record.matchStatus) }}
               </span>

@@ -16,6 +16,8 @@ public interface ImportJobRepository extends JpaRepository<ImportJob, Long>, Jpa
 
     Page<ImportJob> findByCreatedByOrderByCreatedAtDesc(Long userId, Pageable pageable);
 
+    Page<ImportJob> findAllByOrderByCreatedAtDesc(Pageable pageable);
+
     @Query("SELECT ij FROM ImportJob ij WHERE ij.status IN ('PENDING', 'VALIDATING', 'PROCESSING') ORDER BY ij.createdAt DESC")
     Page<ImportJob> findActiveJobs(Pageable pageable);
 

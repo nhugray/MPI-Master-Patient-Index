@@ -123,8 +123,15 @@
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .hero-title {
@@ -151,11 +158,11 @@
   .import-grid {
     grid-template-columns: repeat(12, 1fr);
   }
-  
+
   .grid-left {
     grid-column: span 4;
   }
-  
+
   .grid-right {
     grid-column: span 8;
   }
@@ -173,7 +180,7 @@
   background-color: var(--surface-container-lowest);
   border-radius: 0.75rem;
   border: 1px solid var(--outline-variant);
-  padding: 1rem;
+  padding: 1.4rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
@@ -347,7 +354,9 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .job-details {
@@ -469,6 +478,11 @@
   border: 1px solid var(--outline-variant);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   overflow: hidden;
+}
+
+.preview-card-full {
+  width: 100%;
+  margin-top: 1rem;
 }
 
 .preview-header {
@@ -642,6 +656,47 @@
   color: var(--on-surface);
   font-size: 0.75rem;
   border: 1px solid var(--outline-variant);
+}
+
+/* Preview Table */
+.preview-table-wrapper {
+  padding: 1rem;
+  background-color: var(--surface);
+  border-top: 1px solid var(--outline-variant);
+}
+
+.preview-table-scroll {
+  overflow-x: auto;
+  max-height: 24rem;
+  overflow-y: auto;
+  border: 1px solid var(--outline-variant);
+  border-radius: 0.5rem;
+}
+
+.preview-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.75rem;
+  color: var(--on-surface);
+}
+
+.preview-table th,
+.preview-table td {
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--outline-variant);
+}
+
+.preview-table th {
+  position: sticky;
+  top: 0;
+  background-color: var(--surface-container-low);
+  font-weight: 600;
+}
+
+.preview-table tr.row-invalid td {
+  background-color: #fef2f2;
 }
 
 /* Loading State */
