@@ -1,18 +1,27 @@
 package com.mpi.demo.service.impl;
 
+import com.mpi.demo.constant.MatchActionEnum;
 import com.mpi.demo.constant.MatchDecisionEnum;
+import com.mpi.demo.constant.MatchStatusEnum;
 import com.mpi.demo.entity.AlgorithmWeightConfig;
 import com.mpi.demo.entity.MatchCandidate;
-import com.mpi.demo.repository.AlgorithmWeightConfigRepository;
+import com.mpi.demo.entity.MatchDecisionLog;
 import com.mpi.demo.entity.Patient;
 import com.mpi.demo.entity.PatientMaster;
+import com.mpi.demo.entity.User;
+import com.mpi.demo.repository.AlgorithmWeightConfigRepository;
 import com.mpi.demo.repository.MatchCandidateRepository;
+import com.mpi.demo.repository.MatchDecisionLogRepository;
 import com.mpi.demo.repository.PatientMasterRepository;
+import com.mpi.demo.repository.PatientRepository;
+import com.mpi.demo.repository.UserRepository;
 import com.mpi.demo.service.PatientMatchingService;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -27,16 +36,31 @@ import java.util.stream.Collectors;
 
 @Service
 public class PatientMatchingServiceImpl implements PatientMatchingService {
+    @Value("${mpi.matching.auto-approval-threshold:92.00}")
+    private BigDecimal autoApprovalThreshold;
+
+    @Value("${mpi.matching.manual-review-threshold:65.00}")
+    private BigDecimal manualReviewThreshold;
+
     private final PatientMasterRepository patientMasterRepository;
     private final MatchCandidateRepository matchCandidateRepository;
     private final AlgorithmWeightConfigRepository weightConfigRepository;
+    private final MatchDecisionLogRepository matchDecisionLogRepository;
+    private final UserRepository userRepository;
+    private final PatientRepository patientRepository;
 
     public PatientMatchingServiceImpl(PatientMasterRepository patientMasterRepository,
             MatchCandidateRepository matchCandidateRepository,
-            AlgorithmWeightConfigRepository weightConfigRepository) {
+            AlgorithmWeightConfigRepository weightConfigRepository,
+            MatchDecisionLogRepository matchDecisionLogRepository,
+            UserRepository userRepository,
+            PatientRepository patientRepository) {
         this.patientMasterRepository = patientMasterRepository;
         this.matchCandidateRepository = matchCandidateRepository;
         this.weightConfigRepository = weightConfigRepository;
+        this.matchDecisionLogRepository = matchDecisionLogRepository;
+        this.userRepository = userRepository;
+        this.patientRepository = patientRepository;
     }
 
     private AlgorithmWeightConfig loadActiveConfig() {
@@ -112,30 +136,70 @@ public class PatientMatchingServiceImpl implements PatientMatchingService {
     }
 
     private MatchDecisionEnum getAutoDecision(BigDecimal matchScore, AlgorithmWeightConfig config) {
-        if (matchScore.compareTo(config.getAutoApprovalThreshold()) >= 0) {
+        BigDecimal autoThreshold = this.autoApprovalThreshold != null ? this.autoApprovalThreshold : config.getAutoApprovalThreshold();
+        BigDecimal manualThreshold = this.manualReviewThreshold != null ? this.manualReviewThreshold : config.getManualReviewThreshold();
+
+        if (matchScore.compareTo(autoThreshold) >= 0) {
             return MatchDecisionEnum.AUTO_APPROVED;
         }
-        if (matchScore.compareTo(config.getManualReviewThreshold()) >= 0) {
+        if (matchScore.compareTo(manualThreshold) >= 0) {
             return MatchDecisionEnum.PENDING;
         }
         return MatchDecisionEnum.REJECTED;
     }
 
     @Override
+    @Transactional
     public void processMatchDecision(Long candidateId, MatchDecisionEnum decision, Long reviewerId, String reviewNote) {
         MatchCandidate candidate = matchCandidateRepository.findById(candidateId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy hồ sơ duyệt."));
 
+        User reviewer = null;
+        if (reviewerId != null) {
+            reviewer = userRepository.findById(reviewerId).orElse(null);
+            candidate.setReviewedBy(reviewer);
+        }
+
         candidate.setDecision(decision);
         candidate.setReviewedAt(java.time.LocalDateTime.now());
-
         matchCandidateRepository.save(candidate);
 
+        MatchActionEnum action;
+        Patient patient = candidate.getPatient();
+
         if (decision == MatchDecisionEnum.MANUAL_APPROVED) {
-            Patient patient = candidate.getPatient();
+            action = MatchActionEnum.MERGE;
             PatientMaster master = candidate.getCandidateMaster();
             patient.setMasterPatient(master);
+            patient.setMatchStatus(MatchStatusEnum.MATCHED);
+            Patient savedPatient = patientRepository.save(patient);
+            candidate.setPatient(savedPatient);
+        } else if (decision == MatchDecisionEnum.REJECTED) {
+            action = MatchActionEnum.REJECT;
+            patient.setMatchStatus(MatchStatusEnum.REJECTED);
+            Patient savedPatient = patientRepository.save(patient);
+            candidate.setPatient(savedPatient);
+        } else {
+            action = MatchActionEnum.MERGE;
+            PatientMaster master = candidate.getCandidateMaster();
+            patient.setMasterPatient(master);
+            patient.setMatchStatus(MatchStatusEnum.MATCHED);
+            Patient savedPatient = patientRepository.save(patient);
+            candidate.setPatient(savedPatient);
         }
+
+        String defaultReason = action == MatchActionEnum.MERGE
+                ? "Chuyên viên duyệt gộp hồ sơ vào mã EID: " + candidate.getCandidateMaster().getEnterpriseId()
+                : "Chuyên viên từ chối liên kết hồ sơ";
+
+        MatchDecisionLog decisionLog = MatchDecisionLog.builder()
+                .matchCandidate(candidate)
+                .action(action)
+                .performedBy(reviewer)
+                .reason(reviewNote != null && !reviewNote.isBlank() ? reviewNote : defaultReason)
+                .build();
+
+        matchDecisionLogRepository.save(decisionLog);
     }
 
     @Override
@@ -181,44 +245,41 @@ public class PatientMatchingServiceImpl implements PatientMatchingService {
                 .build();
     }
 
-    private boolean isExactMatch(String str1, String str2) {
-        if (str1 == null || str2 == null) {
+    private boolean isExactMatch(String s1, String s2) {
+        if (s1 == null || s2 == null)
             return false;
-        }
-        return str1.trim().equalsIgnoreCase(str2.trim());
+        return s1.trim().equalsIgnoreCase(s2.trim());
     }
 
     private double calculateStringSimilarity(String s1, String s2) {
-        if (s1 == null || s2 == null) {
-            return 0.0;
-        }
-
-        String str1 = normalizeVietnamese(s1);
-        String str2 = normalizeVietnamese(s2);
-
-        if (str1.equals(str2)) {
+        String n1 = normalize(s1);
+        String n2 = normalize(s2);
+        if (n1.equals(n2))
             return 1.0;
-        }
-
-        if (str1.contains(str2) || str2.contains(str1)) {
-            return 0.85;
-        }
-
-        return 0.0;
+        int distance = levenshteinDistance(n1, n2);
+        int maxLen = Math.max(n1.length(), n2.length());
+        return maxLen == 0 ? 1.0 : 1.0 - (double) distance / maxLen;
     }
 
-    private String normalizeVietnamese(String str) {
-        if (str == null) {
-            return "";
+    private String normalize(String s) {
+        return Normalizer.normalize(s.trim().toLowerCase(), Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "");
+    }
+
+    private int levenshteinDistance(String a, String b) {
+        int[] costs = new int[b.length() + 1];
+        for (int j = 0; j <= b.length(); j++)
+            costs[j] = j;
+        for (int i = 1; i <= a.length(); i++) {
+            costs[0] = i;
+            int nw = i - 1;
+            for (int j = 1; j <= b.length(); j++) {
+                int cj = Math.min(1 + Math.min(costs[j], costs[j - 1]),
+                        a.charAt(i - 1) == b.charAt(j - 1) ? nw : nw + 1);
+                nw = costs[j];
+                costs[j] = cj;
+            }
         }
-
-        String temp = Normalizer.normalize(str, Normalizer.Form.NFD);
-
-        String result = temp.replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
-                .replaceAll("[Đđ]", "d")
-                .toLowerCase()
-                .trim();
-
-        return result.replaceAll("\\s+", " ");
+        return costs[b.length()];
     }
 }

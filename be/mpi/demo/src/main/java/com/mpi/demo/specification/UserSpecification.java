@@ -33,8 +33,11 @@ public class UserSpecification {
                     predicates.add(cb.equal(root.get("gender"), request.gender()));
                 }
 
+                if (request.status() != null) {
+                    predicates.add(cb.equal(root.get("status"), request.status()));
+                }
+
                 if (request.roleId() != null) {
-                    // Dùng subquery-free join; distinct để tránh trùng dòng khi phân trang.
                     Join<User, Role> roles = root.join("roles", JoinType.INNER);
                     predicates.add(cb.equal(roles.get("id"), request.roleId()));
                     query.distinct(true);

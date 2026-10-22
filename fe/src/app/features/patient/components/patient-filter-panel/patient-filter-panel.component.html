@@ -9,7 +9,7 @@
     </button>
     }
   </div>
-  <!-- Gender Filter -->
+
   <div class="filter-dropdown" [class.open]="genderDropdownOpen">
     <button class="filter-trigger" (click)="toggleGenderDropdown($event)">
       <span class="material-symbols-outlined filter-icon">person</span>
@@ -18,10 +18,8 @@
       <span class="material-symbols-outlined arrow">expand_more</span>
     </button>
     <div class="filter-menu" *ngIf="genderDropdownOpen">
-      <div class="filter-menu-item"
-           *ngFor="let gender of genderOptions"
-           [class.selected]="selectedGender === gender.value"
-           (click)="selectGender(gender.value)">
+      <div class="filter-menu-item" *ngFor="let gender of genderOptions"
+        [class.selected]="selectedGender === gender.value" (click)="selectGender(gender.value)">
         <span class="material-symbols-outlined item-icon">{{ getGenderIcon(gender.value) }}</span>
         <span class="item-label">{{ gender.label }}</span>
         <span class="material-symbols-outlined check-icon" *ngIf="selectedGender === gender.value">check</span>
@@ -29,7 +27,6 @@
     </div>
   </div>
 
-  <!-- Match Status Filter -->
   <div class="filter-dropdown" [class.open]="statusDropdownOpen">
     <button class="filter-trigger" (click)="toggleStatusDropdown($event)">
       <span class="material-symbols-outlined filter-icon">task_alt</span>
@@ -38,10 +35,8 @@
       <span class="material-symbols-outlined arrow">expand_more</span>
     </button>
     <div class="filter-menu" *ngIf="statusDropdownOpen">
-      <div class="filter-menu-item"
-           *ngFor="let status of matchStatusOptions"
-           [class.selected]="selectedMatchStatus === status.value"
-           (click)="selectStatus(status.value)">
+      <div class="filter-menu-item" *ngFor="let status of matchStatusOptions"
+        [class.selected]="selectedMatchStatus === status.value" (click)="selectStatus(status.value)">
         <span class="material-symbols-outlined item-icon">{{ getStatusIcon(status.value) }}</span>
         <span class="item-label">{{ status.label }}</span>
         <span class="material-symbols-outlined check-icon" *ngIf="selectedMatchStatus === status.value">check</span>
@@ -49,7 +44,6 @@
     </div>
   </div>
 
-  <!-- Source System Filter -->
   <div class="filter-dropdown" [class.open]="sourceDropdownOpen">
     <button class="filter-trigger" (click)="toggleSourceDropdown($event)">
       <span class="material-symbols-outlined filter-icon">dns</span>
@@ -58,10 +52,8 @@
       <span class="material-symbols-outlined arrow">expand_more</span>
     </button>
     <div class="filter-menu" *ngIf="sourceDropdownOpen">
-      <div class="filter-menu-item"
-           *ngFor="let system of sourceSystems"
-           [class.selected]="selectedSourceSystemId === system.id"
-           (click)="selectSource(system.id)">
+      <div class="filter-menu-item" *ngFor="let system of sourceSystems"
+        [class.selected]="selectedSourceSystemId === system.id" (click)="selectSource(system.id)">
         <span class="material-symbols-outlined item-icon">database</span>
         <span class="item-label">{{ system.facilityName }} - {{ system.name }}</span>
         <span class="material-symbols-outlined check-icon" *ngIf="selectedSourceSystemId === system.id">check</span>
@@ -73,8 +65,4 @@
     <span class="material-symbols-outlined">refresh</span>
   </button>
 
-  <button class="btn-export">
-    <span class="material-symbols-outlined">download</span>
-    Xuất Excel
-  </button>
 </div>

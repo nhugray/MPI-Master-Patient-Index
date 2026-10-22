@@ -21,7 +21,6 @@ import { getApiErrorMessage } from '../../../../shared/utils/http-error.util';
 import { toApiPage } from '../../../../shared/utils/pagination.util';
 import { isSuccess } from '../../../../shared/models';
 
-
 @Component({
   selector: 'app-patient-master-list',
   standalone: true,
@@ -80,8 +79,6 @@ export class PatientMasterListComponent implements OnInit {
   ngOnInit(): void {
     this.loadPatientMasters();
   }
-
-
 
   reload(): void {
     this.loadPatientMasters();
@@ -167,7 +164,6 @@ export class PatientMasterListComponent implements OnInit {
   }
 
   onPatientUpdated(updatedPatient: PatientMaster): void {
-    // Update in the list
     this.patientMasters.update(list =>
       list.map(p => p.id === updatedPatient.id ? updatedPatient : p)
     );
@@ -176,7 +172,6 @@ export class PatientMasterListComponent implements OnInit {
     this.editingPatient.set(null);
   }
 
-  // Helper methods
   getInitials = getInitials;
 
   getAvatarColor = getGenderLabel;

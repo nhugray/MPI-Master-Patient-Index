@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.mpi.demo.constant.GenderEnum;
+import com.mpi.demo.constant.UserStatusEnum;
 import com.mpi.demo.entity.User;
 
 public record UserResponse(
@@ -13,6 +14,7 @@ public record UserResponse(
         String address,
         GenderEnum gender,
         String avatar,
+        UserStatusEnum status,
         List<RoleInfo> roles,
         LocalDateTime createdAt,
         LocalDateTime updatedAt) {
@@ -32,6 +34,7 @@ public record UserResponse(
                 user.getAddress(),
                 user.getGender(),
                 user.getAvatar(),
+                user.getStatus(),
                 roleInfos,
                 user.getCreatedAt(),
                 user.getUpdatedAt());

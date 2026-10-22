@@ -1,0 +1,42 @@
+<div class="filter-group">
+  <div class="search-box">
+    <span class="material-symbols-outlined">search</span>
+    <input type="text" placeholder="Tìm theo tên, email hoặc địa chỉ" class="search-input"
+      (input)="searchService.setQuery($any($event.target).value)">
+    @if (searchService.searchQuery()) {
+    <button class="btn-clear" (click)="searchService.clearQuery()">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+    }
+  </div>
+
+  <div class="filter-dropdown" [class.open]="statusDropdownOpen">
+    <button class="filter-trigger" (click)="toggleStatusDropdown($event)">
+      <span class="material-symbols-outlined filter-icon">{{ getStatusIcon(selectedStatus) }}</span>
+      <span class="filter-label">Trạng thái:</span>
+      <span class="filter-value">{{ getStatusLabel() }}</span>
+      <span class="material-symbols-outlined arrow">expand_more</span>
+    </button>
+    <div class="filter-menu" *ngIf="statusDropdownOpen">
+      <div class="filter-menu-item"
+           [class.selected]="selectedStatus === 'ALL'"
+           (click)="selectStatus('ALL')">
+        <span class="material-symbols-outlined item-icon">{{ getStatusIcon('ALL') }}</span>
+        <span class="item-label">{{ 'Tất cả' }}</span>
+        <span class="material-symbols-outlined check-icon" *ngIf="selectedStatus === 'ALL'">check</span>
+      </div>
+      <div class="filter-menu-item"
+           *ngFor="let status of statusOptions"
+           [class.selected]="selectedStatus === status.value"
+           (click)="selectStatus(status.value)">
+        <span class="material-symbols-outlined item-icon">{{ getStatusIcon(status.value) }}</span>
+        <span class="item-label">{{ status.label }}</span>
+        <span class="material-symbols-outlined check-icon" *ngIf="selectedStatus === status.value">check</span>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-reset" (click)="onReset()" title="Làm mới bộ lọc">
+    <span class="material-symbols-outlined">refresh</span>
+  </button>
+</div>

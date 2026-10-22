@@ -131,7 +131,6 @@ export class ReviewQueueComparePageComponent implements OnInit {
 
     this.isSubmitting.set(true);
 
-    // TODO: reviewerId nên lấy từ AuthService/session hiện tại, tạm dùng giá trị mặc định
     this.reviewQueueService.submitDecision(id, {
       decision,
       reviewNote: this.reviewNote() || undefined,

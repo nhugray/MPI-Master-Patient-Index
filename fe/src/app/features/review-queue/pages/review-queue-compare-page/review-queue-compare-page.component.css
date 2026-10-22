@@ -94,7 +94,7 @@
 
 .compare-grid {
   display: grid;
-  grid-template-columns: 1fr 280px 1fr;
+  grid-template-columns: 1fr 1fr 280px;
   gap: 1.5rem;
   align-items: start;
   flex: 1;
@@ -221,7 +221,6 @@
   font-style: italic;
 }
 
-/* Score Column */
 .score-column {
   display: flex;
   flex-direction: column;

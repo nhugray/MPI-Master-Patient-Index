@@ -1,11 +1,9 @@
-/* Content Container */
 .content-container {
   max-width: 1600px;
   margin: 0 auto;
   padding: 0 1.5rem;
 }
 
-/* Page Header */
 .page-header {
   display: flex;
   flex-direction: column;
@@ -198,7 +196,6 @@
   }
 }
 
-/* Bento Grid Layout */
 .bento-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -212,7 +209,6 @@
   }
 }
 
-/* Card Styles */
 .card {
   background: #FFFFFF;
   border-radius: 12px;
@@ -282,7 +278,6 @@
   letter-spacing: 0.02em;
 }
 
-/* Patient Summary Card */
 .summary-layout {
   display: flex;
   flex-direction: column;
@@ -492,7 +487,6 @@
   font-size: 16px;
 }
 
-/* Identifiers Table */
 .table-wrapper {
   overflow-x: auto;
   background: #FFFFFF;
@@ -610,7 +604,6 @@
   border: 1px solid rgba(148, 163, 184, 0.2);
 }
 
-/* Source Records Grid */
 .records-grid {
   padding: 1.5rem;
   display: grid;
@@ -775,7 +768,6 @@
   font-weight: 500;
 }
 
-/* History Timeline */
 .card-history {
   display: flex;
   flex-direction: column;
@@ -829,6 +821,52 @@
 
 .dot-success {
   background: #10B981;
+}
+
+.dot-error {
+  background: #EF4444;
+}
+
+.history-count-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--primary, #006194);
+  background: rgba(0, 97, 148, 0.08);
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  border: 1px solid rgba(0, 97, 148, 0.15);
+}
+
+.timeline-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 2.5rem 1rem;
+  color: var(--on-surface-variant, #64748b);
+  font-size: 0.875rem;
+}
+
+.timeline-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 2.5rem 1rem;
+  text-align: center;
+  color: var(--on-surface-variant, #64748b);
+}
+
+.timeline-empty .empty-icon {
+  font-size: 2.2rem;
+  color: #94a3b8;
+}
+
+.timeline-empty p {
+  margin: 0;
+  font-size: 0.875rem;
 }
 
 .timeline-content {
@@ -967,7 +1005,6 @@
   font-weight: 500;
 }
 
-/* Loading State */
 .loading-container {
   display: flex;
   flex-direction: column;
@@ -1026,7 +1063,6 @@
   }
 }
 
-/* Responsive Design */
 @media (max-width: 1280px) {
   .detail-container {
     padding: 1.5rem;

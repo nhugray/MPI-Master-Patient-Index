@@ -158,3 +158,106 @@ ADD FOREIGN KEY (`match_candidate_id`) REFERENCES `match_candidate` (`id`) ON DE
 
 ALTER TABLE `match_decision_log`
 ADD FOREIGN KEY (`performed_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+
+CREATE TABLE `import_job` (
+    `id` bigint PRIMARY KEY AUTO_INCREMENT,
+    `file_name` varchar(255) NOT NULL,
+    `file_size` bigint NOT NULL COMMENT 'Kích thước file (bytes)',
+    `file_type` ENUM('CSV', 'XLSX') NOT NULL,
+    `source_system_id` bigint NOT NULL,
+    `status` ENUM(
+        'PENDING',
+        'VALIDATING',
+        'PROCESSING',
+        'COMPLETED',
+        'FAILED',
+        'CANCELLED'
+    ) NOT NULL DEFAULT 'PENDING',
+    `total_rows` int DEFAULT 0,
+    `processed_rows` int DEFAULT 0,
+    `successful_rows` int DEFAULT 0,
+    `failed_rows` int DEFAULT 0,
+    `duplicate_rows` int DEFAULT 0,
+    `warning_rows` int DEFAULT 0,
+    `started_at` datetime,
+    `completed_at` datetime,
+    `error_message` text,
+    `configuration` json COMMENT 'Cấu hình import: mapping, rules, etc.',
+    `created_by` bigint NOT NULL,
+    `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (`source_system_id`) REFERENCES `source_system` (`id`),
+    FOREIGN KEY (`created_by`) REFERENCES `users` (`id`)
+);
+
+CREATE TABLE `import_job_detail` (
+    `id` bigint PRIMARY KEY AUTO_INCREMENT,
+    `import_job_id` bigint NOT NULL,
+    `row_number` int NOT NULL,
+    `row_data` json NOT NULL COMMENT 'Dữ liệu gốc của row',
+    `status` ENUM(
+        'SUCCESS',
+        'FAILED',
+        'DUPLICATE',
+        'WARNING'
+    ) NOT NULL,
+    `match_score` decimal(5, 2) COMMENT 'Điểm match nếu tìm thấy duplicate',
+    `patient_id` bigint COMMENT 'ID của patient đã tạo (nếu SUCCESS)',
+    `matched_master_id` bigint COMMENT 'ID của patient_master đã match (nếu DUPLICATE)',
+    `error_message` text,
+    `warning_message` text,
+    `processed_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (`import_job_id`) REFERENCES `import_job` (`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`patient_id`) REFERENCES `patient` (`id`) ON DELETE SET NULL,
+    FOREIGN KEY (`matched_master_id`) REFERENCES `patient_master` (`id`) ON DELETE SET NULL
+);
+
+USE `mpi_system`;
+
+CREATE TABLE `algorithm_weight_config` (
+    `id` bigint PRIMARY KEY AUTO_INCREMENT,
+    `version` varchar(20) UNIQUE NOT NULL COMMENT 'Format: v2.4, v2.5...',
+    `name_weight` decimal(5, 2) NOT NULL,
+    `dob_weight` decimal(5, 2) NOT NULL,
+    `national_id_weight` decimal(5, 2) NOT NULL,
+    `phone_weight` decimal(5, 2) NOT NULL,
+    `address_weight` decimal(5, 2) NOT NULL,
+    `auto_approval_threshold` decimal(5, 2) NOT NULL,
+    `manual_review_threshold` decimal(5, 2) NOT NULL,
+    `is_active` boolean NOT NULL DEFAULT false,
+    `description` varchar(500),
+    `created_by` varchar(255),
+    `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `deployed_at` datetime DEFAULT NULL
+);
+
+ALTER TABLE import_job
+ADD COLUMN file_token VARCHAR(100) NULL AFTER id;
+
+UPDATE import_job
+SET
+    file_token = file_name
+WHERE
+    file_token IS NULL;
+
+CREATE TABLE `refresh_token` (
+    `id` bigint PRIMARY KEY AUTO_INCREMENT,
+    `user_id` bigint NOT NULL,
+    `token` varchar(500) UNIQUE NOT NULL,
+    `expires_at` datetime NOT NULL,
+    `is_revoked` boolean NOT NULL DEFAULT false,
+    `device_info` varchar(255),
+    `ip_address` varchar(45),
+    `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `used_at` datetime,
+    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+);
+
+USE `mpi_system`;
+
+ALTER TABLE `users`
+ADD COLUMN `status` ENUM(
+    'ACTIVE',
+    'INACTIVE',
+    'SUSPENDED'
+) NOT NULL DEFAULT 'ACTIVE' AFTER `avatar`;

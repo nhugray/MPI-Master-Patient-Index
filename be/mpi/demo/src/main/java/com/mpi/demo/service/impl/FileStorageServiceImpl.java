@@ -22,6 +22,7 @@ import com.mpi.demo.service.StoredFile;
 
 @Service
 public class FileStorageServiceImpl implements FileStorageService {
+
     private final Path uploadDirectory;
     private final long maxFileSize;
     private final Map<String, StoredFile> metadata = new ConcurrentHashMap<>();
@@ -107,4 +108,5 @@ public class FileStorageServiceImpl implements FileStorageService {
     public String extension(FileTypeEnum type) {
         return type == FileTypeEnum.CSV ? ".csv" : ".xlsx";
     }
+
 }

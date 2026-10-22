@@ -119,7 +119,7 @@
           <td>{{ patient.localPatientCode }}</td>
           <td>{{ patient.dateOfBirth | date:'dd/MM/yyyy' }}</td>
           <td>{{ getGenderDisplayLabel(patient.gender) }}</td>
-          <td>{{ formatPhone(patient.phoneNumber) || '-' }}</td>
+          <td>{{ patient.phoneNumber | phoneFormat }}</td>
           <td>
             <span class="status-badge" [class]="'status-' + patient.matchStatus.toLowerCase()">
               <span class="status-dot"></span>

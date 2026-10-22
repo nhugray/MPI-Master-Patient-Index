@@ -52,3 +52,13 @@ export interface MergeHistoryLog {
   reason: string;
   recordsAffected: number;
 }
+
+export interface PatientMasterHistory {
+  action: string;
+  actionType: string;
+  date: string;
+  performedBy: string;
+  detail: string;
+  colorCode: string;
+  matchScore?: number | null;
+}

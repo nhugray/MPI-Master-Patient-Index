@@ -1,0 +1,16 @@
+<div class="login-page">
+  <div class="login-container">
+    <div class="login-card">
+
+      <app-auth-header></app-auth-header>
+
+      <app-auth-error-alert [message]="errorMessage"></app-auth-error-alert>
+
+      <app-login-form (submitLogin)="onLogin($event)"></app-login-form>
+
+      <div class="divider">
+        <span class="divider-text">HOẶC</span>
+      </div>
+    </div>
+  </div>
+</div>

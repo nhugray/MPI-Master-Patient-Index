@@ -10,12 +10,15 @@
     <form [formGroup]="form" (ngSubmit)="onSubmit()" class="modal-body">
       <div class="form-grid">
         <div class="form-group">
-          <label class="form-label">ID Hệ thống nguồn <span class="required">*</span></label>
-          <input
-            type="number"
+          <label class="form-label">Hệ thống nguồn <span class="required">*</span></label>
+          <select
             formControlName="sourceSystemId"
-            class="form-input"
-            placeholder="Nhập ID hệ thống nguồn...">
+            class="form-select">
+            <option value="" disabled>-- Chọn hệ thống nguồn --</option>
+            @for (system of sourceSystems(); track system.id) {
+              <option [value]="system.id">{{ system.name }} ({{ system.code }})</option>
+            }
+          </select>
           @if (form.get('sourceSystemId')?.touched && form.get('sourceSystemId')?.errors?.['required']) {
             <span class="form-error">{{ sourceSystemIdRequiredError }}</span>
           }

@@ -4,7 +4,6 @@
   padding-bottom: 6rem;
 }
 
-/* Header */
 .import-header {
   position: fixed;
   top: 0;
@@ -84,7 +83,6 @@
   border: 2px solid var(--surface-container-lowest);
 }
 
-/* Main Container */
 .import-main {
   padding-top: 4rem;
   padding-left: 1rem;
@@ -93,7 +91,6 @@
   margin: 0 auto;
 }
 
-/* Hero Section */
 .hero-section {
   margin-top: 0.5rem;
   margin-bottom: 1.5rem;
@@ -147,7 +144,6 @@
   color: var(--on-surface-variant);
 }
 
-/* Grid Layout */
 .import-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -175,7 +171,6 @@
   gap: 1rem;
 }
 
-/* Card Styles */
 .card {
   background-color: var(--surface-container-lowest);
   border-radius: 0.75rem;
@@ -226,7 +221,6 @@
   color: var(--on-surface);
 }
 
-/* Form Elements */
 .form-group {
   margin-bottom: 1rem;
 }
@@ -306,7 +300,6 @@
   cursor: pointer;
 }
 
-/* Active Jobs Queue */
 .jobs-title {
   font-size: 0.75rem;
   font-weight: 600;
@@ -395,7 +388,6 @@
   transition: width 0.3s ease;
 }
 
-/* Upload Zone */
 .upload-zone {
   background-color: var(--surface-container-lowest);
   border-radius: 0.75rem;
@@ -471,7 +463,6 @@
   transform: scale(0.98);
 }
 
-/* Preview Card */
 .preview-card {
   background-color: var(--surface-container-lowest);
   border-radius: 0.75rem;
@@ -597,7 +588,6 @@
   transform: scale(0.98);
 }
 
-/* Validation Errors */
 .validation-errors {
   padding: 1rem;
   background-color: #fef2f2;
@@ -630,7 +620,6 @@
   margin-top: 0.25rem;
 }
 
-/* Detected Columns */
 .detected-columns {
   padding: 1rem;
   background-color: var(--surface);
@@ -658,7 +647,6 @@
   border: 1px solid var(--outline-variant);
 }
 
-/* Preview Table */
 .preview-table-wrapper {
   padding: 1rem;
   background-color: var(--surface);
@@ -699,7 +687,6 @@
   background-color: #fef2f2;
 }
 
-/* Loading State */
 .loading-container {
   display: flex;
   flex-direction: column;
@@ -729,7 +716,6 @@
   color: var(--on-surface-variant);
 }
 
-/* Empty State */
 .empty-state {
   text-align: center;
   padding: 3rem 1rem;
@@ -737,7 +723,6 @@
   font-size: 0.875rem;
 }
 
-/* Utility Classes */
 .text-success {
   color: #059669;
 }
@@ -762,7 +747,6 @@
   color: #f59e0b;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .import-main {
     padding-left: 0.75rem;

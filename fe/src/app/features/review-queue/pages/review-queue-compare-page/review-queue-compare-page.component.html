@@ -20,7 +20,6 @@
   </div>
 
   <div class="compare-grid">
-    <!-- Column 1: Patient Record -->
     <div class="record-card patient-card">
       <div class="card-accent patient-accent"></div>
       <div class="card-header">
@@ -42,7 +41,27 @@
       </div>
     </div>
 
-    <!-- Middle: Match Score Column -->
+    <div class="record-card master-card">
+      <div class="card-accent master-accent"></div>
+      <div class="card-header">
+        <span class="material-symbols-outlined filled">star</span>
+        <h3>Hồ sơ Gốc Ứng viên</h3>
+        <span class="badge">{{ candidate()?.candidateMaster?.enterpriseId }}</span>
+      </div>
+      <div class="card-body">
+        <div class="field-row" *ngFor="let field of fieldComparisons()">
+          <div class="field-value" [ngClass]="{
+            'field-match': field.isMatch,
+            'field-mismatch': !field.isMatch && field.patientValue !== '[Trống]' && field.masterValue !== '[Trống]',
+            'field-empty': field.masterValue === '[Trống]'
+          }">
+            {{ field.masterValue }}
+          </div>
+          <div class="field-label">{{ field.label }}</div>
+        </div>
+      </div>
+    </div>
+
     <div class="score-column">
       <div class="score-card">
         <div class="overall-score">
@@ -78,27 +97,6 @@
       </div>
     </div>
 
-    <!-- Column 2: Master Record -->
-    <div class="record-card master-card">
-      <div class="card-accent master-accent"></div>
-      <div class="card-header">
-        <span class="material-symbols-outlined filled">star</span>
-        <h3>Hồ sơ Gốc Ứng viên</h3>
-        <span class="badge">{{ candidate()?.candidateMaster?.enterpriseId }}</span>
-      </div>
-      <div class="card-body">
-        <div class="field-row" *ngFor="let field of fieldComparisons()">
-          <div class="field-value" [ngClass]="{
-            'field-match': field.isMatch,
-            'field-mismatch': !field.isMatch && field.patientValue !== '[Trống]' && field.masterValue !== '[Trống]',
-            'field-empty': field.masterValue === '[Trống]'
-          }">
-            {{ field.masterValue }}
-          </div>
-          <div class="field-label">{{ field.label }}</div>
-        </div>
-      </div>
-    </div>
   </div>
 </div>
 

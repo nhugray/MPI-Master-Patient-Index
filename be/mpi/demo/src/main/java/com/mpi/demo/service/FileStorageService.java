@@ -19,4 +19,5 @@ public interface FileStorageService {
     void delete(String fileToken) throws IOException;
 
     String extension(FileTypeEnum type);
+
 }

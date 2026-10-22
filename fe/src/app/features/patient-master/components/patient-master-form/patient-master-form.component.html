@@ -24,9 +24,9 @@
 
           <div class="form-group form-group-full">
             <label class="form-label">Họ và tên <span class="required">*</span></label>
-            <input 
-              type="text" 
-              class="form-input" 
+            <input
+              type="text"
+              class="form-input"
               formControlName="fullName"
               placeholder="Nhập họ và tên..."
               [class.error]="getFieldError('fullName')">
@@ -37,9 +37,9 @@
 
           <div class="form-group">
             <label class="form-label">Ngày sinh <span class="required">*</span></label>
-            <input 
-              type="date" 
-              class="form-input" 
+            <input
+              type="date"
+              class="form-input"
               formControlName="dateOfBirth"
               [class.error]="getFieldError('dateOfBirth')">
             @if (getFieldError('dateOfBirth')) {
@@ -58,9 +58,9 @@
 
           <div class="form-group">
             <label class="form-label">Số CCCD</label>
-            <input 
-              type="text" 
-              class="form-input" 
+            <input
+              type="text"
+              class="form-input"
               formControlName="nationalId"
               placeholder="012345678901"
               maxlength="12"
@@ -72,9 +72,9 @@
 
           <div class="form-group">
             <label class="form-label">Mã số BHYT</label>
-            <input 
-              type="text" 
-              class="form-input" 
+            <input
+              type="text"
+              class="form-input"
               formControlName="healthInsuranceNo"
               placeholder="GD4..."
               maxlength="20"
@@ -86,9 +86,9 @@
 
           <div class="form-group">
             <label class="form-label">Số điện thoại</label>
-            <input 
-              type="tel" 
-              class="form-input" 
+            <input
+              type="tel"
+              class="form-input"
               formControlName="phoneNumber"
               placeholder="0..."
               maxlength="10"
@@ -100,8 +100,8 @@
 
           <div class="form-group form-group-full">
             <label class="form-label">Địa chỉ</label>
-            <textarea 
-              class="form-input" 
+            <textarea
+              class="form-input"
               formControlName="address"
               placeholder="Nhập địa chỉ..."
               rows="2"

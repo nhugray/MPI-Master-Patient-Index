@@ -1,0 +1,76 @@
+<form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+
+  <div class="form-group">
+    <label for="email" class="form-label">Tên đăng nhập</label>
+    <div class="input-wrapper">
+      <span class="input-icon material-symbols-outlined">person</span>
+      <input
+        formControlName="email"
+        type="email"
+        id="email"
+        class="form-input"
+        placeholder="Nhập tên đăng nhập"
+        [class.is-invalid]="isFieldInvalid('email')"
+      />
+    </div>
+    <span class="error-text" *ngIf="isFieldInvalid('email')">
+      {{ getErrorMessage('email') }}
+    </span>
+  </div>
+
+  <div class="form-group">
+    <label for="password" class="form-label">Mật khẩu</label>
+    <div class="input-wrapper">
+      <span class="input-icon material-symbols-outlined">lock</span>
+      <input
+        formControlName="password"
+        [type]="showPassword ? 'text' : 'password'"
+        id="password"
+        class="form-input"
+        placeholder="Nhập mật khẩu"
+        [class.is-invalid]="isFieldInvalid('password')"
+      />
+      <button
+        type="button"
+        class="toggle-password"
+        (click)="togglePasswordVisibility()"
+        [title]="showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'"
+      >
+        <span class="material-symbols-outlined">
+          {{ showPassword ? 'visibility_off' : 'visibility' }}
+        </span>
+      </button>
+    </div>
+    <span class="error-text" *ngIf="isFieldInvalid('password')">
+      {{ getErrorMessage('password') }}
+    </span>
+  </div>
+
+  <div class="form-actions">
+    <div class="remember-me">
+      <input
+        formControlName="rememberMe"
+        type="checkbox"
+        id="remember-me"
+        class="checkbox-input"
+      />
+      <label for="remember-me" class="checkbox-label">Ghi nhớ đăng nhập</label>
+    </div>
+    <a href="#" class="forgot-password-link">Quên mật khẩu?</a>
+  </div>
+
+  <button
+    type="submit"
+    class="submit-button"
+    [disabled]="isSubmitting || !loginForm.valid"
+  >
+    <span *ngIf="!isSubmitting">
+      Đăng nhập
+      <span class="material-symbols-outlined">login</span>
+    </span>
+    <span *ngIf="isSubmitting" class="spinner">
+      <span class="spinner-dot"></span>
+      Đang đăng nhập...
+    </span>
+  </button>
+</form>

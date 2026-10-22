@@ -20,6 +20,8 @@ public record PatientResponse(
         String phoneNumber,
         String address,
         String healthInsuranceNo,
+        Long masterPatientId,
+        String enterpriseId,
         PatientMaster masterPatient,
         MatchStatusEnum matchStatus,
         BigDecimal matchScore) {
@@ -41,6 +43,8 @@ public record PatientResponse(
                 patient.getPhoneNumber(),
                 patient.getAddress(),
                 patient.getHealthInsuranceNo(),
+                patient.getMasterPatient() != null ? patient.getMasterPatient().getId() : null,
+                patient.getMasterPatient() != null ? patient.getMasterPatient().getEnterpriseId() : null,
                 patient.getMasterPatient(),
                 patient.getMatchStatus(),
                 matchScore);

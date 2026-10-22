@@ -14,14 +14,12 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Table(name = "source_system")
 @Getter
 @Setter
-@NoArgsConstructor
 public class SourceSystem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,4 +48,8 @@ public class SourceSystem {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    public SourceSystem() {
+
+    }
 }

@@ -103,6 +103,12 @@ public class GlobalExceptionHandler {
                 return fieldError.getDefaultMessage();
         }
 
+        @ExceptionHandler(InvalidTokenException.class)
+        public ResponseEntity<ApiResponse<Void>> handleInvalidToken(InvalidTokenException ex) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                                .body(ApiResponse.unauthorized(ex.getMessage()));
+        }
+
         @ExceptionHandler(AuthenticationException.class)
         public ResponseEntity<ApiResponse<Void>> handleAuthentication(AuthenticationException ex) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED)

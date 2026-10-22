@@ -22,6 +22,7 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
+import com.mpi.demo.dto.request.ChangePasswordRequest;
 import com.mpi.demo.dto.request.LoginRequest;
 import com.mpi.demo.dto.request.RegisterRequest;
 import com.mpi.demo.dto.response.LoginResponse;
@@ -78,7 +79,7 @@ public class AuthServiceImpl implements AuthService {
         saveRefreshToken(rawRefreshToken, user, deviceInfo, ipAddress);
 
         log.info("Người dùng đăng nhập thành công: {}", user.getEmail());
-        return new LoginResponse(rawAccessToken, rawRefreshToken);
+        return new LoginResponse(rawAccessToken, rawRefreshToken, accessTokenExpiration);
     }
 
     @Override
@@ -101,30 +102,37 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    @Transactional
-    public LoginResponse refresh(String rawRefreshToken,String currentIP) {
+    @Transactional(noRollbackFor = InvalidTokenException.class)
+    public LoginResponse refresh(String rawRefreshToken, String currentIP) {
+        if (rawRefreshToken == null || rawRefreshToken.isBlank()) {
+            throw new InvalidTokenException("Thiếu refresh token");
+        }
+
         String tokenHash = hashToken(rawRefreshToken);
 
         RefreshToken storedToken = refreshTokenRepository.findByToken(tokenHash)
                 .orElseThrow(() -> new InvalidTokenException("Refresh token không hợp lệ"));
 
+        User user = storedToken.getUser();
+
         if (storedToken.isRevoked()) {
+            refreshTokenRepository.revokeAllByUserId(user.getId());
+            log.warn("Refresh token đã thu hồi bị dùng lại, thu hồi toàn bộ phiên của: {}", user.getEmail());
             throw new InvalidTokenException("Refresh token đã bị thu hồi");
         }
 
         if (storedToken.getExpiresAt().isBefore(Instant.now())) {
             throw new InvalidTokenException("Refresh token đã hết hạn");
         }
-        
+
+        if (storedToken.getIpAddress() != null && !storedToken.getIpAddress().equals(currentIP)) {
+            refreshTokenRepository.revokeAllByUserId(user.getId());
+            log.warn("IP không khớp khi refresh cho người dùng: {}", user.getEmail());
+            throw new InvalidTokenException("IP không khớp - Possible token theft");
+        }
 
         storedToken.setRevoked(true);
         refreshTokenRepository.save(storedToken);
-
-        User user = storedToken.getUser();
-        if (!storedToken.getIpAddress().equals(currentIP)) {
-        refreshTokenRepository.revokeAllByUserId(user.getId());
-        throw new InvalidTokenException("IP không khớp - Possible token theft");
-        }
 
         List<String> roles = user.getRoles().stream()
                 .map(role -> "ROLE_" + role.getName())
@@ -136,17 +144,16 @@ public class AuthServiceImpl implements AuthService {
         saveRefreshToken(newRefreshToken, user, storedToken.getDeviceInfo(), storedToken.getIpAddress());
 
         log.info("Refresh token được làm mới cho người dùng: {}", user.getEmail());
-        return new LoginResponse(newAccessToken, newRefreshToken);
+        return new LoginResponse(newAccessToken, newRefreshToken, accessTokenExpiration);
     }
 
     @Override
     @Transactional
     public void logout(String rawRefreshToken) {
-        RefreshToken storedToken = refreshTokenRepository.findByToken(hashToken(rawRefreshToken))
-                .orElseThrow(() -> new InvalidTokenException("Refresh token không hợp lệ"));
-
-        refreshTokenRepository.revokeAllByUserId(storedToken.getUser().getId());
-        log.info("Người dùng đăng xuất thành công: {}", storedToken.getUser().getEmail());
+        refreshTokenRepository.findByToken(hashToken(rawRefreshToken)).ifPresent(storedToken -> {
+            refreshTokenRepository.revokeAllByUserId(storedToken.getUser().getId());
+            log.info("Người dùng đăng xuất thành công: {}", storedToken.getUser().getEmail());
+        });
     }
 
     @Override
@@ -155,6 +162,29 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Người dùng", "email", email));
         return UserResponse.fromEntity(user);
+    }
+
+    @Override
+    @Transactional
+    public void changePassword(String email, ChangePasswordRequest request) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Người dùng", "email", email));
+
+        if (!passwordEncoder.matches(request.currentPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("Mật khẩu hiện tại không đúng");
+        }
+
+        if (!request.newPassword().equals(request.confirmPassword())) {
+            throw new IllegalArgumentException("Mật khẩu mới và xác nhận mật khẩu không khớp");
+        }
+
+        if (passwordEncoder.matches(request.newPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("Mật khẩu mới không được trùng với mật khẩu hiện tại");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.newPassword()));
+        userRepository.save(user);
+        log.info("Đổi mật khẩu thành công cho người dùng: {}", email);
     }
 
     private String hashToken(String rawToken) {
@@ -224,6 +254,4 @@ public class AuthServiceImpl implements AuthService {
         refreshToken.setRevoked(false);
         refreshTokenRepository.save(refreshToken);
     }
-
-
 }

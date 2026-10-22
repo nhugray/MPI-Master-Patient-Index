@@ -1,3 +1,4 @@
+import { ACTIVE_STATUS_OPTIONS } from '../../../shared/constants';
 import { FacilityType } from './facility.model';
 
 export const FACILITY_TYPE_OPTIONS = [
@@ -6,7 +7,6 @@ export const FACILITY_TYPE_OPTIONS = [
   { value: FacilityType.OTHER, label: 'Khác' }
 ];
 
-export const FACILITY_STATUS_OPTIONS = [
-  { value: true, label: 'Đang hoạt động' },
-  { value: false, label: 'Ngừng hoạt động' }
-];
+export const FACILITY_STATUS_OPTIONS = ACTIVE_STATUS_OPTIONS;
+export const STATUS_OPTIONS = ACTIVE_STATUS_OPTIONS;
+

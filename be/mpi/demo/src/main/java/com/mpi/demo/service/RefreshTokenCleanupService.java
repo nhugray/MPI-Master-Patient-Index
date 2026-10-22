@@ -11,19 +11,19 @@ import com.mpi.demo.repository.RefreshTokenRepository;
 import java.time.Instant;
 
 @Service
-@RequiredArgsConstructor 
+@RequiredArgsConstructor
 @Slf4j
 public class RefreshTokenCleanupService {
 
     private final RefreshTokenRepository refreshTokenRepository;
 
-    @Scheduled(cron = "0 0 2 * * ?") 
+    @Scheduled(cron = "0 0 2 * * ?")
     @Transactional
     public void cleanupExpiredTokens() {
         log.info("Starting cleanup of expired refresh tokens...");
-        
+
         int deletedCount = refreshTokenRepository.deleteAllExpiredBefore(Instant.now());
-        
+
         log.info("Cleaned up {} expired refresh tokens successfully.", deletedCount);
     }
 }

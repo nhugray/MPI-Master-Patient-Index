@@ -226,7 +226,6 @@
   overflow: hidden;
 }
 
-/* Filter Toolbar */
 .filter-toolbar {
   display: flex;
   flex-direction: column;

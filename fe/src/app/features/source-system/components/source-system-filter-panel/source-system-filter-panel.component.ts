@@ -29,7 +29,6 @@ export class SourceSystemFilterPanelComponent {
     { value: 'INACTIVE', label: 'Không hoạt động' }
   ];
 
-  // Dropdown states
   facilityDropdownOpen = false;
   statusDropdownOpen = false;
 

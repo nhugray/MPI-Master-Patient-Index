@@ -39,7 +39,7 @@ public class ReviewQueueController {
             @ParameterObject Pageable pageable) {
 
         Page<MatchCandidate> page = patientMatchingService.searchCandidates(decision, pageable);
-        
+
         Page<MatchCandidateResponse> responsePage = page.map(MatchCandidateResponse::fromEntity);
         ResultPagination result = ResultPagination.fromPage(responsePage);
 

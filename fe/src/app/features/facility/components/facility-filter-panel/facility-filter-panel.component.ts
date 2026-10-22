@@ -30,7 +30,6 @@ export class FacilityFilterPanelComponent {
     { value: 'INACTIVE', label: 'Ngừng hoạt động' }
   ];
 
-  // Dropdown states
   typeDropdownOpen = false;
   statusDropdownOpen = false;
 

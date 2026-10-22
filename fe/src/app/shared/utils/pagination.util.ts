@@ -1,10 +1,8 @@
 import { PageMeta } from '../models/pagination.model';
 
-
 export function toApiPage(uiPage: number): number {
   return uiPage - 1;
 }
-
 
 export function fromApiPage(apiPage: number): number {
   return apiPage + 1;

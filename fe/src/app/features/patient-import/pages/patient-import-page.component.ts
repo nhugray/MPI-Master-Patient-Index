@@ -41,24 +41,20 @@ export class PatientImportPageComponent implements OnInit {
   private readonly toastService = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);
 
-  // Configuration
   selectedSourceSystemId: number | null = null;
   sourceSystems: SourceSystem[] = [];
   skipDuplicates = true;
   duplicateThreshold = 98;
 
-  // File Upload State
   isDragging = false;
   selectedFile: File | null = null;
   isUploading = false;
   validationResponse: FileValidationResponse | null = null;
 
-  // Preview Data
   previewData: PreviewRow[] = [];
   previewTotalRows = 0;
   isLoadingPreview = false;
 
-  // Active Jobs
   activeJobs: ActiveJob[] = [];
   isLoadingJobs = false;
 
@@ -94,7 +90,7 @@ export class PatientImportPageComponent implements OnInit {
       .subscribe({
         next: (response) => {
           if (isSuccess(response) && response.data) {
-            this.activeJobs = response.data.result
+            this.activeJobs = (response.data?.result || [])
               .slice(0, 5)
               .map((job: ImportJob) => this.mapToActiveJob(job));
           }
@@ -134,7 +130,6 @@ export class PatientImportPageComponent implements OnInit {
     return { job, progressPercentage, isProcessing };
   }
 
-  // Drag and Drop Handlers
   onDragOver(event: DragEvent): void {
     event.preventDefault();
     event.stopPropagation();
@@ -166,7 +161,6 @@ export class PatientImportPageComponent implements OnInit {
   }
 
   private handleFileSelection(file: File): void {
-    // Validate file type
     const allowedTypes = [
       'text/csv',
       'application/vnd.ms-excel',
@@ -178,7 +172,6 @@ export class PatientImportPageComponent implements OnInit {
       return;
     }
 
-    // Validate file size (500MB)
     const maxSize = 500 * 1024 * 1024;
     if (file.size > maxSize) {
       this.toastService.error('Lỗi', 'Kích thước file vượt quá 500MB');
@@ -209,12 +202,12 @@ export class PatientImportPageComponent implements OnInit {
         next: (response) => {
           if (isSuccess(response) && response.data) {
             this.validationResponse = response.data;
-            
+
             if (response.data.preview && response.data.preview.length > 0) {
               this.previewData = response.data.preview.slice(0, 50);
               this.previewTotalRows = response.data.totalRows;
             }
-            
+
             this.toastService.success('Thành công', 'File đã được tải lên và xác thực');
           }
           this.isUploading = false;
@@ -233,15 +226,14 @@ export class PatientImportPageComponent implements OnInit {
     }
 
     const columnMappings = this.getDefaultColumnMappings();
-    
-    // Debug logging
+
     console.log('=== START IMPORT DEBUG ===');
     console.log('ValidationResponse:', this.validationResponse);
     console.log('SuggestedMappings:', this.validationResponse.suggestedMappings);
     console.log('ColumnMappings:', columnMappings);
     console.log('ColumnMappings keys:', Object.keys(columnMappings));
     console.log('ColumnMappings values:', Object.values(columnMappings));
-    
+
     const request: StartImportRequest = {
       sourceSystemId: this.selectedSourceSystemId,
       fileToken: this.validationResponse.fileToken,
@@ -249,7 +241,7 @@ export class PatientImportPageComponent implements OnInit {
       skipDuplicates: this.skipDuplicates,
       duplicateThreshold: this.duplicateThreshold
     };
-    
+
     console.log('StartImportRequest:', request);
 
     this.importService.startImport(request)
@@ -272,16 +264,13 @@ export class PatientImportPageComponent implements OnInit {
   }
 
   private getDefaultColumnMappings(): Record<string, string> {
-    // Use suggested mappings from backend validation
-    if (this.validationResponse?.suggestedMappings && 
-        Object.keys(this.validationResponse.suggestedMappings).length > 0) {
+    if (this.validationResponse?.suggestedMappings &&
+      Object.keys(this.validationResponse.suggestedMappings).length > 0) {
       return this.validationResponse.suggestedMappings;
     }
-    
-    // Log warning if no mappings found
+
     console.warn('No suggested mappings found in validation response');
-    
-    // Fallback to empty mappings (backend will reject if invalid)
+
     return {};
   }
 
@@ -308,22 +297,22 @@ export class PatientImportPageComponent implements OnInit {
 
     switch (row.matchStatus) {
       case 'HIGH_MATCH':
-        return { 
-          text: `Khớp cao ${row.estimatedMatchScore || 95}%`, 
-          class: 'text-green-700', 
-          dotClass: 'bg-green-500' 
+        return {
+          text: `Khớp cao ${row.estimatedMatchScore || 95}%`,
+          class: 'text-green-700',
+          dotClass: 'bg-green-500'
         };
       case 'MEDIUM_MATCH':
-        return { 
-          text: `Cần xem xét ${row.estimatedMatchScore || 70}%`, 
-          class: 'text-yellow-700', 
-          dotClass: 'bg-yellow-500' 
+        return {
+          text: `Cần xem xét ${row.estimatedMatchScore || 70}%`,
+          class: 'text-yellow-700',
+          dotClass: 'bg-yellow-500'
         };
       case 'LOW_MATCH':
-        return { 
-          text: `Khớp thấp ${row.estimatedMatchScore || 40}%`, 
-          class: 'text-orange-700', 
-          dotClass: 'bg-orange-500' 
+        return {
+          text: `Khớp thấp ${row.estimatedMatchScore || 40}%`,
+          class: 'text-orange-700',
+          dotClass: 'bg-orange-500'
         };
       case 'NEW_RECORD':
         return { text: 'Hồ sơ mới', class: 'text-blue-700', dotClass: 'bg-blue-500' };

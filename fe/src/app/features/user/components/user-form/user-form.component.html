@@ -1,0 +1,79 @@
+<div class="modal-backdrop" [class.active]="isOpen" (click)="onBackdropClick($event)">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3 class="modal-title">{{ isEditMode ? 'Cập nhật thông tin người dùng' : 'Thêm người dùng mới' }}</h3>
+      <button class="btn-close" (click)="close()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="modal-body">
+      <div class="form-grid">
+        <div class="form-group">
+          <label class="form-label">Tên <span class="required">*</span></label>
+          <input type="text" formControlName="name" class="form-input" placeholder="Nhập tên người dùng...">
+          @if (form.get('name')?.touched && form.get('name')?.errors?.['required']) {
+          <span class="form-error">{{ nameRequiredError }}</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Email <span class="required">*</span></label>
+          <input type="email" formControlName="email" class="form-input" placeholder="user@example.com">
+          @if (form.get('email')?.touched && form.get('email')?.errors?.['required']) {
+          <span class="form-error">{{ emailRequiredError }}</span>
+          }
+          @if (form.get('email')?.touched && form.get('email')?.errors?.['invalidEmail']) {
+          <span class="form-error">Email không hợp lệ</span>
+          }
+        </div>
+
+        @if (isEditMode) {
+
+        <div class="form-group">
+          <label class="form-label">Mật khẩu mới (để trống để giữ nguyên)</label>
+          <input type="password" formControlName="password" class="form-input"
+            placeholder="Để trống để giữ mật khẩu hiện tại">
+        </div>
+        }
+
+        <div class="form-group form-group-full">
+          <label class="form-label">Địa chỉ</label>
+          <input type="text" formControlName="address" class="form-input" placeholder="Nhập địa chỉ...">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Trạng thái</label>
+          <select formControlName="status" class="form-select">
+            @for (status of statusOptions; track status.value) {
+            <option [value]="status.value">{{ status.label }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group form-group-full">
+          <label class="form-label">Vai trò</label>
+          <div class="role-checkboxes">
+            @for (role of roles; track role.id) {
+            <label class="checkbox-label">
+              <input type="checkbox" [value]="role.id" (change)="onRoleChange($event, role.id)"
+                [checked]="roleIdsControl?.value?.includes(role.id)">
+              <span>{{ role.name }} - {{ role.description }}</span>
+            </label>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-cancel" (click)="close()">Hủy</button>
+        <button type="submit" class="btn-submit" [disabled]="isSubmitting">
+          @if (isSubmitting) {
+          <span class="loading-spinner-small"></span>
+          }
+          {{ isEditMode ? 'Cập nhật' : 'Lưu thông tin' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

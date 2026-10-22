@@ -2,13 +2,10 @@ package com.mpi.demo.entity;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-
 import com.mpi.demo.constant.GenderEnum;
 import com.mpi.demo.constant.MatchStatusEnum;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -19,17 +16,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Table(name = "patient")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class Patient {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -80,4 +73,26 @@ public class Patient {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    public Patient() {
+    }
+
+    public Patient(Long id, SourceSystem sourceSystem, String localPatientCode, String fullName, LocalDate dateOfBirth,
+            GenderEnum gender, String nationalId, String healthInsuranceNo, String phoneNumber, String address,
+            PatientMaster masterPatient, MatchStatusEnum matchStatus, LocalDateTime createdAt,
+            LocalDateTime updatedAt) {
+        this.id = id;
+        this.sourceSystem = sourceSystem;
+        this.localPatientCode = localPatientCode;
+        this.fullName = fullName;
+        this.dateOfBirth = dateOfBirth;
+        this.gender = gender;
+        this.nationalId = nationalId;
+        this.healthInsuranceNo = healthInsuranceNo;
+        this.phoneNumber = phoneNumber;
+        this.address = address;
+        this.masterPatient = masterPatient;
+        this.matchStatus = matchStatus;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
 }

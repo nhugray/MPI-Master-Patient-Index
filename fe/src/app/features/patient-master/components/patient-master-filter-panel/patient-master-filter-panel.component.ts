@@ -27,7 +27,6 @@ export class PatientMasterFilterPanelComponent {
   genderOptions = GENDER_OPTIONS;
   statusOptions = PATIENT_STATUS_OPTIONS;
 
-  // Dropdown states
   genderDropdownOpen = false;
   statusDropdownOpen = false;
 

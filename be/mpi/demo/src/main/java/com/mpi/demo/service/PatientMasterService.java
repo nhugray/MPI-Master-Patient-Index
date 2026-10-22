@@ -1,9 +1,12 @@
 package com.mpi.demo.service;
 
+import java.util.List;
+
 import org.springframework.data.domain.Pageable;
 
 import com.mpi.demo.dto.request.PatientMasterSearchRequest;
 import com.mpi.demo.dto.request.UpdatePatientMasterRequest;
+import com.mpi.demo.dto.response.PatientMasterHistoryResponse;
 import com.mpi.demo.dto.response.PatientMasterResponse;
 import com.mpi.demo.entity.Patient;
 import com.mpi.demo.entity.PatientMaster;
@@ -24,4 +27,5 @@ public interface PatientMasterService {
 
     PatientMasterResponse update(UpdatePatientMasterRequest request);
 
+    List<PatientMasterHistoryResponse> getHistory(Long masterId);
 }

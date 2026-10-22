@@ -8,6 +8,7 @@ import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import com.mpi.demo.constant.GenderEnum;
+import com.mpi.demo.constant.UserStatusEnum;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -15,7 +16,6 @@ import lombok.*;
 @Table(name = "users")
 @Getter
 @Setter
-@NoArgsConstructor
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,6 +40,10 @@ public class User {
     @Column(length = 500)
     private String avatar;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private UserStatusEnum status = UserStatusEnum.ACTIVE;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     @BatchSize(size = 50)
@@ -52,4 +56,8 @@ public class User {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    public User() {
+
+    }
 }

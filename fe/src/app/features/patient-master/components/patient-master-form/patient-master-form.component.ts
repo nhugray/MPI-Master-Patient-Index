@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { PatientMaster, UpdatePatientMasterRequest } from '../../models/patient-master.model';
 import { PatientMasterService } from '../../services/patient-master.service';
-import { Gender } from '../../../../shared/enums';
+import { Gender, GENDER_OPTIONS } from '../../../../shared/enums';
 import { phoneValidator, PHONE_ERROR_MESSAGE } from '../../../../shared/validators/phone.validator';
 import { nationalIdValidator, NATIONAL_ID_ERROR_MESSAGE } from '../../../../shared/validators/national-id.validator';
 import { getApiErrorMessage } from '../../../../shared/utils/http-error.util';
@@ -25,11 +25,7 @@ export class PatientMasterEditModalComponent implements OnInit {
   isSubmitting = signal(false);
   errorMessage = signal<string | null>(null);
 
-  genderOptions = [
-    { value: Gender.MALE, label: 'Nam' },
-    { value: Gender.FEMALE, label: 'Nữ' },
-    { value: Gender.OTHER, label: 'Khác' }
-  ];
+  genderOptions = GENDER_OPTIONS;
 
   constructor(
     private fb: FormBuilder,

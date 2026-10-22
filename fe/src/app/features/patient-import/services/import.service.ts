@@ -21,9 +21,6 @@ export class ImportService {
   private readonly apiUrl = environment.apiUrl;
   private readonly basePath = '/imports';
 
-  /**
-   * Upload and validate file
-   */
   uploadFile(file: File, sourceSystemId: number): Observable<ApiResponse<FileValidationResponse>> {
     const formData = new FormData();
     formData.append('file', file);
@@ -35,9 +32,6 @@ export class ImportService {
     );
   }
 
-  /**
-   * Preview import data
-   */
   previewImportData(jobId: number, page: number = 0, size: number = 10): Observable<ApiResponse<PageResponse<PreviewRow>>> {
     const params = new HttpParams()
       .set('page', page.toString())
@@ -49,9 +43,6 @@ export class ImportService {
     );
   }
 
-  /**
-   * Start import process
-   */
   startImport(request: StartImportRequest): Observable<ApiResponse<ImportJob>> {
     return this.http.post<ApiResponse<ImportJob>>(
       `${this.apiUrl}${this.basePath}/start`,
@@ -59,18 +50,12 @@ export class ImportService {
     );
   }
 
-  /**
-   * Get import job status
-   */
   getImportJobStatus(jobId: number): Observable<ApiResponse<ImportJob>> {
     return this.http.get<ApiResponse<ImportJob>>(
       `${this.apiUrl}${this.basePath}/${jobId}`
     );
   }
 
-  /**
-   * Get import job details
-   */
   getImportJobDetails(
     jobId: number,
     status?: ImportRowStatus,
@@ -91,9 +76,6 @@ export class ImportService {
     );
   }
 
-  /**
-   * Search import jobs
-   */
   searchImportJobs(
     params: {
       fileName?: string;
@@ -127,9 +109,6 @@ export class ImportService {
     );
   }
 
-  /**
-   * Cancel import job
-   */
   cancelImportJob(jobId: number): Observable<ApiResponse<void>> {
     return this.http.post<ApiResponse<void>>(
       `${this.apiUrl}${this.basePath}/${jobId}/cancel`,
@@ -137,9 +116,6 @@ export class ImportService {
     );
   }
 
-  /**
-   * Retry failed rows
-   */
   retryFailedRows(jobId: number): Observable<ApiResponse<void>> {
     return this.http.post<ApiResponse<void>>(
       `${this.apiUrl}${this.basePath}/${jobId}/retry-failed`,

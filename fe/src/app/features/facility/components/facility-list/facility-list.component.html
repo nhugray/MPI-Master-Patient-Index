@@ -11,10 +11,6 @@
     </p>
   </div>
   <div class="page-actions">
-    <button class="btn-secondary">
-      <span class="material-symbols-outlined">file_download</span>
-      Xuất dữ liệu
-    </button>
     <button class="btn-primary" (click)="onAddFacility()">
       <span class="material-symbols-outlined">add_circle</span>
       + Thêm cơ sở y tế mới
@@ -96,9 +92,7 @@
 </div>
 
 <div class="filter-toolbar">
-  <app-facility-filter-panel
-    (typeChange)="onTypeFilterChange($event)"
-    (statusChange)="onStatusFilterChange($event)"
+  <app-facility-filter-panel (typeChange)="onTypeFilterChange($event)" (statusChange)="onStatusFilterChange($event)"
     (resetFilters)="resetFilters()">
   </app-facility-filter-panel>
 </div>
@@ -153,7 +147,7 @@
               </span>
               <span class="contact-phone">
                 <span class="material-symbols-outlined">call</span>
-                {{ formatPhone(facility.phoneNumber) }}
+                {{ facility.phoneNumber | phoneFormat }}
               </span>
             </div>
           </td>

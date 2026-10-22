@@ -11,14 +11,12 @@ export const WEIGHT_FIELDS: WeightFieldDefinition[] = [
   {
     key: 'nameWeight',
     label: 'Tên Pháp lý (Given + Surname)',
-    // mô tả tiếng việt
     description: 'Trọng số cho tên pháp lý, bao gồm tên và họ.',
     colorClass: 'text-primary'
   },
   {
     key: 'dobWeight',
     label: 'Ngày sinh (DOB)',
-    // mô tả tiếng việt
     description: 'Trọng số cho ngày sinh, bao gồm ngày tháng năm sinh.',
     colorClass: 'text-primary'
   },
@@ -51,6 +49,3 @@ export const DEFAULT_WEIGHT_FORM: Record<WeightFieldKey, number> = {
   phoneWeight: 3,
   addressWeight: 2
 };
-
-export const DEFAULT_AUTO_APPROVAL_THRESHOLD = 85;
-export const DEFAULT_MANUAL_REVIEW_THRESHOLD = 50;

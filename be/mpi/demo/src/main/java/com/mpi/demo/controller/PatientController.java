@@ -2,6 +2,7 @@ package com.mpi.demo.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mpi.demo.constant.MatchStatusEnum;
 import com.mpi.demo.dto.request.CreatePatientRequest;
 import com.mpi.demo.dto.request.PatientSearchRequest;
 import com.mpi.demo.dto.request.UpdatePatientRequest;
@@ -55,8 +56,21 @@ public class PatientController {
             @Valid @RequestBody CreatePatientRequest request) {
         PatientResponse response = patientService.create(request);
         URI location = URI.create(String.format("api/v1/patients/%s", response.id()));
+
+        String message;
+        if (response.matchStatus() == MatchStatusEnum.MATCHED) {
+            String eid = response.enterpriseId() != null ? response.enterpriseId() : "";
+            message = "Tạo bệnh nhân thành công. Đã tự động gộp vào hồ sơ chủ EID: " + eid;
+        } else if (response.matchStatus() == MatchStatusEnum.PENDING) {
+            String scoreStr = response.matchScore() != null ? (" (" + response.matchScore() + "%)") : "";
+            message = "Đã lưu bệnh nhân. Phát hiện nghi vấn trùng khớp" + scoreStr + ", hồ sơ đã được chuyển vào Hàng đợi duyệt";
+        } else {
+            String eid = response.enterpriseId() != null ? response.enterpriseId() : "";
+            message = "Tạo bệnh nhân mới thành công. Mã định danh EID: " + eid;
+        }
+
         return ResponseEntity.created(location)
-                .body(ApiResponse.success("Tạo bệnh nhân thành công", response));
+                .body(ApiResponse.success(message, response));
     }
 
     @PutMapping

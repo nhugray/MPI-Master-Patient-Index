@@ -73,6 +73,7 @@ CREATE TABLE `users` (
     `address` varchar(500),
     `gender` ENUM('MALE', 'FEMALE', 'OTHER') DEFAULT 'OTHER',
     `avatar` varchar(500),
+    `status` ENUM('ACTIVE', 'INACTIVE', 'SUSPENDED') NOT NULL DEFAULT 'ACTIVE',
     `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );

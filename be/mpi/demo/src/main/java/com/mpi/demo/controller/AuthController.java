@@ -2,6 +2,7 @@ package com.mpi.demo.controller;
 
 import java.util.Arrays;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -9,6 +10,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mpi.demo.dto.request.ChangePasswordRequest;
 import com.mpi.demo.dto.request.LoginRequest;
 import com.mpi.demo.dto.request.RefreshRequest;
 import com.mpi.demo.dto.request.RegisterRequest;
@@ -32,7 +34,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 public class AuthController {
     private static final String REFRESH_TOKEN_COOKIE_NAME = "refresh_token";
     private static final String COOKIE_PATH = "/api/v1/auth";
-    private static final int COOKIE_MAX_AGE = 259200;
+
+    @Value("${jwt.refresh-expiration}")
+    private long refreshTokenExpirationMs;
 
     private final AuthService authService;
 
@@ -59,7 +63,7 @@ public class AuthController {
         LoginResponse loginResponse = authService.login(request, deviceInfo, ipAddress);
         setRefreshTokenCookie(httpResponse, loginResponse.refreshToken());
 
-        return ResponseEntity.ok(ApiResponse.success("Token đã được làm mới", loginResponse));
+        return ResponseEntity.ok(ApiResponse.success("Đăng nhập thành công", loginResponse));
     }
 
     @PostMapping("/refresh")
@@ -101,6 +105,16 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.success(userResponse));
     }
 
+    @PostMapping("/change-password")
+    public ResponseEntity<ApiResponse<Void>> changePassword(
+            @AuthenticationPrincipal Jwt jwt,
+            @Valid @RequestBody ChangePasswordRequest request) {
+
+        String email = jwt.getSubject();
+        authService.changePassword(email, request);
+        return ResponseEntity.ok(ApiResponse.success("Đổi mật khẩu thành công", null));
+    }
+
     private String extractClientIp(HttpServletRequest request) {
         String xForwardedFor = request.getHeader("X-Forwarded-For");
         if (xForwardedFor != null && !xForwardedFor.isBlank()) {
@@ -113,7 +127,7 @@ public class AuthController {
         response.setHeader("Set-Cookie",
                 REFRESH_TOKEN_COOKIE_NAME + "=" + rawToken
                         + "; HttpOnly; Secure; SameSite=Lax; Path=" + COOKIE_PATH
-                        + "; Max-Age=" + COOKIE_MAX_AGE);
+                        + "; Max-Age=" + (refreshTokenExpirationMs / 1000));
     }
 
     private String extractRefreshTokenFromCookie(HttpServletRequest request) {

@@ -3,7 +3,7 @@ import { PatientMasterStatusEnum } from '../models/patient-master.constants'
 
 export interface PatientMaster {
   id: number;
-  enterpriseId: string; // EMPI
+  enterpriseId: string;
   fullName: string;
   dateOfBirth: string;
   gender: Gender;

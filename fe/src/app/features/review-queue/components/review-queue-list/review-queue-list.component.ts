@@ -57,7 +57,6 @@ export class ReviewQueueListComponent implements OnInit {
         }
       },
       error: () => {
-        // Silent fail for counts
       }
     });
   }

@@ -9,7 +9,7 @@
     </button>
     }
   </div>
-  <!-- Facility Filter -->
+
   <div class="filter-dropdown" [class.open]="facilityDropdownOpen">
     <button class="filter-trigger" (click)="toggleFacilityDropdown($event)">
       <span class="material-symbols-outlined filter-icon">apartment</span>
@@ -18,17 +18,13 @@
       <span class="material-symbols-outlined arrow">expand_more</span>
     </button>
     <div class="filter-menu" *ngIf="facilityDropdownOpen">
-      <div class="filter-menu-item"
-           [class.selected]="selectedFacilityId === null"
-           (click)="selectFacility(null)">
+      <div class="filter-menu-item" [class.selected]="selectedFacilityId === null" (click)="selectFacility(null)">
         <span class="material-symbols-outlined item-icon">apps</span>
         <span class="item-label">Tất cả cơ sở</span>
         <span class="material-symbols-outlined check-icon" *ngIf="selectedFacilityId === null">check</span>
       </div>
-      <div class="filter-menu-item"
-           *ngFor="let facility of facilities"
-           [class.selected]="selectedFacilityId === facility.id"
-           (click)="selectFacility(facility.id)">
+      <div class="filter-menu-item" *ngFor="let facility of facilities"
+        [class.selected]="selectedFacilityId === facility.id" (click)="selectFacility(facility.id)">
         <span class="material-symbols-outlined item-icon">local_hospital</span>
         <span class="item-label">{{ facility.name }}</span>
         <span class="material-symbols-outlined check-icon" *ngIf="selectedFacilityId === facility.id">check</span>
@@ -36,7 +32,6 @@
     </div>
   </div>
 
-  <!-- Status Filter -->
   <div class="filter-dropdown" [class.open]="statusDropdownOpen">
     <button class="filter-trigger" (click)="toggleStatusDropdown($event)">
       <span class="material-symbols-outlined filter-icon">toggle_on</span>
@@ -45,10 +40,8 @@
       <span class="material-symbols-outlined arrow">expand_more</span>
     </button>
     <div class="filter-menu" *ngIf="statusDropdownOpen">
-      <div class="filter-menu-item"
-           *ngFor="let status of statusOptions"
-           [class.selected]="selectedStatus === status.value"
-           (click)="selectStatus(status.value)">
+      <div class="filter-menu-item" *ngFor="let status of statusOptions"
+        [class.selected]="selectedStatus === status.value" (click)="selectStatus(status.value)">
         <span class="material-symbols-outlined item-icon">{{ getStatusIcon(status.value) }}</span>
         <span class="item-label">{{ status.label }}</span>
         <span class="material-symbols-outlined check-icon" *ngIf="selectedStatus === status.value">check</span>
@@ -58,10 +51,5 @@
 
   <button class="btn-reset" (click)="onReset()" title="Làm mới bộ lọc">
     <span class="material-symbols-outlined">refresh</span>
-  </button>
-
-  <button class="btn-export">
-    <span class="material-symbols-outlined">download</span>
-    Xuất Excel
   </button>
 </div>

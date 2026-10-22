@@ -55,7 +55,6 @@
   font-size: 1.25rem;
 }
 
-/* Stats Grid - Design from facility page */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -63,7 +62,6 @@
   margin-bottom: 2rem;
 }
 
-/* Filter Toolbar - Synchronized design */
 .filter-toolbar {
   display: flex;
   flex-direction: column;

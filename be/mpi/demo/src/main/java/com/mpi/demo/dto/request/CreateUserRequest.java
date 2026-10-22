@@ -3,6 +3,7 @@ package com.mpi.demo.dto.request;
 import java.util.Set;
 
 import com.mpi.demo.constant.GenderEnum;
+import com.mpi.demo.constant.UserStatusEnum;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -39,6 +40,8 @@ public class CreateUserRequest {
 
     @Size(max = 500, message = "Avatar tối đa 500 ký tự")
     private String avatar;
+
+    private UserStatusEnum status;
 
     private Set<Long> roleIds;
 }

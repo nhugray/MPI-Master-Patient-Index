@@ -13,14 +13,12 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Table(name = "refresh_token")
 @Getter
 @Setter
-@NoArgsConstructor
 public class RefreshToken {
 
     @Id
@@ -47,6 +45,10 @@ public class RefreshToken {
     private String ipAddress;
 
     private Instant createdAt;
+
+    public RefreshToken() {
+
+    }
 
     @PrePersist
     protected void onCreate() {

@@ -1,10 +1,20 @@
 import { Routes } from '@angular/router';
 import { LayoutComponent } from './layout/layout.component';
+import { authGuard } from './core/guards/auth.guard';
+import { noAuthGuard } from './core/guards/no-auth.guard';
 
 export const routes: Routes = [
   {
+    path: 'login',
+    loadComponent: () => import('./features/auth/pages/login-page/login-page.component')
+      .then(m => m.LoginPageComponent),
+    canActivate: [noAuthGuard]
+  },
+
+  {
     path: '',
     component: LayoutComponent,
+    canActivate: [authGuard],
     children: [
       {
         path: '',
@@ -47,11 +57,6 @@ export const routes: Routes = [
           .then(m => m.AlgorithmConfigPageComponent)
       },
       {
-        path: 'dashboard',
-        loadComponent: () => import('./features/dashboard/pages/dashboard-page.component')
-          .then(m => m.DashboardPageComponent)
-      },
-      {
         path: 'facilities',
         loadComponent: () => import('./features/facility/pages/facilities-page.component')
           .then(m => m.FacilitiesPageComponent)
@@ -60,7 +65,22 @@ export const routes: Routes = [
         path: 'source-systems',
         loadComponent: () => import('./features/source-system/pages/source-systems-page.component')
           .then(m => m.SourceSystemsPageComponent)
+      },
+      {
+        path: 'users',
+        loadComponent: () => import('./features/user/pages/users-page/users-page.component')
+          .then(m => m.UsersPageComponent)
+      },
+      {
+        path: 'profile',
+        loadComponent: () => import('./features/user/pages/user-profile-page/user-profile-page.component')
+          .then(m => m.UserProfilePageComponent)
       }
     ]
+  },
+
+  {
+    path: '**',
+    redirectTo: 'login'
   }
 ];

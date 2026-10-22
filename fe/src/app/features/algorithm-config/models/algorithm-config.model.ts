@@ -21,8 +21,8 @@ export interface CreateWeightConfigRequest {
   nationalIdWeight: number;
   phoneWeight: number;
   addressWeight: number;
-  autoApprovalThreshold: number;
-  manualReviewThreshold: number;
+  autoApprovalThreshold?: number;
+  manualReviewThreshold?: number;
   description: string | null;
   createdBy: string | null;
 }

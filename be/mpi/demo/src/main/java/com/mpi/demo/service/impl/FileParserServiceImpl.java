@@ -82,7 +82,7 @@ public class FileParserServiceImpl implements FileParserService {
                 throw new FileParsingException("File Excel không có dữ liệu");
             }
             Sheet sheet = workbook.getSheetAt(0);
-            
+
             if (sheet.getLastRowNum() + 1 > MAX_ROWS) {
                 throw new FileParsingException("File Excel vượt quá giới hạn tối đa " + MAX_ROWS + " dòng.");
             }
@@ -98,7 +98,7 @@ public class FileParserServiceImpl implements FileParserService {
             }
             List<String> headers = normalizeHeaders(rawHeaders);
             List<Map<String, String>> rows = new ArrayList<>();
-            
+
             for (int i = 1; i <= sheet.getLastRowNum(); i++) {
                 Row row = sheet.getRow(i);
                 if (row != null) {

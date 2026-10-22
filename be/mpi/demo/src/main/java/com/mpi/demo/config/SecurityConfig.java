@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -48,6 +49,7 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+                .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
@@ -58,26 +60,28 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/me").authenticated()
                         .requestMatchers("/api/v1/auth/register").hasRole(ADMIN)
 
-                        // ===== CHỈ ADMIN =====
                         .requestMatchers("/api/v1/users/**", "/api/v1/roles/**").hasRole(ADMIN)
                         .requestMatchers("/api/v1/match-decision-logs/**").hasRole(ADMIN)
 
-                        // ===== FACILITY / SOURCE SYSTEM =====
-                        // Rule GET phải đặt TRƯỚC rule chung bên dưới (khớp rule đầu tiên là dừng)
                         .requestMatchers(HttpMethod.GET, "/api/v1/facilities/**", "/api/v1/source-systems/**")
                         .hasAnyRole(ADMIN, REVIEWER, VIEWER)
                         .requestMatchers("/api/v1/facilities/**", "/api/v1/source-systems/**")
                         .hasRole(ADMIN)
 
-                        // ===== PATIENT MASTER (Golden Record) =====
-                        // Đọc: cả 3 role. Ghi/merge: chỉ ADMIN
                         .requestMatchers(HttpMethod.GET, "/api/v1/patient-masters/**")
                         .hasAnyRole(ADMIN, REVIEWER, VIEWER)
                         .requestMatchers("/api/v1/patient-masters/**").hasRole(ADMIN)
 
-                        .requestMatchers("/api/v1/import/**").hasAnyRole(ADMIN, REVIEWER)
-                        .requestMatchers("/api/v1/patients/**").hasAnyRole(ADMIN, REVIEWER)
+                        .requestMatchers("/api/v1/imports/**").hasAnyRole(ADMIN, REVIEWER, VIEWER)
+                        .requestMatchers(HttpMethod.GET, "/api/v1/patients/**").hasAnyRole(ADMIN, REVIEWER, VIEWER)
+                        .requestMatchers("/api/v1/patients/**").hasAnyRole(ADMIN)
                         .requestMatchers("/api/v1/match-candidates/**").hasAnyRole(ADMIN, REVIEWER)
+
+                        .requestMatchers("/api/v1/review-queue/**").hasAnyRole(ADMIN, REVIEWER)
+                        .requestMatchers("/api/v1/algorithm-config/**").hasRole(ADMIN)
+
+                        .requestMatchers("/api/v1/auth/change-password")
+                        .hasAnyRole(ADMIN, REVIEWER, VIEWER)
 
                         .requestMatchers(HttpMethod.GET, "/api/v1/dashboard/**")
                         .hasAnyRole(ADMIN, REVIEWER, VIEWER)

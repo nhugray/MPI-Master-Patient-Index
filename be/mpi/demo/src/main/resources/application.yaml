@@ -22,7 +22,7 @@ file:
     max-size: 524288000
 jwt:
   secret: "vodinhnhuvodinhnhuvodinhnhuvodinhnhu"
-  access-token-expiration: 5
+  access-token-expiration: 9000000
   refresh-expiration: 604800000  
 springdoc:
     swagger-ui:
@@ -35,6 +35,10 @@ springdoc:
                     type: http
                     scheme: bearer
                     bearerFormat: JWT
-                    description: "Nhập chuỗi Access Token (JWT) của bạn vào đây (Không cần gõ chữ 'Bearer')"
         security:
             - bearerAuth: []
+
+mpi:
+  matching:
+    auto-approval-threshold: 92.00
+    manual-review-threshold: 65.00

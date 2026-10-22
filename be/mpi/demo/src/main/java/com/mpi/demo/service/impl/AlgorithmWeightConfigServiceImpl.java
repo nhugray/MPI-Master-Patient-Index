@@ -3,6 +3,7 @@ package com.mpi.demo.service.impl;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,12 @@ import com.mpi.demo.service.AlgorithmWeightConfigService;
 @Service
 public class AlgorithmWeightConfigServiceImpl implements AlgorithmWeightConfigService {
 
+    @Value("${mpi.matching.auto-approval-threshold:92.00}")
+    private BigDecimal defaultAutoApprovalThreshold;
+
+    @Value("${mpi.matching.manual-review-threshold:65.00}")
+    private BigDecimal defaultManualReviewThreshold;
+
     private static final BigDecimal TOTAL_WEIGHT_EXPECTED = new BigDecimal("100.00");
     private static final BigDecimal WEIGHT_TOLERANCE = new BigDecimal("0.01");
 
@@ -31,7 +38,23 @@ public class AlgorithmWeightConfigServiceImpl implements AlgorithmWeightConfigSe
     public WeightConfigResponse getActiveConfig() {
         AlgorithmWeightConfig config = algorithmWeightConfigRepository.findByIsActiveTrue()
                 .orElseThrow(() -> new ResourceNotFoundException("Cấu hình trọng số", "isActive", true));
-        return WeightConfigResponse.fromEntity(config);
+        WeightConfigResponse response = WeightConfigResponse.fromEntity(config);
+        return new WeightConfigResponse(
+                response.id(),
+                response.version(),
+                response.nameWeight(),
+                response.dobWeight(),
+                response.nationalIdWeight(),
+                response.phoneWeight(),
+                response.addressWeight(),
+                defaultAutoApprovalThreshold != null ? defaultAutoApprovalThreshold : response.autoApprovalThreshold(),
+                defaultManualReviewThreshold != null ? defaultManualReviewThreshold : response.manualReviewThreshold(),
+                response.isActive(),
+                response.description(),
+                response.createdBy(),
+                response.createdAt(),
+                response.deployedAt()
+        );
     }
 
     @Override
@@ -52,6 +75,13 @@ public class AlgorithmWeightConfigServiceImpl implements AlgorithmWeightConfigSe
     public WeightConfigResponse createConfig(CreateWeightConfigRequest request) {
         validateTotalWeight(request);
 
+        BigDecimal autoThreshold = request.autoApprovalThreshold() != null
+                ? request.autoApprovalThreshold()
+                : defaultAutoApprovalThreshold;
+        BigDecimal manualThreshold = request.manualReviewThreshold() != null
+                ? request.manualReviewThreshold()
+                : defaultManualReviewThreshold;
+
         AlgorithmWeightConfig config = AlgorithmWeightConfig.builder()
                 .version(generateNextVersion())
                 .nameWeight(request.nameWeight())
@@ -59,8 +89,8 @@ public class AlgorithmWeightConfigServiceImpl implements AlgorithmWeightConfigSe
                 .nationalIdWeight(request.nationalIdWeight())
                 .phoneWeight(request.phoneWeight())
                 .addressWeight(request.addressWeight())
-                .autoApprovalThreshold(request.autoApprovalThreshold())
-                .manualReviewThreshold(request.manualReviewThreshold())
+                .autoApprovalThreshold(autoThreshold)
+                .manualReviewThreshold(manualThreshold)
                 .description(request.description())
                 .createdBy(request.createdBy())
                 .isActive(false)

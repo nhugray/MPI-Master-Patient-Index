@@ -1,9 +1,11 @@
-import { Component, EventEmitter, Input, Output, OnInit, inject, DestroyRef } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit, inject, DestroyRef, signal } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { PatientService } from '../../services/patient.service';
+import { SourceSystemService } from '../../../source-system/services/source-system.service';
+import { SourceSystem } from '../../../source-system/models/source-system.model';
 import { ToastService } from '../../../../shared/components/toast/toast.service';
 import { Gender, MatchStatus } from '../../../../shared/enums';
 import {
@@ -33,9 +35,12 @@ export class PatientFormComponent implements OnInit {
 
   private readonly fb = inject(FormBuilder);
   private readonly patientService = inject(PatientService);
+  private readonly sourceSystemService = inject(SourceSystemService);
   private readonly toastService = inject(ToastService);
   private readonly document = inject(DOCUMENT);
   private readonly destroyRef = inject(DestroyRef);
+
+  sourceSystems = signal<SourceSystem[]>([]);
 
   form!: FormGroup;
   isSubmitting = false;
@@ -51,12 +56,28 @@ export class PatientFormComponent implements OnInit {
   readonly nationalIdErrorMessage = NATIONAL_ID_ERROR_MESSAGE;
   readonly phoneErrorMessage = PHONE_ERROR_MESSAGE;
 
-  readonly sourceSystemIdRequiredError = getRequiredErrorMessage('ID hệ thống nguồn');
+  readonly sourceSystemIdRequiredError = getRequiredErrorMessage('Hệ thống nguồn');
   readonly localPatientCodeRequiredError = getRequiredErrorMessage('Mã bệnh nhân cục bộ');
   readonly fullNameRequiredError = getRequiredErrorMessage('Họ tên');
 
   ngOnInit(): void {
     this.initForm();
+    this.loadSourceSystems();
+  }
+
+  loadSourceSystems(): void {
+    this.sourceSystemService.search({ isActive: true, page: 0, size: 100 })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          if (isSuccess(response)) {
+            this.sourceSystems.set(response.data.result);
+          }
+        },
+        error: (error) => {
+          console.error('Lỗi tải danh sách hệ thống nguồn:', error);
+        }
+      });
   }
 
   private initForm(): void {
@@ -79,6 +100,10 @@ export class PatientFormComponent implements OnInit {
     this.patient = patient || null;
     this.isOpen = true;
     this.document.body.classList.add('modal-open');
+
+    if (this.sourceSystems().length === 0) {
+      this.loadSourceSystems();
+    }
 
     if (patient) {
       this.form.patchValue({
@@ -170,12 +195,14 @@ export class PatientFormComponent implements OnInit {
     }
   }
 
-  private handleSuccess(response: { statusCode: number; data: Patient }): void {
+  private handleSuccess(response: { statusCode: number; message?: string; data: Patient }): void {
     if (isSuccess(response)) {
-      this.toastService.success(
-        'Thành công',
-        this.isEditMode ? 'Cập nhật thông tin bệnh nhân thành công' : 'Thêm mới bệnh nhân thành công'
-      );
+      const msg = response.message || (this.isEditMode ? 'Cập nhật thông tin bệnh nhân thành công' : 'Thêm mới bệnh nhân thành công');
+      if (!this.isEditMode && response.data?.matchStatus === MatchStatus.PENDING) {
+        this.toastService.warning('Cần xem xét', msg);
+      } else {
+        this.toastService.success('Thành công', msg);
+      }
       this.saved.emit(response.data);
       this.close();
     }

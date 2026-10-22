@@ -1,0 +1,162 @@
+<div class="page-header">
+  <div class="page-header-content">
+    <div class="breadcrumb">
+      <span class="breadcrumb-dot"></span>
+      <span class="breadcrumb-label">Quản trị Hệ thống</span>
+    </div>
+    <h2 class="page-title">Quản lý Người dùng</h2>
+    <p class="page-subtitle">
+      Quản lý danh sách tài khoản, phân quyền truy cập và cấu hình vai trò người dùng hệ thống MPI.
+    </p>
+  </div>
+  <div class="page-actions">
+    <button class="btn-primary" (click)="onAddUser()">
+      <span class="material-symbols-outlined">person_add</span>
+      Thêm người dùng mới
+    </button>
+  </div>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card stat-card-primary">
+    <div class="stat-background"></div>
+    <div class="stat-header">
+      <span class="stat-label">Tổng tài khoản</span>
+      <div class="stat-icon">
+        <span class="material-symbols-outlined">group</span>
+      </div>
+    </div>
+    <div class="stat-body">
+      <div class="stat-value">{{ totalCount() | number }}</div>
+      <div class="stat-tags">
+        <span class="stat-tag">{{ activeCount() }} Hoạt động</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="stat-card stat-card-secondary">
+    <div class="stat-background"></div>
+    <div class="stat-header">
+      <span class="stat-label">Đang kích hoạt</span>
+      <div class="stat-icon stat-icon-secondary">
+        <span class="material-symbols-outlined">check_circle</span>
+      </div>
+    </div>
+    <div class="stat-body">
+      <div class="stat-value stat-value-secondary">{{ activeCount() | number }}</div>
+      <div class="stat-info">
+        <span class="stat-description">
+          {{ totalCount() > 0 ? (((activeCount() / totalCount()) * 100) | number:'1.1-1') : 0 }}% sẵn sàng
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="stat-card stat-card-success">
+    <div class="stat-background"></div>
+    <div class="stat-header">
+      <span class="stat-label">Quản trị viên</span>
+      <div class="stat-icon stat-icon-success">
+        <span class="material-symbols-outlined">admin_panel_settings</span>
+      </div>
+    </div>
+    <div class="stat-body">
+      <div class="stat-value stat-value-success">{{ adminCount() | number }}</div>
+      <div class="stat-info">
+        <span class="stat-description">Với toàn quyền hệ thống</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="filter-toolbar">
+  <app-user-filter-panel (statusChange)="onStatusFilterChange($event)" (resetFilters)="resetFilters()">
+  </app-user-filter-panel>
+</div>
+
+<div class="table-card">
+  <div class="table-container">
+    <table class="user-table">
+      <thead>
+        <tr>
+          <th>Người dùng</th>
+          <th>Email</th>
+          <th>Vai trò</th>
+          <th>Trạng thái</th>
+          <th>Ngày tạo</th>
+          <th class="text-right">Thao tác</th>
+        </tr>
+      </thead>
+      <tbody>
+        @if (isLoading()) {
+        <tr>
+          <td colspan="6" class="loading-cell">
+            <div class="loading-spinner"></div>
+            <span>Đang tải dữ liệu...</span>
+          </td>
+        </tr>
+        } @else if (users().length === 0) {
+        <tr>
+          <td colspan="6" class="empty-cell">
+            <div class="empty-content">
+              <span class="material-symbols-outlined">search_off</span>
+              <p>Không tìm thấy người dùng nào</p>
+            </div>
+          </td>
+        </tr>
+        } @else {
+        @for (user of users(); track user.id) {
+        <tr class="table-row">
+          <td>
+            <div class="user-info">
+              <div class="user-avatar">{{ getInitials(user.name) }}</div>
+              <div class="user-details">
+                <p class="user-name">{{ user.name }}</p>
+                <span class="user-id">#USR-{{ ('00000' + user.id).slice(-5) }}</span>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="email-cell">
+              <span class="email-text">{{ user.email }}</span>
+              <span class="material-symbols-outlined verified-icon">verified</span>
+            </div>
+          </td>
+          <td>
+            <div class="role-badges">
+              @for (role of user.roles; track role.id) {
+              <span class="role-badge">{{ role.name }}</span>
+              }
+            </div>
+          </td>
+          <td>
+            <span class="status-badge" [ngClass]="getStatusClass(user.status)">
+              <span class="status-dot"></span>
+              {{ getStatusLabel(user.status) }}
+            </span>
+          </td>
+          <td class="date-cell">
+            <span>{{ formatDate(user.createdAt) }}</span>
+          </td>
+          <td class="text-right">
+            <div class="action-buttons">
+              <button class="btn-action btn-edit" (click)="onEditUser(user)" title="Chỉnh sửa">
+                <span class="material-symbols-outlined">edit</span>
+              </button>
+              <button class="btn-action btn-delete" (click)="onDeleteUser(user)" title="Xóa">
+                <span class="material-symbols-outlined">delete</span>
+              </button>
+            </div>
+          </td>
+        </tr>
+        }
+        }
+      </tbody>
+    </table>
+  </div>
+
+  @if (!isLoading() && users().length > 0) {
+  <app-pagination [pageMeta]="pageMeta()" (pageChange)="onPageChange($event)">
+  </app-pagination>
+  }
+</div>

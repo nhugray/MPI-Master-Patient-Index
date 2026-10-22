@@ -11,7 +11,7 @@ import { FacilitySearchParams, defaultSearchParams } from '../../models/facility
 import { FACILITY_TYPE_OPTIONS } from '../../models/facility.constants';
 import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
 import { SearchService } from '../../../../shared/services/search.service';
-import { formatPhoneNumber } from '../../../../shared/validators/phone.validator';
+import { PhoneFormatPipe } from '../../../../shared/pipes';
 import { getApiErrorMessage } from '../../../../shared/utils/http-error.util';
 import { toApiPage } from '../../../../shared/utils/pagination.util';
 import { FacilityFilterPanelComponent } from '../facility-filter-panel/facility-filter-panel.component';
@@ -23,7 +23,8 @@ import { FacilityFilterPanelComponent } from '../facility-filter-panel/facility-
     DecimalPipe,
     FormsModule,
     PaginationComponent,
-    FacilityFilterPanelComponent
+    FacilityFilterPanelComponent,
+    PhoneFormatPipe
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './facility-list.component.html',
@@ -161,6 +162,5 @@ export class FacilityListComponent implements OnInit {
       default: return '';
     }
   }
-
-  formatPhone = formatPhoneNumber;
 }
+

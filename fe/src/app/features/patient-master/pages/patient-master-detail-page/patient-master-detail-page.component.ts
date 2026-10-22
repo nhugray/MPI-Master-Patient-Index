@@ -5,11 +5,11 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { PatientMasterService } from '../../services/patient-master.service';
 import { PatientMaster } from '../../models/patient-master.model';
-import { SourceRecord } from '../../models/patient-master-detail.model';
+import { SourceRecord, PatientMasterHistory } from '../../models/patient-master-detail.model';
 import { ToastService } from '../../../../shared/components/toast/toast.service';
 import { PatientMasterEditModalComponent } from '../../components/patient-master-form/patient-master-form.component';
 import { getInitials, maskNationalId, maskPhoneNumber } from '../../../../shared/utils/string.util';
-import { calculateAge, formatDate } from '../../../../shared/utils/date.util';
+import { calculateAge, formatDate, formatDateTime } from '../../../../shared/utils/date.util';
 import { GENDER_OPTIONS, getGenderLabel, Gender } from '../../../../shared/enums';
 import { isSuccess } from '../../../../shared/models';
 
@@ -31,8 +31,8 @@ export class PatientMasterDetailPageComponent implements OnInit {
 
   patientMaster = signal<PatientMaster | null>(null);
   sourceRecords = signal<SourceRecord[]>([]);
-  // Điểm tin cậy: thấp nhất trong các hồ sơ nguồn có điểm match.
-  // Hồ sơ tạo master mới (không match ai) không có điểm -> hiện "Hồ sơ mới".
+  history = signal<PatientMasterHistory[]>([]);
+
   confidence = computed(() => {
     const records = this.sourceRecords();
     const scores = records
@@ -47,35 +47,12 @@ export class PatientMasterDetailPageComponent implements OnInit {
     }
     return { text: '—', verified: false };
   });
+
   isLoading = signal(true);
   isLoadingSourceRecords = signal(false);
+  isLoadingHistory = signal(false);
 
   masterId = signal<number | null>(null);
-
-
-  mockHistory = [
-    {
-      action: 'Cập nhật thủ công (Manual Edit)',
-      date: 'Hôm nay, 14:30',
-      by: 'Admin Trần Văn B',
-      detail: 'Cập nhật địa chỉ thường trú theo CCCD mới cung cấp.',
-      color: 'brand-primary'
-    },
-    {
-      action: 'Gộp thủ công (Manual Merge)',
-      date: '15/10/2023, 09:15',
-      by: 'Reviewer Lê Thị C',
-      detail: 'Gộp hồ sơ LAB-2023-112 từ LIS-LAB. Lý do: Thiếu dấu tiếng Việt nhưng khớp SĐT và Ngày sinh.',
-      color: 'warning-high'
-    },
-    {
-      action: 'Tự động gộp (Auto Merge)',
-      date: '10/10/2023, 11:20',
-      by: 'Hệ thống (Rule Engine)',
-      detail: 'Tạo hồ sơ gốc và gộp hồ sơ REC-8891-A từ HIS-CORE. Điểm tin cậy: 98%.',
-      color: 'success-optimal'
-    }
-  ];
 
   ngOnInit(): void {
     this.route.params.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(params => {
@@ -84,6 +61,7 @@ export class PatientMasterDetailPageComponent implements OnInit {
         this.masterId.set(id);
         this.loadPatientMaster(id);
         this.loadSourceRecords(id);
+        this.loadHistory(id);
       }
     });
   }
@@ -124,11 +102,31 @@ export class PatientMasterDetailPageComponent implements OnInit {
     });
   }
 
+  loadHistory(masterId: number): void {
+    this.isLoadingHistory.set(true);
+    this.patientMasterService.getHistory(masterId).pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: (response) => {
+        if (isSuccess(response)) {
+          this.history.set(response.data);
+        }
+        this.isLoadingHistory.set(false);
+      },
+      error: (error) => {
+        console.error('Error loading history:', error);
+        this.isLoadingHistory.set(false);
+      }
+    });
+  }
+
   goBack(): void {
     this.router.navigate(['/patient-masters']);
   }
 
   getInitials = getInitials;
+  formatDate = formatDate;
+  formatDateTime = formatDateTime;
 
   getAge(dateOfBirth: string): number {
     return calculateAge(dateOfBirth);
@@ -148,38 +146,25 @@ export class PatientMasterDetailPageComponent implements OnInit {
   getStatusDisplay(status: string): string {
     const map: Record<string, string> = {
       'ACTIVE': 'Hoạt động',
-      'MERGED': 'Đã gộp',
-      'INACTIVE': 'Không hoạt động'
+      'INACTIVE': 'Tạm khóa',
+      'MERGED': 'Đã gộp'
     };
     return map[status] || status;
   }
 
-  getMatchStatusBadgeClass(matchStatus: string): string {
+  getStatusClass(status: string): string {
     const map: Record<string, string> = {
-      'MATCHED': 'status-auto-merged',
-      'NEW_MASTER': 'status-auto-merged',
-      'REJECTED': 'status-manual-merged',
-      'PENDING': 'status-pending'
+      'ACTIVE': 'status-active',
+      'INACTIVE': 'status-inactive',
+      'MERGED': 'status-merged'
     };
-    return map[matchStatus] || '';
+    return map[status] || 'status-active';
   }
-
-  getMatchStatusDisplay(matchStatus: string): string {
-    const map: Record<string, string> = {
-      'MATCHED': 'Đã gộp',
-      'NEW_MASTER': 'Hồ sơ mới',
-      'REJECTED': 'Từ chối',
-      'PENDING': 'Chờ xử lý'
-    };
-    return map[matchStatus] || matchStatus;
-  }
-
-  formatDate = formatDate;
 
   openEditModal(): void {
-    const patient = this.patientMaster();
-    if (patient) {
-      this.editingPatient.set(patient);
+    const current = this.patientMaster();
+    if (current) {
+      this.editingPatient.set({ ...current });
     }
   }
 
@@ -187,10 +172,13 @@ export class PatientMasterDetailPageComponent implements OnInit {
     this.editingPatient.set(null);
   }
 
-  onPatientUpdated(updatedPatient: PatientMaster): void {
-    this.patientMaster.set(updatedPatient);
-    this.toastService.success('Thành công', 'Cập nhật hồ sơ gốc thành công');
-    this.editingPatient.set(null);
+  onPatientUpdated(updated: PatientMaster): void {
+    this.patientMaster.set(updated);
+    this.closeEditModal();
+    this.toastService.success('Thành công', 'Đã cập nhật hồ sơ gốc thành công');
+    const id = this.masterId();
+    if (id) {
+      this.loadHistory(id);
+    }
   }
-
 }

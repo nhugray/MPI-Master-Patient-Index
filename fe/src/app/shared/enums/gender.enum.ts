@@ -15,7 +15,6 @@ export const GENDER_OPTIONS: GenderOption[] = [
   { value: Gender.OTHER, label: 'Khác' }
 ];
 
-// export 1 hàm 
 export const getGenderLabel = (gender: Gender): string => {
   switch (gender) {
     case Gender.MALE: return 'male';

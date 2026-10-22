@@ -40,3 +40,9 @@ export function formatFileSize(bytes: number): string {
   if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
   return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
 }
+
+export function formatPhoneNumber(phone: string | null | undefined): string {
+  if (!phone) return '-';
+  return phone.replace(/(\d{4})(\d{3})(\d{3})/, '$1 $2 $3');
+}
+

@@ -16,5 +16,5 @@ public interface ImportJobDetailRepository
     Page<ImportJobDetail> findByImportJobIdOrderByRowNumber(Long importJobId,Pageable pageable);
 
     @Query("SELECT COUNT(d) FROM ImportJobDetail d WHERE d.importJob.id = ?1 AND d.status = ?2")
-    long countByImportJobIdAndStatus(Long importJobId, ImportRowStatusEnum status); 
+    long countByImportJobIdAndStatus(Long importJobId, ImportRowStatusEnum status);
 }

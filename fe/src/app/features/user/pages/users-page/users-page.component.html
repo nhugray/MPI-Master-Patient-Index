@@ -1,0 +1,22 @@
+<div class="users-page">
+  <app-user-list
+    #userList
+    (addUser)="openAddModal()"
+    (editUser)="openEditModal($event)"
+    (deleteUser)="openDeleteConfirm($event)">
+  </app-user-list>
+
+  <app-user-form
+    #userForm
+    (saved)="onUserSaved()">
+  </app-user-form>
+
+  <app-confirm-dialog
+    [isOpen]="isDeleteDialogOpen"
+    title="Xác nhận xóa người dùng"
+    [message]="deleteMessage"
+    confirmText="Xóa người dùng"
+    (confirm)="onConfirmDelete()"
+    (cancel)="onCancelDelete()">
+  </app-confirm-dialog>
+</div>

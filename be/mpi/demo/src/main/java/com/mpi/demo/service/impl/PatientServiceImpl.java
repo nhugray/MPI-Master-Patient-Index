@@ -9,12 +9,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.mpi.demo.constant.MatchDecisionEnum;
 import com.mpi.demo.constant.MatchStatusEnum;
 import com.mpi.demo.dto.request.CreatePatientRequest;
 import com.mpi.demo.dto.request.PatientSearchRequest;
 import com.mpi.demo.dto.request.UpdatePatientRequest;
 import com.mpi.demo.dto.response.PatientResponse;
+import com.mpi.demo.entity.MatchCandidate;
 import com.mpi.demo.entity.Patient;
 import com.mpi.demo.entity.SourceSystem;
 import com.mpi.demo.exception.DuplicateResourceException;
@@ -23,6 +26,8 @@ import com.mpi.demo.helper.ResultPagination;
 import com.mpi.demo.repository.MatchCandidateRepository;
 import com.mpi.demo.repository.PatientRepository;
 import com.mpi.demo.repository.SourceSystemRepository;
+import com.mpi.demo.service.PatientMasterService;
+import com.mpi.demo.service.PatientMatchingService;
 import com.mpi.demo.service.PatientService;
 import com.mpi.demo.specification.PatientSpecification;
 
@@ -31,15 +36,20 @@ public class PatientServiceImpl implements PatientService {
 
         private final PatientRepository patientRepository;
         private final SourceSystemRepository sourceSystemRepository;
-
         private final MatchCandidateRepository matchCandidateRepository;
+        private final PatientMatchingService patientMatchingService;
+        private final PatientMasterService patientMasterService;
 
         public PatientServiceImpl(PatientRepository patientRepository,
                         SourceSystemRepository sourceSystemRepository,
-                        MatchCandidateRepository matchCandidateRepository) {
+                        MatchCandidateRepository matchCandidateRepository,
+                        PatientMatchingService patientMatchingService,
+                        PatientMasterService patientMasterService) {
                 this.matchCandidateRepository = matchCandidateRepository;
                 this.patientRepository = patientRepository;
                 this.sourceSystemRepository = sourceSystemRepository;
+                this.patientMatchingService = patientMatchingService;
+                this.patientMasterService = patientMasterService;
         }
 
         @Override
@@ -58,6 +68,7 @@ public class PatientServiceImpl implements PatientService {
         }
 
         @Override
+        @Transactional
         public PatientResponse create(CreatePatientRequest request) {
                 SourceSystem sourceSystem = sourceSystemRepository.findById(request.getSourceSystemId())
                                 .orElseThrow(() -> new ResourceNotFoundException("Hệ thống nguồn", "id",
@@ -80,11 +91,36 @@ public class PatientServiceImpl implements PatientService {
                 patient.setHealthInsuranceNo(request.getHealthInsuranceNo());
                 patient.setPhoneNumber(request.getPhoneNumber());
                 patient.setAddress(request.getAddress());
-
                 patient.setMatchStatus(MatchStatusEnum.PENDING);
 
                 Patient saved = patientRepository.save(patient);
-                return PatientResponse.fromEntity(saved);
+
+                List<MatchCandidate> candidates = patientMatchingService.findMatchCandidates(saved);
+                BigDecimal topScore = null;
+
+                if (candidates.isEmpty()) {
+                        patientMasterService.createMaster(saved);
+                } else {
+                        MatchCandidate topCandidate = candidates.get(0);
+                        topScore = topCandidate.getMatchScore();
+
+                        for (MatchCandidate candidate : candidates) {
+                                candidate.setPatient(saved);
+                                matchCandidateRepository.save(candidate);
+                        }
+
+                        if (topCandidate.getDecision() == MatchDecisionEnum.AUTO_APPROVED) {
+                                patientMasterService.linkToMaster(saved.getId(), topCandidate.getCandidateMaster().getId());
+                        } else if (topCandidate.getDecision() == MatchDecisionEnum.PENDING) {
+                                saved.setMatchStatus(MatchStatusEnum.PENDING);
+                                patientRepository.save(saved);
+                        } else {
+                                patientMasterService.createMaster(saved);
+                        }
+                }
+
+                Patient updated = patientRepository.findById(saved.getId()).orElse(saved);
+                return PatientResponse.fromEntity(updated, topScore);
         }
 
         @Override

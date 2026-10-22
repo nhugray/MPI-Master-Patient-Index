@@ -22,7 +22,9 @@ export interface Patient {
   address: string | null;
   healthInsuranceNo: string | null;
   masterPatientId: number | null;
+  enterpriseId?: string | null;
   matchStatus: MatchStatus;
+  matchScore?: number | null;
 }
 
 export interface CreatePatientRequest {

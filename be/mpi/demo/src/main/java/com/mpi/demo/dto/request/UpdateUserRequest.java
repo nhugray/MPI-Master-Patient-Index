@@ -3,6 +3,7 @@ package com.mpi.demo.dto.request;
 import java.util.Set;
 
 import com.mpi.demo.constant.GenderEnum;
+import com.mpi.demo.constant.UserStatusEnum;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -32,7 +33,6 @@ public class UpdateUserRequest {
     @Size(max = 255, message = "Email tối đa 255 ký tự")
     private String email;
 
-    /** Để trống nếu không muốn đổi mật khẩu. */
     @Size(min = 6, max = 255, message = "Mật khẩu từ 6 đến 255 ký tự")
     private String password;
 
@@ -44,6 +44,7 @@ public class UpdateUserRequest {
     @Size(max = 500, message = "Avatar tối đa 500 ký tự")
     private String avatar;
 
-    /** null = giữ nguyên roles hiện tại; tập rỗng = bỏ hết roles. */
+    private UserStatusEnum status;
+
     private Set<Long> roleIds;
 }

@@ -3,9 +3,8 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiResponse, PageResponse } from '../../../shared/models';
 import { PatientMaster, PatientMasterSearchRequest, UpdatePatientMasterRequest } from '../models/patient-master.model';
-import { PatientMasterDetail, LinkedIdentifier, SourceRecord, MergeHistoryLog } from '../models/patient-master-detail.model';
+import { PatientMasterDetail, LinkedIdentifier, SourceRecord, MergeHistoryLog, PatientMasterHistory } from '../models/patient-master-detail.model';
 import { environment } from '../../../../environments/environment';
-
 
 @Injectable({
   providedIn: 'root'
@@ -30,7 +29,6 @@ export class PatientMasterService {
       httpParams = httpParams.set('status', params.status);
     }
 
-
     return this.http.get<ApiResponse<PageResponse<PatientMaster>>>(`${this.apiUrl}${this.basePath}`, {
       params: httpParams
     });
@@ -49,6 +47,10 @@ export class PatientMasterService {
       .set('page', page.toString())
       .set('size', size.toString());
     return this.http.get<ApiResponse<PageResponse<SourceRecord>>>(`${this.apiUrl}${this.basePath}/${masterId}/patients`, { params });
+  }
+
+  getHistory(masterId: number): Observable<ApiResponse<PatientMasterHistory[]>> {
+    return this.http.get<ApiResponse<PatientMasterHistory[]>>(`${this.apiUrl}${this.basePath}/${masterId}/history`);
   }
 
   update(data: UpdatePatientMasterRequest): Observable<ApiResponse<PatientMaster>> {

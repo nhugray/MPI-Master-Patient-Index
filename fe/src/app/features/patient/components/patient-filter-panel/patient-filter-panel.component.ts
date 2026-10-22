@@ -37,7 +37,6 @@ export class PatientFilterPanelComponent {
 
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
-    // Close all dropdowns when clicking outside
     this.genderDropdownOpen = false;
     this.statusDropdownOpen = false;
     this.sourceDropdownOpen = false;

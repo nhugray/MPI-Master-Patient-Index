@@ -1,12 +1,14 @@
 package com.mpi.demo.dto.request;
 
 import com.mpi.demo.constant.GenderEnum;
+import com.mpi.demo.constant.UserStatusEnum;
 
 public record UserSearchRequest(
-        /** Tìm theo tên hoặc email (LIKE, không phân biệt hoa thường). */
         String keyword,
 
         GenderEnum gender,
+
+        UserStatusEnum status,
 
         Long roleId
 

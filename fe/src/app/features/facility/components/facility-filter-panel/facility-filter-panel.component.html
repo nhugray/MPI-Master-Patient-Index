@@ -9,7 +9,7 @@
     </button>
     }
   </div>
-  <!-- Facility Type Filter -->
+
   <div class="filter-dropdown" [class.open]="typeDropdownOpen">
     <button class="filter-trigger" (click)="toggleTypeDropdown($event)">
       <span class="material-symbols-outlined filter-icon">category</span>
@@ -18,10 +18,8 @@
       <span class="material-symbols-outlined arrow">expand_more</span>
     </button>
     <div class="filter-menu" *ngIf="typeDropdownOpen">
-      <div class="filter-menu-item"
-           *ngFor="let type of facilityTypeOptions"
-           [class.selected]="selectedType === type.value"
-           (click)="selectType(type.value)">
+      <div class="filter-menu-item" *ngFor="let type of facilityTypeOptions"
+        [class.selected]="selectedType === type.value" (click)="selectType(type.value)">
         <span class="material-symbols-outlined item-icon">{{ getTypeIcon(type.value) }}</span>
         <span class="item-label">{{ type.label }}</span>
         <span class="material-symbols-outlined check-icon" *ngIf="selectedType === type.value">check</span>
@@ -29,7 +27,6 @@
     </div>
   </div>
 
-  <!-- Status Filter -->
   <div class="filter-dropdown" [class.open]="statusDropdownOpen">
     <button class="filter-trigger" (click)="toggleStatusDropdown($event)">
       <span class="material-symbols-outlined filter-icon">toggle_on</span>
@@ -38,10 +35,8 @@
       <span class="material-symbols-outlined arrow">expand_more</span>
     </button>
     <div class="filter-menu" *ngIf="statusDropdownOpen">
-      <div class="filter-menu-item"
-           *ngFor="let status of statusOptions"
-           [class.selected]="selectedStatus === status.value"
-           (click)="selectStatus(status.value)">
+      <div class="filter-menu-item" *ngFor="let status of statusOptions"
+        [class.selected]="selectedStatus === status.value" (click)="selectStatus(status.value)">
         <span class="material-symbols-outlined item-icon">{{ getStatusIcon(status.value) }}</span>
         <span class="item-label">{{ status.label }}</span>
         <span class="material-symbols-outlined check-icon" *ngIf="selectedStatus === status.value">check</span>
@@ -53,8 +48,4 @@
     <span class="material-symbols-outlined">refresh</span>
   </button>
 
-  <button class="btn-export">
-    <span class="material-symbols-outlined">download</span>
-    Xuất Excel
-  </button>
 </div>

@@ -12,8 +12,6 @@ import lombok.*;
 @Table(name = "role")
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class Role {
 
     @Id
@@ -33,4 +31,8 @@ public class Role {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    public Role() {
+
+    }
 }

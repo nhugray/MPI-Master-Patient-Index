@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.mpi.demo.constant.GenderEnum;
+import com.mpi.demo.constant.UserStatusEnum;
 import com.mpi.demo.dto.request.CreateUserRequest;
 import com.mpi.demo.dto.request.UpdateUserRequest;
 import com.mpi.demo.dto.request.UserSearchRequest;
@@ -72,6 +73,7 @@ public class UserServiceImpl implements UserService {
         user.setAddress(request.getAddress());
         user.setGender(request.getGender() != null ? request.getGender() : GenderEnum.OTHER);
         user.setAvatar(request.getAvatar());
+        user.setStatus(request.getStatus() != null ? request.getStatus() : UserStatusEnum.ACTIVE);
         user.setRoles(resolveRoles(request.getRoleIds()));
         return UserResponse.fromEntity(userRepository.save(user));
     }
@@ -97,6 +99,9 @@ public class UserServiceImpl implements UserService {
             user.setGender(request.getGender());
         }
         user.setAvatar(request.getAvatar());
+        if (request.getStatus() != null) {
+            user.setStatus(request.getStatus());
+        }
         if (request.getRoleIds() != null) {
             user.setRoles(resolveRoles(request.getRoleIds()));
         }

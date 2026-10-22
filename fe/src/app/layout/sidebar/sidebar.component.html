@@ -12,10 +12,6 @@
   </div>
 
   <nav class="sidebar-nav">
-    <a class="nav-item" routerLink="/dashboard" routerLinkActive="active">
-      <span class="material-symbols-outlined">dashboard</span>
-      <span class="nav-label">Dashboard</span>
-    </a>
     <a class="nav-item active" routerLink="/patients" routerLinkActive="active">
       <span class="material-symbols-outlined">person</span>
       <span class="nav-label">Bệnh nhân</span>
@@ -44,17 +40,16 @@
       <span class="material-symbols-outlined">storage</span>
       <span class="nav-label">Hệ thống Nguồn</span>
     </a>
+    <a class="nav-item" routerLink="/users" routerLinkActive="active">
+      <span class="material-symbols-outlined">manage_accounts</span>
+      <span class="nav-label">Quản lý Người dùng</span>
+    </a>
 
   </nav>
-
   <div class="sidebar-footer">
-    <a class="nav-item" routerLink="/settings">
-      <span class="material-symbols-outlined">settings</span>
-      <span class="nav-label">Cài đặt</span>
-    </a>
-    <a class="nav-item nav-item-danger" routerLink="/logout">
+    <div class="nav-item nav-item-danger" (click)="logout($event)" style="cursor: pointer;">
       <span class="material-symbols-outlined">logout</span>
       <span class="nav-label">Đăng xuất</span>
-    </a>
+    </div>
   </div>
 </aside>

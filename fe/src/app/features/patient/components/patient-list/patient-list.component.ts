@@ -13,7 +13,7 @@ import { GENDER_OPTIONS } from '../../../../shared/enums';
 import { MATCH_STATUS_OPTIONS } from '../../models/patient.constants';
 import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
 import { SearchService } from '../../../../shared/services/search.service';
-import { formatPhoneNumber } from '../../../../shared/validators/phone.validator';
+import { PhoneFormatPipe } from '../../../../shared/pipes';
 import { getInitials } from '../../../../shared/utils/string.util';
 import { getApiErrorMessage } from '../../../../shared/utils/http-error.util';
 import { toApiPage } from '../../../../shared/utils/pagination.util';
@@ -30,7 +30,8 @@ import { PatientFilterPanelComponent } from '../patient-filter-panel/patient-fil
     DecimalPipe,
     FormsModule,
     PaginationComponent,
-    PatientFilterPanelComponent
+    PatientFilterPanelComponent,
+    PhoneFormatPipe
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './patient-list.component.html',
@@ -57,12 +58,10 @@ export class PatientListComponent implements OnInit {
   matchedCount = signal(0);
   totalCount = signal(0);
 
-  // Filter options
   genderOptions = GENDER_OPTIONS;
   matchStatusOptions = MATCH_STATUS_OPTIONS;
   sourceSystems = signal<SourceSystem[]>([]);
 
-  // Selected filters
   selectedGender: string = 'ALL';
   selectedMatchStatus: string = 'ALL';
   selectedSourceSystemId: number | null = null;
@@ -204,6 +203,4 @@ export class PatientListComponent implements OnInit {
   getMatchStatusLabel(status: MatchStatus): string {
     return MATCH_STATUS_OPTIONS.find(o => o.value === status)?.label || status;
   }
-
-  formatPhone = formatPhoneNumber;
-}
+}

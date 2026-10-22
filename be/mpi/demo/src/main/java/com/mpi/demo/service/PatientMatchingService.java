@@ -22,10 +22,10 @@ public interface PatientMatchingService {
     void processMatchDecision(Long candidateId, MatchDecisionEnum decision, Long reviewerId, String reviewNote);
 
     Page<MatchCandidate> getPendingReviews(Pageable pageable);
-    
+
     Page<MatchCandidate> searchCandidates(MatchDecisionEnum decision, Pageable pageable);
-    
+
     MatchCandidate getCandidateById(Long candidateId);
-    
+
     Map<String, Long> getDecisionCounts();
 }

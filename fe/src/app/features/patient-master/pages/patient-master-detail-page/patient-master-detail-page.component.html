@@ -22,23 +22,20 @@
     </div>
   </div>
 
-  <!-- Loading State -->
   <div *ngIf="isLoading()" class="loading-container">
     <div class="loading-spinner"></div>
     <p class="loading-text">Đang tải thông tin hồ sơ gốc...</p>
   </div>
 
-  <!-- Content Grid -->
   <div *ngIf="!isLoading() && patientMaster()" class="bento-grid">
-    <!-- Patient Summary Card (Full Width) -->
+
     <div class="card card-full">
       <div class="summary-layout">
-        <!-- Avatar/Initials -->
+
         <div class="avatar-circle">
           <span class="avatar-text">{{ getInitials(patientMaster()!.fullName) }}</span>
         </div>
 
-        <!-- Core Info -->
         <div class="core-info">
           <div class="name-status-row">
             <h3 class="patient-name">{{ patientMaster()!.fullName }}</h3>
@@ -87,7 +84,6 @@
           </div>
         </div>
 
-        <!-- Golden Record Score -->
         <div class="score-box">
           <div class="score-label">Điểm tin cậy</div>
           <div class="score-circle">
@@ -101,7 +97,6 @@
       </div>
     </div>
 
-    <!-- Left Column: Identifiers & Source Records -->
     <div class="column-left">
       <div class="card">
         <div class="card-header card-header-with-count">
@@ -136,10 +131,8 @@
               <span *ngIf="record.phoneNumber"> • {{ record.phoneNumber }}</span>
             </div>
             <div class="record-tags">
-              <span class="tag tag-score" *ngIf="record.matchScore !== null && record.matchScore !== undefined">Score: {{ record.matchScore }}</span>
-              <span class="tag" [ngClass]="getMatchStatusBadgeClass(record.matchStatus)">
-                {{ getMatchStatusDisplay(record.matchStatus) }}
-              </span>
+              <span class="tag tag-score" *ngIf="record.matchScore !== null && record.matchScore !== undefined">Score:
+                {{ record.matchScore }}</span>
             </div>
           </div>
 
@@ -151,7 +144,6 @@
       </div>
     </div>
 
-    <!-- Right Column: History Timeline -->
     <div class="column-right">
       <div class="card card-history">
         <div class="card-header">
@@ -159,47 +151,52 @@
             <span class="material-symbols-outlined card-icon">history_toggle_off</span>
             Lịch sử gộp/tách (MatchDecisionLog)
           </h3>
+          @if (!isLoadingHistory()) {
+          <span class="history-count-badge">{{ history().length }} sự kiện</span>
+          }
         </div>
         <div class="timeline-container">
+          @if (isLoadingHistory()) {
+          <div class="timeline-loading">
+            <div class="loading-spinner"></div>
+            <span>Đang tải nhật ký biến động...</span>
+          </div>
+          } @else if (history().length === 0) {
+          <div class="timeline-empty">
+            <span class="material-symbols-outlined empty-icon">event_busy</span>
+            <p>Chưa có biến động nào được ghi nhận cho hồ sơ này</p>
+          </div>
+          } @else {
           <div class="timeline">
-            <!-- Timeline Items (Mock Data) -->
-            <div *ngFor="let item of mockHistory" class="timeline-item">
-              <div class="timeline-dot" [class.dot-brand-primary]="item.color === 'brand-primary'"
-                [class.dot-warning]="item.color === 'warning-high'"
-                [class.dot-success]="item.color === 'success-optimal'"></div>
+
+            @for (item of history(); track item.date + item.action) {
+            <div class="timeline-item">
+              <div class="timeline-dot" [class.dot-brand-primary]="item.colorCode === 'brand-primary'"
+                [class.dot-warning]="item.colorCode === 'warning-high'"
+                [class.dot-success]="item.colorCode === 'success-optimal'"
+                [class.dot-error]="item.colorCode === 'error-optimal'"></div>
               <div class="timeline-content">
                 <div class="timeline-header">
                   <div class="timeline-action">{{ item.action }}</div>
-                  <div class="timeline-date">{{ item.date }}</div>
+                  <div class="timeline-date">{{ formatDateTime(item.date) }}</div>
                 </div>
                 <div class="timeline-by">
-                  Bởi: <span class="timeline-user">{{ item.by }}</span>
+                  Bởi: <span class="timeline-user">{{ item.performedBy }}</span>
                 </div>
                 <div class="timeline-detail">
                   {{ item.detail }}
                 </div>
-                <button class="timeline-link">
-                  <span class="material-symbols-outlined link-icon">visibility</span>
-                  Xem chi tiết log
-                </button>
               </div>
             </div>
-
-            <!-- Timeline End Indicator -->
-            <div class="timeline-item timeline-end">
-              <div class="timeline-dot-end"></div>
-              <div class="timeline-content">
-                <div class="timeline-end-text">Khởi tạo hồ sơ</div>
-              </div>
-            </div>
+            }
           </div>
+          }
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Edit Modal -->
 @if (editingPatient()) {
 <app-patient-master-form [patientMaster]="editingPatient()!" (close)="closeEditModal()"
   (saved)="onPatientUpdated($event)">

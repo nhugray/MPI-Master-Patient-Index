@@ -33,12 +33,10 @@ public record CreateWeightConfigRequest(
         @DecimalMax(value = "100.00", message = "Trọng số Địa chỉ phải <= 100")
         BigDecimal addressWeight,
 
-        @NotNull(message = "Ngưỡng tự động duyệt không được để trống")
         @DecimalMin(value = "0.00")
         @DecimalMax(value = "100.00")
         BigDecimal autoApprovalThreshold,
 
-        @NotNull(message = "Ngưỡng cần xem xét không được để trống")
         @DecimalMin(value = "0.00")
         @DecimalMax(value = "100.00")
         BigDecimal manualReviewThreshold,

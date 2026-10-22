@@ -1,0 +1,395 @@
+<div class="profile-page">
+
+  <div class="page-topbar">
+    <div class="topbar-content">
+      <div class="topbar-left">
+        <nav class="breadcrumb">
+          <span class="breadcrumb-item">Quản trị MPI</span>
+          <span class="material-symbols-outlined chevron">chevron_right</span>
+          <a class="breadcrumb-link" (click)="goBack()">Quản lý Người dùng</a>
+          <span class="material-symbols-outlined chevron">chevron_right</span>
+          <span class="breadcrumb-current">Hồ sơ tài khoản cá nhân</span>
+        </nav>
+        <div class="topbar-title-row">
+          <button class="btn-back" (click)="goBack()" title="Quay lại">
+            <span class="material-symbols-outlined">arrow_back</span>
+            <span>Danh sách Người dùng</span>
+          </button>
+          @if (user()) {
+          <span class="status-pill" [ngClass]="getStatusClass(user()!.status)">
+            <span class="status-pulse-dot"></span>
+            <span>{{ getStatusLabel(user()!.status) }}</span>
+          </span>
+          }
+        </div>
+      </div>
+      <div class="topbar-right">
+        <button class="btn-action-secondary" (click)="showChangePassword.set(true)">
+          <span class="material-symbols-outlined">lock_reset</span>
+          <span>Đổi mật khẩu</span>
+        </button>
+        @if (!isEditing()) {
+        <button class="btn-action-primary" (click)="openEdit()">
+          <span class="material-symbols-outlined">edit_square</span>
+          <span>Chỉnh sửa thông tin</span>
+        </button>
+        }
+      </div>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+  <div class="loading-state">
+    <div class="loading-spinner-ring"></div>
+    <p class="loading-title">Đang đồng bộ hồ sơ người dùng...</p>
+    <span class="loading-subtitle">Truy xuất dữ liệu định danh từ MPI Core</span>
+  </div>
+  } @else if (user()) {
+
+  <div class="profile-container">
+
+    <section class="hero-bento-card">
+      <div class="hero-bg-gradient"></div>
+      <div class="hero-grid">
+
+        <div class="hero-user-identity">
+          <div class="avatar-container">
+            <div class="avatar-box">
+              <span class="avatar-text">{{ getInitials(user()!.name) }}</span>
+            </div>
+            <div class="avatar-badge-online" title="Trạng thái hệ thống: Sẵn sàng">
+              <span class="online-indicator"></span>
+              <span>ONLINE</span>
+            </div>
+          </div>
+
+          <div class="hero-details">
+            <div class="name-badge-group">
+              <h1 class="user-fullname">{{ user()!.name }}</h1>
+              <div class="role-chips-group">
+                @for (role of user()!.roles; track role.id) {
+                <span class="role-chip-pill" [attr.data-role]="role.name">
+                  <span class="material-symbols-outlined role-chip-icon">{{ getRoleIcon(role.name) }}</span>
+                  <span>{{ role.name }}</span>
+                </span>
+                }
+              </div>
+            </div>
+
+            <div class="identity-chips-row">
+              <div class="identity-tag code-tag" (click)="copyUserId(user()!.id)" title="Bấm để sao chép mã">
+                <span class="material-symbols-outlined">fingerprint</span>
+                <span class="mono-text">#USR-{{ ('00000' + user()!.id).slice(-5) }}</span>
+                <span class="material-symbols-outlined copy-icon">content_copy</span>
+              </div>
+
+              <div class="identity-tag email-tag">
+                <span class="material-symbols-outlined email-icon">mail</span>
+                <span class="email-text">{{ user()!.email }}</span>
+                <span class="material-symbols-outlined verified-check" title="Email đã xác thực">verified</span>
+              </div>
+
+              <div class="identity-tag org-tag">
+                <span class="material-symbols-outlined org-icon">local_hospital</span>
+                <span>Hệ thống MPI Quốc Gia</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-stat-tiles">
+          <div class="stat-tile">
+            <span class="stat-tile-label">Trạng thái</span>
+            <div class="stat-tile-value status-indicator-val" [ngClass]="getStatusClass(user()!.status)">
+              <span class="status-dot"></span>
+              <span>{{ getStatusLabel(user()!.status) }}</span>
+            </div>
+            <span class="stat-tile-sub">Xác thực OAuth2</span>
+          </div>
+
+          <div class="stat-tile">
+            <span class="stat-tile-label">Vai trò kích hoạt</span>
+            <div class="stat-tile-value text-primary-val">{{ user()!.roles.length }} Quyền</div>
+            <span class="stat-tile-sub">Phân quyền phân tầng</span>
+          </div>
+
+          <div class="stat-tile">
+            <span class="stat-tile-label">Bảo mật tài khoản</span>
+            <div class="stat-tile-value text-success-val">
+              <span class="material-symbols-outlined shield-icon">shield_with_heart</span>
+              <span>Chuẩn HIPAA</span>
+            </div>
+            <span class="stat-tile-sub">Mã hóa JWT RS256</span>
+          </div>
+
+          <div class="stat-tile">
+            <span class="stat-tile-label">Thời gian tạo</span>
+            <div class="stat-tile-value text-compact">{{ formatDateTime(user()!.createdAt) }}</div>
+            <span class="stat-tile-sub">Đồng bộ tự động</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <div class="content-layout">
+      <div class="col-main">
+        <div class="card-surface">
+          @if (!isEditing()) {
+          <div class="fields-bento-grid">
+            <div class="field-item">
+              <span class="field-caption">Họ và tên đầy đủ (name)</span>
+              <div class="field-main-val">
+                <span class="val-strong">{{ user()!.name }}</span>
+                <span class="val-sub-mono">ID: {{ user()!.id }}</span>
+              </div>
+            </div>
+
+            <div class="field-item">
+              <span class="field-caption">Địa chỉ Email định danh (email)</span>
+              <div class="field-main-val">
+                <span class="val-strong">{{ user()!.email }}</span>
+                <span class="pill-badge-success">Chính</span>
+              </div>
+            </div>
+
+            <div class="field-item full-span">
+              <span class="field-caption">Địa chỉ thường trú / Công tác (address)</span>
+              <div class="field-main-val address-val">
+                <span class="material-symbols-outlined pin-icon">location_on</span>
+                <span class="val-text">{{ user()!.address || 'Chưa cập nhật thông tin địa chỉ thường trú' }}</span>
+              </div>
+            </div>
+
+            <div class="field-item">
+              <span class="field-caption">Quy chuẩn dữ liệu y tế</span>
+              <div class="field-main-val">
+                <span class="pill-badge-info">Chuẩn HL7 FHIR v4</span>
+              </div>
+            </div>
+
+            <div class="field-item">
+              <span class="field-caption">Phân vùng thẩm quyền</span>
+              <div class="field-main-val">
+                <span class="val-strong">Toàn hệ thống liên viện</span>
+              </div>
+            </div>
+          </div>
+
+          } @else {
+
+          <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-container">
+            <div class="form-grid-layout">
+              <div class="form-field-group">
+                <label class="form-label-styled">
+                  Họ và tên <span class="required-star">*</span>
+                </label>
+                <div class="input-wrapper">
+                  <span class="material-symbols-outlined input-icon">badge</span>
+                  <input type="text" formControlName="name" class="input-styled" placeholder="Nhập họ và tên...">
+                </div>
+                @if (form.get('name')?.touched && form.get('name')?.errors?.['required']) {
+                <span class="error-msg">Họ và tên không được để trống</span>
+                }
+              </div>
+
+              <div class="form-field-group">
+                <label class="form-label-styled">
+                  Địa chỉ Email <span class="required-star">*</span>
+                </label>
+                <div class="input-wrapper">
+                  <span class="material-symbols-outlined input-icon">mail</span>
+                  <input type="email" formControlName="email" class="input-styled" placeholder="user@medisync.vn">
+                </div>
+                @if (form.get('email')?.touched && form.get('email')?.errors?.['required']) {
+                <span class="error-msg">Email không được để trống</span>
+                }
+                @if (form.get('email')?.touched && form.get('email')?.errors?.['invalidEmail']) {
+                <span class="error-msg">Định dạng email không hợp lệ</span>
+                }
+              </div>
+
+              <div class="form-field-group full-span">
+                <label class="form-label-styled">Địa chỉ liên hệ</label>
+                <div class="input-wrapper">
+                  <span class="material-symbols-outlined input-icon">location_on</span>
+                  <input type="text" formControlName="address" class="input-styled"
+                    placeholder="Số nhà, tên đường, Phường/Xã, Quận/Huyện, Tỉnh/TP...">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-action-bar">
+              <button type="button" class="btn-ghost" (click)="cancelEdit()">
+                <span>Hủy bỏ</span>
+              </button>
+              <button type="submit" class="btn-solid-primary" [disabled]="isSubmitting()">
+                @if (isSubmitting()) {
+                <span class="btn-spinner"></span>
+                <span>Đang lưu...</span>
+                } @else {
+                <span class="material-symbols-outlined">save</span>
+                <span>Lưu thông tin</span>
+                }
+              </button>
+            </div>
+          </form>
+          }
+        </div>
+
+        <div class="card-surface">
+          <div class="card-header-styled">
+            <div class="card-header-info">
+              <div class="header-icon-box success">
+                <span class="material-symbols-outlined">verified_user</span>
+              </div>
+              <div>
+                <h2 class="card-heading">Vai trò & Phân quyền truy cập</h2>
+                <p class="card-subheading">{{ user()!.roles.length }} vai trò đang được chỉ định trong cơ sở dữ liệu MPI
+                </p>
+              </div>
+            </div>
+            <span class="count-bubble">{{ user()!.roles.length }} Roles</span>
+          </div>
+
+          <div class="role-cards-stack">
+            @for (role of user()!.roles; track role.id) {
+            <div class="role-card-item">
+              <div class="role-icon-plate" [attr.data-role]="role.name">
+                <span class="material-symbols-outlined">{{ getRoleIcon(role.name) }}</span>
+              </div>
+              <div class="role-meta-content">
+                <div class="role-title-row">
+                  <span class="role-code-title">{{ role.name }}</span>
+                  <span class="role-id-tag">ID: {{ role.id }}</span>
+                  <span class="role-level-pill">Quyền cốt lõi</span>
+                </div>
+                <p class="role-narrative">{{ getRoleDescription(role.name) }}</p>
+              </div>
+              <div class="role-status-badge">
+                <span class="material-symbols-outlined">check_circle</span>
+                <span>Kích hoạt</span>
+              </div>
+            </div>
+            } @empty {
+            <div class="empty-roles-box">
+              <span class="material-symbols-outlined empty-icon">admin_panel_settings</span>
+              <p class="empty-text">Chưa có vai trò nào được gán cho tài khoản này.</p>
+            </div>
+            }
+          </div>
+        </div>
+
+      </div>
+
+      <div class="col-side">
+
+        <div class="card-surface">
+          <div class="card-header-styled compact">
+            <div class="card-header-info">
+              <div class="header-icon-box warning">
+                <span class="material-symbols-outlined">security</span>
+              </div>
+              <h3 class="card-heading-sm">Bảo mật & Trạng thái</h3>
+            </div>
+            <span class="pill-badge-success uppercase">{{ user()!.status || 'ACTIVE' }}</span>
+          </div>
+
+          <div class="security-items-list">
+            <div class="security-row">
+              <div class="sec-left">
+                <span class="sec-title">Phương thức xác thực</span>
+                <span class="sec-caption">Single Sign-On / JWT RS256</span>
+              </div>
+              <div class="sec-right">
+                <span class="material-symbols-outlined sec-lead-icon">key</span>
+              </div>
+            </div>
+
+            <div class="security-row">
+              <div class="sec-left">
+                <span class="sec-title">Chính sách phiên làm việc</span>
+                <span class="sec-caption">Phiên trình duyệt an toàn (HttpOnly)</span>
+              </div>
+              <div class="sec-right">
+                <span class="badge-mini-active">Active</span>
+              </div>
+            </div>
+
+            <div class="security-row">
+              <div class="sec-left">
+                <span class="sec-title">Chu kỳ đổi mật khẩu</span>
+                <span class="sec-caption">Cấp độ tuân thủ y tế loại 3</span>
+              </div>
+              <div class="sec-right">
+                <span class="sec-highlight">Đạt chuẩn</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-surface">
+          <div class="card-header-styled compact">
+            <div class="card-header-info">
+              <div class="header-icon-box primary">
+                <span class="material-symbols-outlined">nest_clock_farsight_analog</span>
+              </div>
+              <h3 class="card-heading-sm">Dấu vết Hệ thống (Audit)</h3>
+            </div>
+          </div>
+
+          <div class="timestamp-bento-list">
+            <div class="timestamp-tile">
+              <div class="ts-icon-box">
+                <span class="material-symbols-outlined">calendar_add_on</span>
+              </div>
+              <div class="ts-content">
+                <span class="ts-label-caption">Ngày tạo tài khoản (createdAt)</span>
+                <span class="ts-timestamp-val">{{ formatDateTime(user()!.createdAt) }}</span>
+                <span class="ts-extra-info">Khởi tạo bởi Quản trị viên</span>
+              </div>
+            </div>
+
+            <div class="timestamp-tile">
+              <div class="ts-icon-box brand">
+                <span class="material-symbols-outlined">update</span>
+              </div>
+              <div class="ts-content">
+                <span class="ts-label-caption">Cập nhật gần nhất (updatedAt)</span>
+                <span class="ts-timestamp-val">{{ formatDateTime(user()!.updatedAt) }}</span>
+                <span class="ts-extra-info">Ghi nhận log vào Audit Trail</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-surface diagnostic-card">
+          <div class="diagnostic-header">
+            <div class="diag-title-row">
+              <span class="material-symbols-outlined pulse-icon">sync</span>
+              <span class="diag-label">Tình trạng kết nối MPI API</span>
+            </div>
+            <span class="diag-status-ok">Tối ưu 100%</span>
+          </div>
+          <div class="diag-sparkline-box">
+            <div class="progress-bar-wrap">
+              <div class="progress-fill" style="width: 98%;"></div>
+            </div>
+            <div class="diag-caption-row">
+              <span>Độ trễ gateway: &lt; 25ms</span>
+              <span>Uptime: 99.98%</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+  }
+</div>
+
+@if (showChangePassword()) {
+  <app-user-change-password (closed)="showChangePassword.set(false)"></app-user-change-password>
+}

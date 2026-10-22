@@ -1,20 +1,10 @@
 package com.mpi.demo.controller;
 
-import org.springframework.web.bind.annotation.RestController;
-
-import com.mpi.demo.dto.request.PatientMasterSearchRequest;
-import com.mpi.demo.dto.request.UpdatePatientMasterRequest;
-import com.mpi.demo.dto.response.PatientMasterResponse;
-import com.mpi.demo.helper.ApiResponse;
-import com.mpi.demo.helper.ResultPagination;
-import com.mpi.demo.service.PatientMasterService;
-import com.mpi.demo.service.PatientService;
-
-import jakarta.validation.Valid;
+import java.util.List;
 
 import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,6 +12,18 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.mpi.demo.dto.request.PatientMasterSearchRequest;
+import com.mpi.demo.dto.request.UpdatePatientMasterRequest;
+import com.mpi.demo.dto.response.PatientMasterHistoryResponse;
+import com.mpi.demo.dto.response.PatientMasterResponse;
+import com.mpi.demo.helper.ApiResponse;
+import com.mpi.demo.helper.ResultPagination;
+import com.mpi.demo.service.PatientMasterService;
+import com.mpi.demo.service.PatientService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/patient-masters")
@@ -70,5 +72,11 @@ public class PatientMasterController {
         Pageable pageable = PageRequest.of(page, size);
         ResultPagination result = patientService.getByMasterPatientId(id, pageable);
         return ResponseEntity.ok(ApiResponse.success("Lấy danh sách hồ sơ nguồn thành công", result));
+    }
+
+    @GetMapping("/{id}/history")
+    public ResponseEntity<ApiResponse<List<PatientMasterHistoryResponse>>> getHistory(@PathVariable Long id) {
+        List<PatientMasterHistoryResponse> history = patientMasterService.getHistory(id);
+        return ResponseEntity.ok(ApiResponse.success("Lấy lịch sử biến động hồ sơ thành công", history));
     }
 }

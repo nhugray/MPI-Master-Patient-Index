@@ -1,10 +1,7 @@
 <div class="patient-import-page">
-  <!-- TOP APP BAR -->
 
-
-  <!-- MAIN CONTAINER -->
   <main class="import-main">
-    <!-- Hero Section -->
+
     <section class="hero-section">
       <div class="hero-badge">
         <span class="pulse-dot"></span>
@@ -14,13 +11,10 @@
       <p class="hero-subtitle">Tải lên và khớp hồ sơ bệnh nhân từ các nguồn bên ngoài</p>
     </section>
 
-    <!-- MAIN LAYOUT GRID -->
     <div class="import-grid">
 
-      <!-- LEFT COLUMN: CONFIGURATION & ACTIVE JOBS -->
       <div class="grid-left">
 
-        <!-- CONFIGURATION PANEL CARD -->
         <section class="card">
           <div class="card-header">
             <div class="card-header-left">
@@ -33,7 +27,7 @@
           </div>
 
           <div>
-            <!-- Source System Dropdown -->
+
             <div class="form-group">
               <label class="form-label">Hệ thống Nguồn</label>
               <div class="select-wrapper">
@@ -46,7 +40,6 @@
               </div>
             </div>
 
-            <!-- Data Mapping Template -->
             <div class="form-group">
               <label class="form-label">Mẫu Ánh xạ Dữ liệu</label>
               <div class="select-wrapper">
@@ -57,7 +50,6 @@
               </div>
             </div>
 
-            <!-- Checkbox -->
             <div class="checkbox-group">
               <input [(ngModel)]="skipDuplicates" id="skip_dupes" type="checkbox" class="form-checkbox" />
               <label for="skip_dupes" class="checkbox-label">
@@ -70,7 +62,6 @@
 
       <div class="grid-right">
 
-        <!-- DRAG & DROP UPLOAD ZONE -->
         <section class="upload-zone" [class.dragging]="isDragging" (dragover)="onDragOver($event)"
           (dragleave)="onDragLeave($event)" (drop)="onDrop($event)" (click)="fileInput.click()">
 
@@ -101,9 +92,8 @@
 
     </div>
 
-    <!-- DATA PREVIEW CARD (full width) -->
     <section *ngIf="validationResponse" class="preview-card preview-card-full">
-      <!-- Card Header -->
+
       <div class="preview-header">
         <div class="preview-header-content">
           <div class="preview-info">
@@ -141,7 +131,6 @@
         </div>
       </div>
 
-      <!-- Validation Errors -->
       <div *ngIf="validationResponse.errors && validationResponse.errors.length > 0" class="validation-errors">
         <h4 class="validation-title">Lỗi xác thực:</h4>
         <ul class="validation-list">
@@ -154,7 +143,6 @@
         </ul>
       </div>
 
-      <!-- Detected Columns -->
       <div class="detected-columns">
         <h4 class="columns-title">Các cột được phát hiện:</h4>
         <div class="columns-list">
@@ -164,7 +152,6 @@
         </div>
       </div>
 
-      <!-- Preview Data Table -->
       <div *ngIf="previewData.length > 0" class="preview-table-wrapper">
         <h4 class="columns-title">
           Xem trước dữ liệu ({{ previewData.length }} / {{ previewTotalRows | number }} dòng)

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 import { WeightConfig, WeightFieldKey, CreateWeightConfigRequest } from '../../models/algorithm-config.model';
-import { WEIGHT_FIELDS, TOTAL_WEIGHT_EXPECTED, DEFAULT_WEIGHT_FORM, DEFAULT_AUTO_APPROVAL_THRESHOLD, DEFAULT_MANUAL_REVIEW_THRESHOLD } from '../../models/algorithm-config.constants';
+import { WEIGHT_FIELDS, TOTAL_WEIGHT_EXPECTED, DEFAULT_WEIGHT_FORM } from '../../models/algorithm-config.constants';
 
 @Component({
   selector: 'app-weight-editor-panel',
@@ -38,8 +38,8 @@ export class WeightEditorPanelComponent {
   private readonly _activeConfig = signal<WeightConfig | null>(null);
 
   weights = signal<Record<WeightFieldKey, number>>({ ...DEFAULT_WEIGHT_FORM });
-  autoApprovalThreshold = signal<number>(DEFAULT_AUTO_APPROVAL_THRESHOLD);
-  manualReviewThreshold = signal<number>(DEFAULT_MANUAL_REVIEW_THRESHOLD);
+  autoApprovalThreshold = signal<number>(0);
+  manualReviewThreshold = signal<number>(0);
   description = signal<string>('');
 
   totalWeight = computed(() => {
@@ -71,8 +71,8 @@ export class WeightEditorPanelComponent {
 
     const request: CreateWeightConfigRequest = {
       ...this.weights(),
-      autoApprovalThreshold: this.autoApprovalThreshold(),
-      manualReviewThreshold: this.manualReviewThreshold(),
+      autoApprovalThreshold: this.autoApprovalThreshold() || undefined,
+      manualReviewThreshold: this.manualReviewThreshold() || undefined,
       description: this.description() || null,
       createdBy: null
     };

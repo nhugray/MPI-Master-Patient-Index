@@ -98,7 +98,6 @@ export class SourceSystemListComponent implements OnInit {
     this.loadSourceSystems();
   }
 
-
   reload(): void {
     this.loadSourceSystems();
   }

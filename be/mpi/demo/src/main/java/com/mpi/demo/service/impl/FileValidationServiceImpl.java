@@ -56,16 +56,16 @@ public class FileValidationServiceImpl implements FileValidationService {
                 }
             }
             Map<String, Object> rowDataAsObject = new LinkedHashMap<>(row);
-            
+
             preview.add(new PreviewRowDto(
-                rowNumber, 
+                rowNumber,
                 rowDataAsObject,
-                rowMessages.isEmpty() ? "VALID" : "INVALID", 
-                rowMessages, 
+                rowMessages.isEmpty() ? "VALID" : "INVALID",
+                rowMessages,
                 null
             ));
         }
-        
+
         return new FileValidationResponse(
                 errors.isEmpty(),
                 null,
@@ -120,7 +120,7 @@ public class FileValidationServiceImpl implements FileValidationService {
         String dateOfBirth = value(row, mappings, "dateOfBirth");
         String phone = value(row, mappings, "phoneNumber");
         String gender = value(row, mappings, "gender");
-        
+
         if (localCode.isBlank()) {
             messages.add("Thieu localPatientCode");
         } else if (!localCodes.add(localCode)) {
@@ -131,13 +131,13 @@ public class FileValidationServiceImpl implements FileValidationService {
         if (fullName.isBlank()) {
             messages.add("Thieu fullName");
         }
-        
+
         if (!gender.isBlank()) {
             if (!gender.equals("MALE") && !gender.equals("FEMALE") && !gender.equals("OTHER")) {
                 messages.add("gender phai la MALE, FEMALE hoac OTHER");
             }
         }
-        
+
         if (!nationalId.isBlank()) {
             if (!NATIONAL_ID.matcher(nationalId).matches()) {
                 messages.add("nationalId phai co 9 hoac 12 chu so");
@@ -160,7 +160,7 @@ public class FileValidationServiceImpl implements FileValidationService {
         }
         return messages;
     }
-    
+
     private String extractColumnFromMessage(String message) {
         if (message.contains("localPatientCode")) return "localPatientCode";
         if (message.contains("fullName")) return "fullName";
