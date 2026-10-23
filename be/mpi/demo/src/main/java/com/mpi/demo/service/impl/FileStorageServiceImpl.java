@@ -87,12 +87,12 @@ public class FileStorageServiceImpl implements FileStorageService {
     public FileTypeEnum detectType(String fileName) {
         String extension = StringUtils.getFilenameExtension(fileName);
         if (extension == null) {
-            throw new FileStorageException("File phai co duoi .csv hoac .xlsx");
+            throw new FileStorageException("File phải có đuôi .csv hoặc .xlsx");
         }
         return switch (extension.toLowerCase(Locale.ROOT)) {
             case "csv" -> FileTypeEnum.CSV;
             case "xlsx" -> FileTypeEnum.XLSX;
-            default -> throw new FileStorageException("Chi ho tro file CSV va XLSX");
+            default -> throw new FileStorageException("Chỉ hỗ trợ file CSV và XLSX");
         };
     }
 

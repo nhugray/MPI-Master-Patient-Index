@@ -147,7 +147,7 @@ public class AsyncImportProcessorImpl implements AsyncImportProcessor {
 
             if (patientRepository.existsBySourceSystemIdAndLocalPatientCode(sourceSystem.getId(), localCode)) {
                 detail.setStatus(ImportRowStatusEnum.DUPLICATE);
-                detail.setErrorMessage("localPatientCode đã tồn tại trong hệ thống");
+                detail.setErrorMessage("Mã bệnh nhân nội bộ đã tồn tại trong hệ thống");
                 job.setDuplicateRows(job.getDuplicateRows() + 1);
             } else {
                 Patient patient = toPatient(row, mappings, sourceSystem);
@@ -178,7 +178,7 @@ public class AsyncImportProcessorImpl implements AsyncImportProcessor {
                     } else if (topCandidate.getDecision() == MatchDecisionEnum.PENDING) {
                         detail.setStatus(ImportRowStatusEnum.REQUIRES_REVIEW);
                         detail.setWarningMessage("Phát hiện trùng khớp với độ tin cậy "
-                            + topCandidate.getMatchScore() + "%, cần review thủ công");
+                                + topCandidate.getMatchScore() + "%, cần review thủ công");
                         job.setWarningRows(job.getWarningRows() + 1);
                     } else {
                         patientMasterService.createMaster(patient);
@@ -264,7 +264,7 @@ public class AsyncImportProcessorImpl implements AsyncImportProcessor {
 
         try {
             return objectMapper.readValue(configuration,
-                objectMapper.getTypeFactory().constructMapType(HashMap.class, String.class, String.class));
+                    objectMapper.getTypeFactory().constructMapType(HashMap.class, String.class, String.class));
         } catch (JsonProcessingException e) {
             Map<String, String> defaultMappings = new HashMap<>();
             defaultMappings.put("localPatientCode", "localPatientCode");
