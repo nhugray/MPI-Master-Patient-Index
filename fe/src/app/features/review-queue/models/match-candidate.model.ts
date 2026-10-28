@@ -57,11 +57,13 @@ export interface ReviewQueueSearchRequest {
   decision?: MatchDecisionEnum;
   page: number;
   size: number;
+  sort?: string;
 }
 
 export const defaultReviewQueueSearchParams: ReviewQueueSearchRequest = {
   page: 0,
-  size: 10
+  size: 10,
+  sort: 'createdAt,desc'
 };
 
 export interface ReviewDecisionRequest {

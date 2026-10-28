@@ -8,7 +8,9 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -97,6 +99,10 @@ public class PatientMasterServiceImpl implements PatientMasterService {
 
     @Override
     public ResultPagination searchMasters(PatientMasterSearchRequest request, Pageable pageable) {
+        if (pageable.getSort().isUnsorted()) {
+            pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
+                    Sort.by(Sort.Direction.DESC, "createdAt").and(Sort.by(Sort.Direction.DESC, "id")));
+        }
         Specification<PatientMaster> spec = PatientMasterSpecification.build(request);
         Page<PatientMaster> page = patientMasterRepository.findAll(spec, pageable);
         Page<PatientMasterResponse> response = page.map(this::toResponse);
@@ -137,12 +143,16 @@ public class PatientMasterServiceImpl implements PatientMasterService {
 
         List<PatientMasterHistoryResponse> historyList = new ArrayList<>();
         Set<Long> processedCandidateIds = new HashSet<>();
+        Set<Long> processedPatientIds = new HashSet<>();
 
         List<MatchDecisionLog> logs = matchDecisionLogRepository.findByMasterIdOrderByCreatedAtDesc(masterId);
         for (MatchDecisionLog log : logs) {
             MatchCandidate mc = log.getMatchCandidate();
             if (mc != null) {
                 processedCandidateIds.add(mc.getId());
+                if (mc.getPatient() != null) {
+                    processedPatientIds.add(mc.getPatient().getId());
+                }
             }
 
             String actionTitle;
@@ -196,8 +206,15 @@ public class PatientMasterServiceImpl implements PatientMasterService {
 
         List<MatchCandidate> candidates = matchCandidateRepository.findByCandidateMasterId(masterId);
         for (MatchCandidate mc : candidates) {
+            Long patientId = mc.getPatient() != null ? mc.getPatient().getId() : null;
+            if (patientId != null && processedPatientIds.contains(patientId)) {
+                continue;
+            }
             if (!processedCandidateIds.contains(mc.getId()) &&
                     (mc.getDecision() == MatchDecisionEnum.AUTO_APPROVED || mc.getDecision() == MatchDecisionEnum.MANUAL_APPROVED)) {
+                if (patientId != null) {
+                    processedPatientIds.add(patientId);
+                }
 
                 boolean isAuto = mc.getDecision() == MatchDecisionEnum.AUTO_APPROVED;
                 String actionTitle = isAuto ? "Tự động gộp (Auto Merge)" : "Gộp thủ công (Manual Merge)";

@@ -25,6 +25,8 @@ export interface Patient {
   enterpriseId?: string | null;
   matchStatus: MatchStatus;
   matchScore?: number | null;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface CreatePatientRequest {

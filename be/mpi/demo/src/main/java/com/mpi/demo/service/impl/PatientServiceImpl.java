@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,8 +56,12 @@ public class PatientServiceImpl implements PatientService {
 
         @Override
         public ResultPagination search(PatientSearchRequest search, Pageable pageable) {
+                final Pageable effectivePageable = pageable.getSort().isUnsorted()
+                                ? PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
+                                                Sort.by(Sort.Direction.DESC, "createdAt").and(Sort.by(Sort.Direction.DESC, "id")))
+                                : pageable;
                 Specification<Patient> spec = PatientSpecification.build(search);
-                Page<PatientResponse> pageResult = patientRepository.findBy(spec, q -> q.page(pageable))
+                Page<PatientResponse> pageResult = patientRepository.findBy(spec, q -> q.page(effectivePageable))
                                 .map(PatientResponse::fromEntity);
                 return ResultPagination.fromPage(pageResult);
         }
@@ -166,7 +172,11 @@ public class PatientServiceImpl implements PatientService {
 
         @Override
         public ResultPagination getByMasterPatientId(Long masterPatientId, Pageable pageable) {
-                Page<Patient> pageResult = patientRepository.findByMasterPatientId(masterPatientId, pageable);
+                final Pageable effectivePageable = pageable.getSort().isUnsorted()
+                                ? PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
+                                                Sort.by(Sort.Direction.DESC, "createdAt").and(Sort.by(Sort.Direction.DESC, "id")))
+                                : pageable;
+                Page<Patient> pageResult = patientRepository.findByMasterPatientId(masterPatientId, effectivePageable);
                 List<Long> patientIds = pageResult.getContent().stream().map(Patient::getId).toList();
                 Map<Long, BigDecimal> scores = new HashMap<>();
                 if (!patientIds.isEmpty()) {

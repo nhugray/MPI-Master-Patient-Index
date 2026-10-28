@@ -22,7 +22,7 @@ public class AlgorithmWeightConfigServiceImpl implements AlgorithmWeightConfigSe
     @Value("${mpi.matching.auto-approval-threshold:92.00}")
     private BigDecimal defaultAutoApprovalThreshold;
 
-    @Value("${mpi.matching.manual-review-threshold:65.00}")
+    @Value("${mpi.matching.manual-review-threshold:50.00}")
     private BigDecimal defaultManualReviewThreshold;
 
     private static final BigDecimal TOTAL_WEIGHT_EXPECTED = new BigDecimal("100.00");

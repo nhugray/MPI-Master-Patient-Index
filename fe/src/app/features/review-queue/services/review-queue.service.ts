@@ -23,6 +23,10 @@ export class ReviewQueueService {
       httpParams = httpParams.set('decision', params.decision);
     }
 
+    if (params.sort) {
+      httpParams = httpParams.set('sort', params.sort);
+    }
+
     return this.http.get<ApiResponse<PageResponse<MatchCandidate>>>(`${this.apiUrl}${this.basePath}`, { params: httpParams });
   }
 

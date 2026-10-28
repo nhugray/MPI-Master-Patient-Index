@@ -109,7 +109,15 @@ export class PatientListComponent implements OnInit {
     ).subscribe({
       next: (response) => {
         if (isSuccess(response)) {
-          this.patients.set(response.data.result);
+          const sortedList = [...(response.data.result || [])].sort((a, b) => {
+            const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+            const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+            if (timeB !== timeA) {
+              return timeB - timeA;
+            }
+            return (b.id || 0) - (a.id || 0);
+          });
+          this.patients.set(sortedList);
           this.pageMeta.set(response.data.meta);
 
           const total = response.data.meta?.total || 0;

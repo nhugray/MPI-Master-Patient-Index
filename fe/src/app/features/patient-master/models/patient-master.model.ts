@@ -24,10 +24,12 @@ export interface PatientMasterSearchRequest {
   sourceSystemIds?: number[];
   page: number;
   size: number;
+  sort?: string;
 }
 export const defaultSearchParams: PatientMasterSearchRequest = {
   page: 0,
-  size: 10
+  size: 50,
+  sort: 'createdAt,desc'
 };
 
 export interface UpdatePatientMasterRequest {

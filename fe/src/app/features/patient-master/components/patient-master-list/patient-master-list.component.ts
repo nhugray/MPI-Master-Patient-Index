@@ -70,7 +70,8 @@ export class PatientMasterListComponent implements OnInit {
       this.searchParams = {
         ...this.searchParams,
         keyword: query || undefined,
-        page: 0
+        page: 0,
+        sort: 'createdAt,desc'
       };
       this.loadPatientMasters();
     }, { allowSignalWrites: true });
@@ -91,7 +92,15 @@ export class PatientMasterListComponent implements OnInit {
     ).subscribe({
       next: (response) => {
         if (isSuccess(response)) {
-          this.patientMasters.set(response.data.result);
+          const sortedList = [...(response.data.result || [])].sort((a, b) => {
+            const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+            const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+            if (timeB !== timeA) {
+              return timeB - timeA;
+            }
+            return (b.id || 0) - (a.id || 0);
+          });
+          this.patientMasters.set(sortedList);
           this.pageMeta.set(response.data.meta);
 
           const total = response.data.meta?.total || 0;
@@ -124,7 +133,8 @@ export class PatientMasterListComponent implements OnInit {
     this.searchParams = {
       ...this.searchParams,
       gender: gender !== 'ALL' ? gender as Gender : undefined,
-      page: 0
+      page: 0,
+      sort: 'createdAt,desc'
     };
     this.loadPatientMasters();
   }

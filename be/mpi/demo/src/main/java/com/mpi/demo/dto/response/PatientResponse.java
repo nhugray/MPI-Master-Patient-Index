@@ -2,6 +2,7 @@ package com.mpi.demo.dto.response;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import com.mpi.demo.constant.GenderEnum;
 import com.mpi.demo.constant.MatchStatusEnum;
@@ -24,7 +25,9 @@ public record PatientResponse(
         String enterpriseId,
         PatientMaster masterPatient,
         MatchStatusEnum matchStatus,
-        BigDecimal matchScore) {
+        BigDecimal matchScore,
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt) {
 
     public static PatientResponse fromEntity(Patient patient) {
         return fromEntity(patient, null);
@@ -47,6 +50,8 @@ public record PatientResponse(
                 patient.getMasterPatient() != null ? patient.getMasterPatient().getEnterpriseId() : null,
                 patient.getMasterPatient(),
                 patient.getMatchStatus(),
-                matchScore);
+                matchScore,
+                patient.getCreatedAt(),
+                patient.getUpdatedAt());
     }
 }

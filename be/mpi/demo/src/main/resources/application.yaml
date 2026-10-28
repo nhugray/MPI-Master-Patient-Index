@@ -41,4 +41,4 @@ springdoc:
 mpi:
   matching:
     auto-approval-threshold: 92.00
-    manual-review-threshold: 65.00
+    manual-review-threshold: 50.00

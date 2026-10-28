@@ -21,6 +21,8 @@ public interface MatchCandidateRepository extends JpaRepository<MatchCandidate, 
 
     Page<MatchCandidate> findByDecisionOrderByCreatedAtDesc(MatchDecisionEnum decision, Pageable pageable);
 
+    Page<MatchCandidate> findAllByOrderByCreatedAtDesc(Pageable pageable);
+
     @Query("SELECT mc FROM MatchCandidate mc WHERE " +
             "mc.matchScore >= ?1 AND " +
             "mc.decision = 'PENDING' " +

@@ -49,6 +49,9 @@ export class PatientService {
     if (params.matchStatus !== undefined) {
       httpParams = httpParams.set('matchStatus', params.matchStatus);
     }
+    if (params.sort) {
+      httpParams = httpParams.set('sort', params.sort);
+    }
 
     return this.http.get<ApiResponse<PageResponse<Patient>>>(`${this.apiUrl}${this.basePath}`, {
       params: httpParams

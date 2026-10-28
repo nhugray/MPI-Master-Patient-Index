@@ -15,9 +15,11 @@ export interface PatientSearchParams {
   matchStatus?: MatchStatus;
   page?: number;
   size?: number;
+  sort?: string;
 }
 
 export const defaultSearchParams: PatientSearchParams = {
   page: 0,
-  size: 10
+  size: 50,
+  sort: 'createdAt,desc'
 };

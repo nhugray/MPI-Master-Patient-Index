@@ -1,0 +1,5 @@
+localPatientCode,fullName,dateOfBirth,gender,nationalId,healthInsuranceNo,phoneNumber,address
+TEST_AUTO_001,Nguyễn Văn An,12/03/1985,MALE,079085001234,DN479085001234,0901111111,"12 Lê Lợi, Q.1, TP.HCM"
+TEST_REVIEW_002,Phạm Văn Dũng,15/01/1990,MALE,,DN401090004567,0912222221,"Tổ 5 Kim Mã, Ba Đình, Hà Nội"
+TEST_NEW_003,Đỗ Hoàng Long,20/08/2001,MALE,038201009988,GD438201009988,0987654321,"120 Cầu Giấy, Hà Nội"
+

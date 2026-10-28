@@ -44,7 +44,7 @@ export class PatientImportPageComponent implements OnInit {
   selectedSourceSystemId: number | null = null;
   sourceSystems: SourceSystem[] = [];
   skipDuplicates = true;
-  duplicateThreshold = 98;
+  duplicateThreshold = 95;
 
   isDragging = false;
   selectedFile: File | null = null;

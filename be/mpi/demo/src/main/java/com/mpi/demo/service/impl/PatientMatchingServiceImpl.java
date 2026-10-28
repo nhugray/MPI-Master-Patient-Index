@@ -28,10 +28,8 @@ import java.math.RoundingMode;
 import java.text.Normalizer;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,7 +37,7 @@ public class PatientMatchingServiceImpl implements PatientMatchingService {
     @Value("${mpi.matching.auto-approval-threshold:92.00}")
     private BigDecimal autoApprovalThreshold;
 
-    @Value("${mpi.matching.manual-review-threshold:65.00}")
+    @Value("${mpi.matching.manual-review-threshold:50.00}")
     private BigDecimal manualReviewThreshold;
 
     private final PatientMasterRepository patientMasterRepository;
@@ -72,25 +70,26 @@ public class PatientMatchingServiceImpl implements PatientMatchingService {
     @Override
     public List<MatchCandidate> findMatchCandidates(Patient patient) {
         AlgorithmWeightConfig config = loadActiveConfig();
-        Set<PatientMaster> masterCandidates = new HashSet<>();
+        Map<Long, PatientMaster> masterCandidates = new HashMap<>();
 
         if (patient.getDateOfBirth() != null && patient.getFullName() != null && patient.getFullName().length() >= 3) {
             String first3 = patient.getFullName().substring(0, 3).toUpperCase();
-            masterCandidates.addAll(
-                    patientMasterRepository.findByDateOfBirthAndFirst3Chars(patient.getDateOfBirth(), first3));
+            patientMasterRepository.findByDateOfBirthAndFirst3Chars(patient.getDateOfBirth(), first3)
+                    .forEach(m -> masterCandidates.put(m.getId(), m));
         }
 
         if (patient.getPhoneNumber() != null && patient.getPhoneNumber().length() >= 4) {
             String last4 = patient.getPhoneNumber().substring(patient.getPhoneNumber().length() - 4);
-            masterCandidates.addAll(patientMasterRepository.findByPhoneLast4Digits(last4));
+            patientMasterRepository.findByPhoneLast4Digits(last4)
+                    .forEach(m -> masterCandidates.put(m.getId(), m));
         }
 
         if (patient.getNationalId() != null) {
             patientMasterRepository.findByNationalId(patient.getNationalId())
-                    .ifPresent(masterCandidates::add);
+                    .ifPresent(m -> masterCandidates.put(m.getId(), m));
         }
 
-        return masterCandidates.stream()
+        return masterCandidates.values().stream()
                 .map(master -> buildMatchCandidate(patient, master, config))
                 .filter(mc -> mc.getMatchScore().compareTo(new BigDecimal("30.00")) >= 0)
                 .sorted(Comparator.comparing(MatchCandidate::getMatchScore).reversed())
@@ -136,8 +135,10 @@ public class PatientMatchingServiceImpl implements PatientMatchingService {
     }
 
     private MatchDecisionEnum getAutoDecision(BigDecimal matchScore, AlgorithmWeightConfig config) {
-        BigDecimal autoThreshold = this.autoApprovalThreshold != null ? this.autoApprovalThreshold : config.getAutoApprovalThreshold();
-        BigDecimal manualThreshold = this.manualReviewThreshold != null ? this.manualReviewThreshold : config.getManualReviewThreshold();
+        BigDecimal autoThreshold = this.autoApprovalThreshold != null ? this.autoApprovalThreshold
+                : config.getAutoApprovalThreshold();
+        BigDecimal manualThreshold = this.manualReviewThreshold != null ? this.manualReviewThreshold
+                : config.getManualReviewThreshold();
 
         if (matchScore.compareTo(autoThreshold) >= 0) {
             return MatchDecisionEnum.AUTO_APPROVED;
@@ -205,7 +206,7 @@ public class PatientMatchingServiceImpl implements PatientMatchingService {
     @Override
     public Page<MatchCandidate> searchCandidates(MatchDecisionEnum decision, Pageable pageable) {
         if (decision == null) {
-            return matchCandidateRepository.findAll(pageable);
+            return matchCandidateRepository.findAllByOrderByCreatedAtDesc(pageable);
         }
         return matchCandidateRepository.findByDecisionOrderByCreatedAtDesc(decision, pageable);
     }

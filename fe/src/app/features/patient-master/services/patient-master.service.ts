@@ -28,6 +28,9 @@ export class PatientMasterService {
     if (params.status) {
       httpParams = httpParams.set('status', params.status);
     }
+    if (params.sort) {
+      httpParams = httpParams.set('sort', params.sort);
+    }
 
     return this.http.get<ApiResponse<PageResponse<PatientMaster>>>(`${this.apiUrl}${this.basePath}`, {
       params: httpParams

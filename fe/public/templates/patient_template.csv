@@ -1,0 +1,5 @@
+localPatientCode,fullName,dateOfBirth,gender,nationalId,healthInsuranceNo,phoneNumber,address
+BN_001,Nguyễn Văn An,12/03/1985,MALE,079085001234,DN479085001234,0901111111,"12 Lê Lợi, Phường Bến Nghé, Quận 1, TP.HCM"
+BN_002,Trần Thị Bích,24/07/1992,FEMALE,079192002345,DN479192002345,0901111112,"45 Nguyễn Trãi, Phường 2, Quận 5, TP.HCM"
+BN_003,Lê Văn Cường,05/11/1998,MALE,001198007766,DN401198007766,0912345678,"120 Cầu Giấy, Phường Quan Hoa, Quận Cầu Giấy, Hà Nội"
+

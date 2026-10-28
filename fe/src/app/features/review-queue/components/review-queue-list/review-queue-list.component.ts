@@ -85,7 +85,8 @@ export class ReviewQueueListComponent implements OnInit {
     this.searchParams = {
       ...this.searchParams,
       decision: decision === 'ALL' ? undefined : decision,
-      page: 0
+      page: 0,
+      sort: 'createdAt,desc'
     };
     this.loadCandidates();
   }
