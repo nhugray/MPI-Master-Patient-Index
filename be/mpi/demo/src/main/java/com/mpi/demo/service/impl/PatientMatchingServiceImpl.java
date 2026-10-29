@@ -15,6 +15,7 @@ import com.mpi.demo.repository.MatchDecisionLogRepository;
 import com.mpi.demo.repository.PatientMasterRepository;
 import com.mpi.demo.repository.PatientRepository;
 import com.mpi.demo.repository.UserRepository;
+import com.mpi.demo.service.PatientMasterService;
 import com.mpi.demo.service.PatientMatchingService;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -23,9 +24,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.Normalizer;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -46,19 +51,22 @@ public class PatientMatchingServiceImpl implements PatientMatchingService {
     private final MatchDecisionLogRepository matchDecisionLogRepository;
     private final UserRepository userRepository;
     private final PatientRepository patientRepository;
+    private final PatientMasterService patientMasterService;
 
     public PatientMatchingServiceImpl(PatientMasterRepository patientMasterRepository,
             MatchCandidateRepository matchCandidateRepository,
             AlgorithmWeightConfigRepository weightConfigRepository,
             MatchDecisionLogRepository matchDecisionLogRepository,
             UserRepository userRepository,
-            PatientRepository patientRepository) {
+            PatientRepository patientRepository,
+            PatientMasterService patientMasterService) {
         this.patientMasterRepository = patientMasterRepository;
         this.matchCandidateRepository = matchCandidateRepository;
         this.weightConfigRepository = weightConfigRepository;
         this.matchDecisionLogRepository = matchDecisionLogRepository;
         this.userRepository = userRepository;
         this.patientRepository = patientRepository;
+        this.patientMasterService = patientMasterService;
     }
 
     private AlgorithmWeightConfig loadActiveConfig() {
@@ -86,7 +94,7 @@ public class PatientMatchingServiceImpl implements PatientMatchingService {
 
         if (patient.getNationalId() != null) {
             patientMasterRepository.findByNationalId(patient.getNationalId())
-                    .ifPresent(m -> masterCandidates.put(m.getId(), m));
+                    .forEach(m -> masterCandidates.put(m.getId(), m));
         }
 
         return masterCandidates.values().stream()
@@ -162,36 +170,142 @@ public class PatientMatchingServiceImpl implements PatientMatchingService {
         }
 
         candidate.setDecision(decision);
-        candidate.setReviewedAt(java.time.LocalDateTime.now());
+        candidate.setReviewedAt(LocalDateTime.now());
         matchCandidateRepository.save(candidate);
 
         MatchActionEnum action;
         Patient patient = candidate.getPatient();
+        String defaultReason;
 
-        if (decision == MatchDecisionEnum.MANUAL_APPROVED) {
+        if (decision == MatchDecisionEnum.MANUAL_APPROVED || decision == MatchDecisionEnum.AUTO_APPROVED) {
             action = MatchActionEnum.MERGE;
-            PatientMaster master = candidate.getCandidateMaster();
-            patient.setMasterPatient(master);
-            patient.setMatchStatus(MatchStatusEnum.MATCHED);
-            Patient savedPatient = patientRepository.save(patient);
-            candidate.setPatient(savedPatient);
+            PatientMaster targetMaster = candidate.getCandidateMaster();
+            PatientMaster currentMaster = patient.getMasterPatient();
+            boolean deletedWrongMaster = false;
+
+            if (currentMaster != null && !currentMaster.getId().equals(targetMaster.getId())) {
+                boolean isCandidateMaster = !matchCandidateRepository.findByCandidateMasterId(currentMaster.getId())
+                        .isEmpty();
+                long linkedCount = patientRepository.countByMasterPatient(currentMaster);
+
+                if (!isCandidateMaster && linkedCount <= 1) {
+                    // Chuyển liên kết bệnh nhân sang targetMaster
+                    patient.setMasterPatient(targetMaster);
+                    patient.setMatchStatus(MatchStatusEnum.MATCHED);
+                    Patient savedPatient = patientRepository.saveAndFlush(patient);
+                    candidate.setPatient(savedPatient);
+
+                    // Xóa hồ sơ gốc tạo nhầm lúc từ chối
+                    patientMasterRepository.delete(currentMaster);
+                    patientMasterRepository.flush();
+                    deletedWrongMaster = true;
+                } else {
+                    // Bệnh nhân đang liên kết với một Master khác (ví dụ M1 trước đó)
+                    patient.setMasterPatient(targetMaster);
+                    patient.setMatchStatus(MatchStatusEnum.MATCHED);
+                    Patient savedPatient = patientRepository.save(patient);
+                    candidate.setPatient(savedPatient);
+
+                    // Tìm ứng viên cũ của currentMaster từng được duyệt để chuyển sang REJECTED và
+                    // ghi log UNMERGE
+                    List<MatchCandidate> previousApprovedCandidates = matchCandidateRepository
+                            .findByPatientId(patient.getId()).stream()
+                            .filter(mc -> mc.getCandidateMaster().getId().equals(currentMaster.getId())
+                                    && (mc.getDecision() == MatchDecisionEnum.MANUAL_APPROVED
+                                            || mc.getDecision() == MatchDecisionEnum.AUTO_APPROVED))
+                            .collect(Collectors.toList());
+
+                    String patientCode = patient.getLocalPatientCode() != null ? patient.getLocalPatientCode()
+                            : ("ID-" + patient.getId());
+
+                    for (MatchCandidate prev : previousApprovedCandidates) {
+                        prev.setDecision(MatchDecisionEnum.REJECTED);
+                        prev.setReviewedAt(java.time.LocalDateTime.now());
+                        prev.setReviewedBy(reviewer);
+                        matchCandidateRepository.save(prev);
+
+                        String unmergeReason = String.format(
+                                "Hồ sơ bệnh nhân %s đã được tách (unlink) khỏi mã EID: %s để chuyển sang gộp vào mã EID: %s",
+                                patientCode, currentMaster.getEnterpriseId(),
+                                targetMaster.getEnterpriseId());
+
+                        MatchDecisionLog unmergeLog = MatchDecisionLog.builder()
+                                .matchCandidate(prev)
+                                .action(MatchActionEnum.UNMERGE)
+                                .performedBy(reviewer)
+                                .reason(unmergeReason)
+                                .build();
+
+                        matchDecisionLogRepository.save(unmergeLog);
+                    }
+                }
+            } else {
+                patient.setMasterPatient(targetMaster);
+                patient.setMatchStatus(MatchStatusEnum.MATCHED);
+                Patient savedPatient = patientRepository.save(patient);
+                candidate.setPatient(savedPatient);
+            }
+
+            defaultReason = "Chuyên viên duyệt gộp hồ sơ vào mã EID: " + targetMaster.getEnterpriseId()
+                    + (deletedWrongMaster ? " (Đã xóa hồ sơ gốc tạo nhầm)" : "");
+
+            // Hướng 1: Tự động đóng/từ chối tất cả các ứng viên nghi trùng khác của cùng
+            // bệnh nhân
+            List<MatchCandidate> otherPendingCandidates = matchCandidateRepository.findByPatientId(patient.getId())
+                    .stream()
+                    .filter(mc -> !mc.getId().equals(candidate.getId())
+                            && mc.getDecision() == MatchDecisionEnum.PENDING)
+                    .collect(Collectors.toList());
+
+            for (MatchCandidate other : otherPendingCandidates) {
+                other.setDecision(MatchDecisionEnum.REJECTED);
+                other.setReviewedAt(java.time.LocalDateTime.now());
+                other.setReviewedBy(reviewer);
+                matchCandidateRepository.save(other);
+
+                String autoRejectReason = "Hệ thống tự động từ chối do hồ sơ bệnh nhân đã được duyệt gộp vào mã EID: "
+                        + targetMaster.getEnterpriseId();
+
+                MatchDecisionLog autoRejectLog = MatchDecisionLog.builder()
+                        .matchCandidate(other)
+                        .action(MatchActionEnum.REJECT)
+                        .performedBy(reviewer)
+                        .reason(autoRejectReason)
+                        .build();
+
+                matchDecisionLogRepository.save(autoRejectLog);
+            }
+
         } else if (decision == MatchDecisionEnum.REJECTED) {
             action = MatchActionEnum.REJECT;
-            patient.setMatchStatus(MatchStatusEnum.REJECTED);
-            Patient savedPatient = patientRepository.save(patient);
-            candidate.setPatient(savedPatient);
-        } else {
-            action = MatchActionEnum.MERGE;
-            PatientMaster master = candidate.getCandidateMaster();
-            patient.setMasterPatient(master);
-            patient.setMatchStatus(MatchStatusEnum.MATCHED);
-            Patient savedPatient = patientRepository.save(patient);
-            candidate.setPatient(savedPatient);
-        }
+            PatientMaster currentMaster = patient.getMasterPatient();
 
-        String defaultReason = action == MatchActionEnum.MERGE
-                ? "Chuyên viên duyệt gộp hồ sơ vào mã EID: " + candidate.getCandidateMaster().getEnterpriseId()
-                : "Chuyên viên từ chối liên kết hồ sơ";
+            // Nếu bệnh nhân chưa có master riêng hoặc đang trỏ vào candidateMaster
+            if (currentMaster == null || currentMaster.getId().equals(candidate.getCandidateMaster().getId())) {
+                patient.setMasterPatient(null);
+                patientRepository.saveAndFlush(patient);
+
+                // Khởi tạo hồ sơ gốc mới cho bệnh nhân này
+                PatientMaster newMaster = patientMasterService.createMaster(patient);
+                patient.setMatchStatus(MatchStatusEnum.REJECTED);
+                Patient savedPatient = patientRepository.save(patient);
+                candidate.setPatient(savedPatient);
+
+                defaultReason = "Chuyên viên từ chối liên kết hồ sơ và khởi tạo hồ sơ gốc mới mã EID: "
+                        + newMaster.getEnterpriseId();
+            } else {
+                if (patient.getMatchStatus() != MatchStatusEnum.MATCHED) {
+                    patient.setMatchStatus(MatchStatusEnum.REJECTED);
+                    Patient savedPatient = patientRepository.save(patient);
+                    candidate.setPatient(savedPatient);
+                }
+
+                defaultReason = "Chuyên viên từ chối liên kết hồ sơ";
+            }
+        } else {
+            action = MatchActionEnum.REJECT;
+            defaultReason = "Chuyên viên cập nhật trạng thái hồ sơ";
+        }
 
         MatchDecisionLog decisionLog = MatchDecisionLog.builder()
                 .matchCandidate(candidate)
@@ -213,8 +327,17 @@ public class PatientMatchingServiceImpl implements PatientMatchingService {
 
     @Override
     public MatchCandidate getCandidateById(Long candidateId) {
-        return matchCandidateRepository.findById(candidateId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy hồ sơ duyệt."));
+        MatchCandidate candidate = matchCandidateRepository.findById(candidateId)
+                .orElseThrow(() -> new RuntimeException("Khong tim thay ho so duyet."));
+        if (candidate.getScoreBreakdown() == null && candidate.getPatient() != null
+                && candidate.getCandidateMaster() != null) {
+            AlgorithmWeightConfig config = loadActiveConfig();
+            String breakdownJson = generateScoreBreakdown(candidate.getPatient(), candidate.getCandidateMaster(),
+                    config);
+            candidate.setScoreBreakdown(breakdownJson);
+            matchCandidateRepository.save(candidate);
+        }
+        return candidate;
     }
 
     @Override
@@ -236,14 +359,67 @@ public class PatientMatchingServiceImpl implements PatientMatchingService {
     private MatchCandidate buildMatchCandidate(Patient patient, PatientMaster master, AlgorithmWeightConfig config) {
         BigDecimal score = calculateMatchScore(patient, master, config);
         MatchDecisionEnum decision = getAutoDecision(score, config);
+        String scoreBreakdown = generateScoreBreakdown(patient, master, config);
 
         return MatchCandidate.builder()
                 .patient(patient)
                 .candidateMaster(master)
                 .matchScore(score)
                 .decision(decision)
+                .scoreBreakdown(scoreBreakdown)
                 .weightVersion(config.getVersion())
                 .build();
+    }
+
+    private String generateScoreBreakdown(Patient patient, PatientMaster master, AlgorithmWeightConfig config) {
+        List<Map<String, Object>> breakdown = new ArrayList<>();
+
+        double nameSimilarity = 0.0;
+        if (patient.getFullName() != null && master.getFullName() != null) {
+            nameSimilarity = calculateStringSimilarity(patient.getFullName(), master.getFullName());
+        }
+        BigDecimal nameScore = config.getNameWeight().multiply(BigDecimal.valueOf(nameSimilarity)).setScale(2,
+                RoundingMode.HALF_UP);
+        breakdown.add(createBreakdownItem("fullName", "Họ và tên", nameScore, config.getNameWeight()));
+
+        boolean dobMatch = patient.getDateOfBirth() != null && patient.getDateOfBirth().equals(master.getDateOfBirth());
+        BigDecimal dobScore = dobMatch ? config.getDobWeight().setScale(2, RoundingMode.HALF_UP)
+                : BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
+        breakdown.add(createBreakdownItem("dateOfBirth", "Ngày sinh", dobScore, config.getDobWeight()));
+
+        boolean nationalIdMatch = isExactMatch(patient.getNationalId(), master.getNationalId());
+        BigDecimal nationalIdScore = nationalIdMatch ? config.getNationalIdWeight().setScale(2, RoundingMode.HALF_UP)
+                : BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
+        breakdown.add(createBreakdownItem("nationalId", "CCCD/CMND", nationalIdScore, config.getNationalIdWeight()));
+
+        boolean phoneMatch = isExactMatch(patient.getPhoneNumber(), master.getPhoneNumber());
+        BigDecimal phoneScore = phoneMatch ? config.getPhoneWeight().setScale(2, RoundingMode.HALF_UP)
+                : BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
+        breakdown.add(createBreakdownItem("phoneNumber", "Số điện thoại", phoneScore, config.getPhoneWeight()));
+
+        double addressSimilarity = 0.0;
+        if (patient.getAddress() != null && master.getAddress() != null) {
+            addressSimilarity = calculateStringSimilarity(patient.getAddress(), master.getAddress());
+        }
+        BigDecimal addressScore = config.getAddressWeight().multiply(BigDecimal.valueOf(addressSimilarity)).setScale(2,
+                RoundingMode.HALF_UP);
+        breakdown.add(createBreakdownItem("address", "Địa chỉ", addressScore, config.getAddressWeight()));
+
+        try {
+            return new ObjectMapper().writeValueAsString(breakdown);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private Map<String, Object> createBreakdownItem(String field, String fieldLabel, BigDecimal score,
+            BigDecimal maxScore) {
+        Map<String, Object> item = new HashMap<>();
+        item.put("field", field);
+        item.put("fieldLabel", fieldLabel);
+        item.put("score", score);
+        item.put("maxScore", maxScore);
+        return item;
     }
 
     private boolean isExactMatch(String s1, String s2) {

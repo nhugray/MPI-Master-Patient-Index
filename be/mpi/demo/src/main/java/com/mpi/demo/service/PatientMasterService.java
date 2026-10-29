@@ -1,6 +1,7 @@
 package com.mpi.demo.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.Pageable;
 
@@ -19,6 +20,8 @@ public interface PatientMasterService {
 
     void unlinkPatient(Long patientId);
 
+    void deleteMaster(Long id);
+
     String generateEnterpriseId();
 
     ResultPagination searchMasters(PatientMasterSearchRequest request, Pageable pageable);
@@ -28,4 +31,6 @@ public interface PatientMasterService {
     PatientMasterResponse update(UpdatePatientMasterRequest request);
 
     List<PatientMasterHistoryResponse> getHistory(Long masterId);
+
+    Map<String, Long> getMasterCounts();
 }

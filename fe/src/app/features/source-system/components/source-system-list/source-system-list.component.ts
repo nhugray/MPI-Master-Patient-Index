@@ -70,6 +70,7 @@ export class SourceSystemListComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadDropdownData();
+    this.loadCounts();
     this.loadSourceSystems();
   }
 
@@ -99,7 +100,26 @@ export class SourceSystemListComponent implements OnInit {
   }
 
   reload(): void {
+    this.loadCounts();
     this.loadSourceSystems();
+  }
+
+  loadCounts(): void {
+    this.sourceSystemService.getCounts().pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: (response) => {
+        if (isSuccess(response)) {
+          const counts = response.data;
+          this.totalCount.set(counts['TOTAL'] ?? counts['total'] ?? 0);
+          this.activeCount.set(counts['ACTIVE'] ?? counts['active'] ?? 0);
+          this.inactiveCount.set(counts['INACTIVE'] ?? counts['inactive'] ?? 0);
+        }
+      },
+      error: (err) => {
+        console.error('Error loading source system counts:', err);
+      }
+    });
   }
 
   loadSourceSystems(): void {
@@ -112,14 +132,9 @@ export class SourceSystemListComponent implements OnInit {
           this.sourceSystems.set(response.data.result);
           this.pageMeta.set(response.data.meta);
 
-          const total = response.data.meta?.total || 0;
-          this.totalCount.set(total);
-          this.activeCount.set(
-            response.data.result.filter((s: SourceSystem) => s.isActive).length
-          );
-          this.inactiveCount.set(
-            response.data.result.filter((s: SourceSystem) => !s.isActive).length
-          );
+          if (this.totalCount() === 0) {
+            this.totalCount.set(response.data.meta?.total || 0);
+          }
         }
         this.isLoading.set(false);
       },

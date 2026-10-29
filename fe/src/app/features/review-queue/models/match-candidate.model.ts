@@ -69,7 +69,7 @@ export const defaultReviewQueueSearchParams: ReviewQueueSearchRequest = {
 export interface ReviewDecisionRequest {
   decision: MatchDecisionEnum;
   reviewNote?: string;
-  reviewerId: number;
+  reviewerId?: number;
 }
 
 export interface ScoreBreakdownItem {

@@ -685,6 +685,39 @@
   font-family: 'Courier New', monospace;
 }
 
+
+.record-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.btn-card-edit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: #f8fafc;
+  color: var(--on-surface-variant);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.btn-card-edit:hover {
+  background: var(--brand-primary);
+  color: #ffffff;
+  border-color: var(--brand-primary);
+  transform: scale(1.05);
+}
+
+.btn-card-edit .material-symbols-outlined {
+  font-size: 16px;
+}
+
 .record-date {
   display: flex;
   align-items: center;

@@ -15,4 +15,6 @@ public interface FacilityRepository extends JpaRepository<Facility, Long>, JpaSp
     Page<Facility> findByNameContainingIgnoreCase(String name, Pageable pageable);
 
     Optional<Facility> findByCode(String code);
+
+    long countByIsActive(Boolean isActive);
 }

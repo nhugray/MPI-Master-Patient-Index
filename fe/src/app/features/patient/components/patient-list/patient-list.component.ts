@@ -56,6 +56,7 @@ export class PatientListComponent implements OnInit {
 
   pendingCount = signal(0);
   matchedCount = signal(0);
+  newMasterCount = signal(0);
   totalCount = signal(0);
 
   genderOptions = GENDER_OPTIONS;
@@ -80,6 +81,7 @@ export class PatientListComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadSourceSystems();
+    this.loadCounts();
     this.loadPatients();
   }
 
@@ -99,7 +101,27 @@ export class PatientListComponent implements OnInit {
   }
 
   reload(): void {
+    this.loadCounts();
     this.loadPatients();
+  }
+
+  loadCounts(): void {
+    this.patientService.getCounts().pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: (response) => {
+        if (isSuccess(response)) {
+          const counts = response.data;
+          this.totalCount.set(counts['TOTAL'] ?? counts['total'] ?? 0);
+          this.pendingCount.set(counts['PENDING'] ?? counts['pending'] ?? 0);
+          this.matchedCount.set(counts['MATCHED'] ?? counts['matched'] ?? 0);
+          this.newMasterCount.set(counts['NEW_MASTER'] ?? counts['newMaster'] ?? 0);
+        }
+      },
+      error: (err) => {
+        console.error('Error loading patient counts:', err);
+      }
+    });
   }
 
   loadPatients(): void {
@@ -121,13 +143,9 @@ export class PatientListComponent implements OnInit {
           this.pageMeta.set(response.data.meta);
 
           const total = response.data.meta?.total || 0;
-          this.totalCount.set(total);
-          this.pendingCount.set(
-            response.data.result.filter((p: Patient) => p.matchStatus === MatchStatus.PENDING).length
-          );
-          this.matchedCount.set(
-            response.data.result.filter((p: Patient) => p.matchStatus === MatchStatus.MATCHED).length
-          );
+          if (this.totalCount() === 0) {
+            this.totalCount.set(total);
+          }
         }
         this.isLoading.set(false);
       },

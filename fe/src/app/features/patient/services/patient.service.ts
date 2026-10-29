@@ -73,4 +73,7 @@ export class PatientService {
   delete(id: number): Observable<ApiResponse<void>> {
     return this.http.delete<ApiResponse<void>>(`${this.apiUrl}${this.basePath}/${id}`);
   }
+  getCounts(): Observable<ApiResponse<{ [key: string]: number }>> {
+    return this.http.get<ApiResponse<{ [key: string]: number }>>(`${this.apiUrl}${this.basePath}/counts`);
+  }
 }

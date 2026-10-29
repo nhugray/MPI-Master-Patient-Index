@@ -50,6 +50,9 @@ export class FacilityListComponent implements OnInit {
   private searchParams: FacilitySearchParams = { ...defaultSearchParams };
 
   activeCount = signal(0);
+  inactiveCount = signal(0);
+  sourceSystemsCount = signal(0);
+  activeSourceSystemsCount = signal(0);
   totalCount = signal(0);
 
   facilityTypeOptions = FACILITY_TYPE_OPTIONS;
@@ -68,11 +71,33 @@ export class FacilityListComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.loadCounts();
     this.loadFacilities();
   }
 
   reload(): void {
+    this.loadCounts();
     this.loadFacilities();
+  }
+
+  loadCounts(): void {
+    this.facilityService.getCounts().pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: (response) => {
+        if (isSuccess(response)) {
+          const counts = response.data;
+          this.totalCount.set(counts['TOTAL'] ?? counts['total'] ?? 0);
+          this.activeCount.set(counts['ACTIVE'] ?? counts['active'] ?? 0);
+          this.inactiveCount.set(counts['INACTIVE'] ?? counts['inactive'] ?? 0);
+          this.sourceSystemsCount.set(counts['SOURCE_SYSTEMS'] ?? counts['sourceSystems'] ?? 0);
+          this.activeSourceSystemsCount.set(counts['ACTIVE_SOURCE_SYSTEMS'] ?? counts['activeSourceSystems'] ?? 0);
+        }
+      },
+      error: (err) => {
+        console.error('Error loading facility counts:', err);
+      }
+    });
   }
 
   loadFacilities(): void {
@@ -85,10 +110,9 @@ export class FacilityListComponent implements OnInit {
           this.facilities.set(response.data.result);
           this.pageMeta.set(response.data.meta);
 
-          this.totalCount.set(response.data.meta.total);
-          this.activeCount.set(
-            response.data.result.filter((f: Facility) => f.isActive).length
-          );
+          if (this.totalCount() === 0) {
+            this.totalCount.set(response.data.meta.total);
+          }
         }
         this.isLoading.set(false);
       },

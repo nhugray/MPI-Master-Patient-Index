@@ -59,4 +59,8 @@ export class PatientMasterService {
   update(data: UpdatePatientMasterRequest): Observable<ApiResponse<PatientMaster>> {
     return this.http.put<ApiResponse<PatientMaster>>(`${this.apiUrl}${this.basePath}/${data.id}`, data);
   }
+
+  getCounts(): Observable<ApiResponse<{ [key: string]: number }>> {
+    return this.http.get<ApiResponse<{ [key: string]: number }>>(`${this.apiUrl}${this.basePath}/counts`);
+  }
 }

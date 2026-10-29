@@ -1,6 +1,7 @@
 package com.mpi.demo.controller;
 
 import java.net.URI;
+import java.util.Map;
 
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
@@ -40,6 +41,12 @@ public class UserController {
             @ParameterObject Pageable pageable) {
         ResultPagination result = userService.search(search, pageable);
         return ResponseEntity.ok(ApiResponse.success("Lấy danh sách người dùng thành công", result));
+    }
+
+    @GetMapping("/counts")
+    public ResponseEntity<ApiResponse<Map<String, Long>>> getUserCounts() {
+        Map<String, Long> counts = userService.getUserCounts();
+        return ResponseEntity.ok(ApiResponse.success("Lấy số lượng thống kê người dùng thành công", counts));
     }
 
     @GetMapping("/{id}")

@@ -19,7 +19,8 @@
       </div>
     </div>
     <div class="stat-body">
-      <div class="stat-value stat-value-primary">{{ pageMeta()?.total || 0 | number }}</div>
+
+      <div class="stat-value stat-value-primary">{{ totalCount() | number }}</div>
       <div class="stat-info">
         <span class="stat-description">Toàn hệ thống MPI</span>
       </div>
@@ -37,9 +38,7 @@
     <div class="stat-body">
       <div class="stat-value stat-value-secondary">{{ pendingCount() | number }}</div>
       <div class="stat-info">
-        <span class="stat-pulse"></span>
-        <span class="stat-description">{{ totalCount() > 0 ? (pendingCount() / totalCount() * 100 | number:'1.1-1') : 0
-          }}% đang xử lý</span>
+        <span class="stat-description">Hồ sơ đã đối chiếu</span>
       </div>
     </div>
   </div>
@@ -55,9 +54,23 @@
     <div class="stat-body">
       <div class="stat-value stat-value-tertiary">{{ matchedCount() | number }}</div>
       <div class="stat-info">
-        <span class="stat-pulse stat-pulse-tertiary"></span>
-        <span class="stat-description">{{ totalCount() > 0 ? (matchedCount() / totalCount() * 100 | number:'1.1-1') : 0
-          }}% hoàn thành</span>
+        <span class="stat-description">Bệnh nhân đã đối chiếu</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="stat-card stat-card-quaternary">
+    <div class="stat-background"></div>
+    <div class="stat-header">
+      <span class="stat-label">Tạo mới</span>
+      <div class="stat-icon stat-icon-quaternary">
+        <span class="material-symbols-outlined">person_add</span>
+      </div>
+    </div>
+    <div class="stat-body">
+      <div class="stat-value stat-value-quaternary">{{ newMasterCount() | number }}</div>
+      <div class="stat-info">
+        <span class="stat-description">Bệnh nhân được tạo mới</span>
       </div>
     </div>
   </div>

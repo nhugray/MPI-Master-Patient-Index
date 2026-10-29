@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed, DestroyRef } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, DestroyRef, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -8,6 +8,8 @@ import { PatientMaster } from '../../models/patient-master.model';
 import { SourceRecord, PatientMasterHistory } from '../../models/patient-master-detail.model';
 import { ToastService } from '../../../../shared/components/toast/toast.service';
 import { PatientMasterEditModalComponent } from '../../components/patient-master-form/patient-master-form.component';
+import { PatientFormComponent } from '../../../patient/components/patient-form/patient-form.component';
+import { Patient } from '../../../patient/models/patient.model';
 import { getInitials, maskNationalId, maskPhoneNumber } from '../../../../shared/utils/string.util';
 import { calculateAge, formatDate, formatDateTime } from '../../../../shared/utils/date.util';
 import { GENDER_OPTIONS, getGenderLabel, Gender } from '../../../../shared/enums';
@@ -16,11 +18,12 @@ import { isSuccess } from '../../../../shared/models';
 @Component({
   selector: 'app-patient-master-detail-page',
   standalone: true,
-  imports: [CommonModule, PatientMasterEditModalComponent],
+  imports: [CommonModule, PatientMasterEditModalComponent, PatientFormComponent],
   templateUrl: './patient-master-detail-page.component.html',
   styleUrls: ['./patient-master-detail-page.component.css']
 })
 export class PatientMasterDetailPageComponent implements OnInit {
+  @ViewChild('patientForm') patientForm!: PatientFormComponent;
   editingPatient = signal<PatientMaster | null>(null);
 
   private readonly route = inject(ActivatedRoute);
@@ -178,6 +181,35 @@ export class PatientMasterDetailPageComponent implements OnInit {
     this.toastService.success('Thành công', 'Đã cập nhật hồ sơ gốc thành công');
     const id = this.masterId();
     if (id) {
+      this.loadHistory(id);
+    }
+  }
+  openEditPatient(record: SourceRecord): void {
+    const patient: Patient = {
+      id: record.id,
+      sourceSystemId: record.sourceSystemId,
+      sourceSystemName: record.sourceSystemName,
+      localPatientCode: record.localPatientCode,
+      fullName: record.fullName,
+      dateOfBirth: record.dateOfBirth,
+      gender: record.gender as any,
+      nationalId: record.nationalId,
+      phoneNumber: record.phoneNumber,
+      address: record.address,
+      healthInsuranceNo: record.healthInsuranceNo,
+      masterPatientId: this.masterId(),
+      matchStatus: record.matchStatus as any,
+      matchScore: record.matchScore,
+      createdAt: record.createdAt
+    };
+    this.patientForm.open(patient);
+  }
+
+  onPatientRecordSaved(): void {
+    const id = this.masterId();
+    if (id) {
+      this.loadPatientMaster(id);
+      this.loadSourceRecords(id);
       this.loadHistory(id);
     }
   }

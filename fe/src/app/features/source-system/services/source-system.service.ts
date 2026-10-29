@@ -46,6 +46,10 @@ export class SourceSystemService {
     });
   }
 
+  getCounts(): Observable<ApiResponse<{ [key: string]: number }>> {
+    return this.http.get<ApiResponse<{ [key: string]: number }>>(`${this.apiUrl}${this.basePath}/counts`);
+  }
+
   getById(id: number): Observable<ApiResponse<SourceSystem>> {
     return this.http.get<ApiResponse<SourceSystem>>(`${this.apiUrl}${this.basePath}/${id}`);
   }

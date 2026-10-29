@@ -1,6 +1,8 @@
 package com.mpi.demo.service.impl;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.List;
 import java.util.Set;
 
@@ -114,6 +116,18 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Người dùng", "id", id));
         userRepository.delete(user);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<String, Long> getUserCounts() {
+        Map<String, Long> counts = new HashMap<>();
+        counts.put("TOTAL", userRepository.count());
+        counts.put("ACTIVE", userRepository.countByStatus(UserStatusEnum.ACTIVE));
+        counts.put("INACTIVE", userRepository.countByStatus(UserStatusEnum.INACTIVE));
+        counts.put("SUSPENDED", userRepository.countByStatus(UserStatusEnum.SUSPENDED));
+        counts.put("ADMIN", userRepository.countByRoleName("ADMIN"));
+        return counts;
     }
 
     private Set<Role> resolveRoles(Set<Long> roleIds) {

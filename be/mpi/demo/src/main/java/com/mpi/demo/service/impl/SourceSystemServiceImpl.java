@@ -1,5 +1,8 @@
 package com.mpi.demo.service.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -94,6 +97,15 @@ public class SourceSystemServiceImpl implements SourceSystemService {
         SourceSystem existingSourceSystem = sourceSystemRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Hệ thống nguồn", "id", id));
         sourceSystemRepository.delete(existingSourceSystem);
+    }
+
+    @Override
+    public Map<String, Long> getSourceSystemCounts() {
+        Map<String, Long> counts = new HashMap<>();
+        counts.put("TOTAL", sourceSystemRepository.count());
+        counts.put("ACTIVE", sourceSystemRepository.countByIsActive(true));
+        counts.put("INACTIVE", sourceSystemRepository.countByIsActive(false));
+        return counts;
     }
 
 }

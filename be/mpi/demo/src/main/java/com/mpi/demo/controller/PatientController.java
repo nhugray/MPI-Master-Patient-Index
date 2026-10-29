@@ -1,5 +1,7 @@
 package com.mpi.demo.controller;
 
+import java.util.Map;
+
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mpi.demo.constant.MatchStatusEnum;
@@ -44,6 +46,12 @@ public class PatientController {
         return ResponseEntity.ok(ApiResponse.success("Lấy danh sách người dùng thành công", result));
     }
 
+    @GetMapping("/counts")
+    public ResponseEntity<ApiResponse<Map<String, Long>>> getCounts() {
+        Map<String, Long> counts = patientService.getPatientCounts();
+        return ResponseEntity.ok(ApiResponse.success("Lấy thống kê bệnh nhân thành công", counts));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<PatientResponse>> getById(@PathVariable Long id) {
         PatientResponse patient = patientService.getById(id);
@@ -63,7 +71,8 @@ public class PatientController {
             message = "Tạo bệnh nhân thành công. Đã tự động gộp vào hồ sơ chủ EID: " + eid;
         } else if (response.matchStatus() == MatchStatusEnum.PENDING) {
             String scoreStr = response.matchScore() != null ? (" (" + response.matchScore() + "%)") : "";
-            message = "Đã lưu bệnh nhân. Phát hiện nghi vấn trùng khớp" + scoreStr + ", hồ sơ đã được chuyển vào Hàng đợi duyệt";
+            message = "Đã lưu bệnh nhân. Phát hiện nghi vấn trùng khớp" + scoreStr
+                    + ", hồ sơ đã được chuyển vào Hàng đợi duyệt";
         } else {
             String eid = response.enterpriseId() != null ? response.enterpriseId() : "";
             message = "Tạo bệnh nhân mới thành công. Mã định danh EID: " + eid;

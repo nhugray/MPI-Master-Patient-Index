@@ -214,6 +214,11 @@
   opacity: 0.85;
 }
 
+.field-value.field-partial {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
 .field-value.field-empty {
   background: var(--surface-container-low);
   border-color: var(--outline-variant);
@@ -276,7 +281,8 @@
   color: var(--on-surface-variant);
 }
 
-.breakdown-percent {
+.breakdown-percent,
+.breakdown-score {
   font-weight: 700;
 }
 

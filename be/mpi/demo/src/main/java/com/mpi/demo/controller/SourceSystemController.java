@@ -13,6 +13,7 @@ import com.mpi.demo.service.SourceSystemService;
 import jakarta.validation.Valid;
 
 import java.net.URI;
+import java.util.Map;
 
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
@@ -41,6 +42,12 @@ public class SourceSystemController {
 
         ResultPagination result = sourceSystemService.search(search, pageable);
         return ResponseEntity.ok(ApiResponse.success("Lấy danh sách hệ thống nguồn thành công", result));
+    }
+
+    @GetMapping("/counts")
+    public ResponseEntity<ApiResponse<Map<String, Long>>> getSourceSystemCounts() {
+        Map<String, Long> counts = sourceSystemService.getSourceSystemCounts();
+        return ResponseEntity.ok(ApiResponse.success("Lấy số lượng thống kê hệ thống nguồn thành công", counts));
     }
 
     @GetMapping("/{id}")

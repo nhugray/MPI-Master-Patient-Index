@@ -6,6 +6,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { ReviewQueueService } from '../../services/review-queue.service';
 import { MatchCandidate, MatchDecisionEnum, ScoreBreakdownItem } from '../../models/match-candidate.model';
+import { AuthService } from '../../../auth/services/auth.service';
 import { ToastService } from '../../../../shared/components/toast/toast.service';
 import { formatDate } from '../../../../shared/utils/date.util';
 import { normalizeString } from '../../../../shared/utils/string.util';
@@ -18,7 +19,9 @@ interface FieldComparison {
   patientValue: string;
   masterValue: string;
   isMatch: boolean;
-  matchPercent: number;
+  isPartial: boolean;
+  score: number;
+  maxScore: number;
 }
 
 @Component({
@@ -32,6 +35,7 @@ export class ReviewQueueComparePageComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly reviewQueueService = inject(ReviewQueueService);
+  private readonly authService = inject(AuthService);
   private readonly toastService = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);
 
@@ -49,23 +53,40 @@ export class ReviewQueueComparePageComponent implements OnInit {
     const patient = c.patient;
     const master = c.candidateMaster;
 
+    const breakdownMap = new Map<string, ScoreBreakdownItem>();
+    if (c.scoreBreakdown) {
+      try {
+        const items: ScoreBreakdownItem[] = typeof c.scoreBreakdown === 'string'
+          ? JSON.parse(c.scoreBreakdown)
+          : c.scoreBreakdown;
+        if (Array.isArray(items)) {
+          items.forEach(item => breakdownMap.set(item.field, item));
+        }
+      } catch (e) {
+        console.error('Failed to parse scoreBreakdown', e);
+      }
+    }
+
     return [
-      this.buildComparison('Họ và tên', patient.fullName, master.fullName),
+      this.buildComparison('Họ và tên', 'fullName', patient.fullName, master.fullName, breakdownMap.get('fullName'), 30),
       this.buildComparison(
         'Ngày sinh',
+        'dateOfBirth',
         patient.dateOfBirth ? this.formatDate(patient.dateOfBirth) : '',
-        master.dateOfBirth ? this.formatDate(master.dateOfBirth) : ''
+        master.dateOfBirth ? this.formatDate(master.dateOfBirth) : '',
+        breakdownMap.get('dateOfBirth'),
+        25
       ),
-      this.buildComparison('CCCD/CMND', patient.nationalId || '', master.nationalId || ''),
-      this.buildComparison('Số điện thoại', patient.phoneNumber || '', master.phoneNumber || ''),
-      this.buildComparison('Địa chỉ', patient.address || '', master.address || ''),
-      this.buildComparison('BHYT', patient.healthInsuranceNo || '', master.healthInsuranceNo || '')
+      this.buildComparison('CCCD/CMND', 'nationalId', patient.nationalId || '', master.nationalId || '', breakdownMap.get('nationalId'), 31),
+      this.buildComparison('Số điện thoại', 'phoneNumber', patient.phoneNumber || '', master.phoneNumber || '', breakdownMap.get('phoneNumber'), 5),
+      this.buildComparison('Địa chỉ', 'address', patient.address || '', master.address || '', breakdownMap.get('address'), 9),
     ];
   });
 
   overallScore = computed(() => {
     const c = this.candidate();
-    return c ? Math.round(c.matchScore) : 0;
+    if (!c || c.matchScore == null) return 0;
+    return c.matchScore;
   });
 
   ngOnInit(): void {
@@ -96,16 +117,41 @@ export class ReviewQueueComparePageComponent implements OnInit {
     });
   }
 
-  private buildComparison(label: string, patientValue: string, masterValue: string): FieldComparison {
-    const isMatch = this.normalizeValue(patientValue) === this.normalizeValue(masterValue);
-    const hasValues = !!patientValue && !!masterValue;
+  private buildComparison(
+    label: string,
+    key: string,
+    patientValue: string,
+    masterValue: string,
+    breakdownItem?: ScoreBreakdownItem,
+    defaultMaxScore: number = 0
+  ): FieldComparison {
+    const pVal = (patientValue || '').trim();
+    const mVal = (masterValue || '').trim();
+    const hasValues = !!pVal && !!mVal;
+
+    let score = 0;
+    let maxScore = defaultMaxScore;
+
+    if (breakdownItem) {
+      score = Number(breakdownItem.score) || 0;
+      maxScore = Number(breakdownItem.maxScore) || defaultMaxScore;
+    } else {
+      const isExact = this.normalizeValue(pVal) === this.normalizeValue(mVal);
+      score = (hasValues && isExact) ? maxScore : 0;
+    }
+
+    const isMatch = hasValues && score === maxScore && maxScore > 0;
+    const isPartial = hasValues && score > 0 && score < maxScore;
+
     return {
       label,
-      key: label,
+      key,
       patientValue: patientValue || '[Trống]',
       masterValue: masterValue || '[Trống]',
-      isMatch: hasValues && isMatch,
-      matchPercent: !hasValues ? 0 : (isMatch ? 100 : 0)
+      isMatch,
+      isPartial,
+      score,
+      maxScore
     };
   }
 
@@ -118,11 +164,15 @@ export class ReviewQueueComparePageComponent implements OnInit {
   }
 
   onApprove(): void {
-    this.submitDecision(MatchDecisionEnum.MANUAL_APPROVED, 'Đã duyệt gộp hồ sơ thành công');
+    const isPreviouslyRejected = this.candidate()?.decision === MatchDecisionEnum.REJECTED;
+    const msg = isPreviouslyRejected
+      ? 'Đã duyệt gộp hồ sơ và xóa hồ sơ gốc tạo nhầm thành công'
+      : 'Đã duyệt gộp hồ sơ thành công';
+    this.submitDecision(MatchDecisionEnum.MANUAL_APPROVED, msg);
   }
 
   onReject(): void {
-    this.submitDecision(MatchDecisionEnum.REJECTED, 'Đã từ chối gộp hồ sơ');
+    this.submitDecision(MatchDecisionEnum.REJECTED, 'Đã từ chối gộp hồ sơ và tạo hồ sơ gốc mới thành công');
   }
 
   private submitDecision(decision: MatchDecisionEnum, successMessage: string): void {
@@ -131,10 +181,13 @@ export class ReviewQueueComparePageComponent implements OnInit {
 
     this.isSubmitting.set(true);
 
+    const currentUser = this.authService.getCurrentUser();
+    const reviewerId = currentUser?.id;
+
     this.reviewQueueService.submitDecision(id, {
       decision,
       reviewNote: this.reviewNote() || undefined,
-      reviewerId: 1
+      reviewerId
     }).pipe(
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({

@@ -20,6 +20,6 @@ export interface PatientSearchParams {
 
 export const defaultSearchParams: PatientSearchParams = {
   page: 0,
-  size: 50,
+  size: 10,
   sort: 'createdAt,desc'
 };

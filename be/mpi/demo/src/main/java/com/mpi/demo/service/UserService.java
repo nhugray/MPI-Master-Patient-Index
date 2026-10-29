@@ -1,5 +1,7 @@
 package com.mpi.demo.service;
 
+import java.util.Map;
+
 import org.springframework.data.domain.Pageable;
 
 import com.mpi.demo.dto.request.CreateUserRequest;
@@ -19,4 +21,6 @@ public interface UserService {
     ResultPagination search(UserSearchRequest search, Pageable pageable);
 
     void delete(Long id);
+
+    Map<String, Long> getUserCounts();
 }

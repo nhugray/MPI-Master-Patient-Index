@@ -1,6 +1,7 @@
 package com.mpi.demo.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.PageRequest;
@@ -43,6 +44,12 @@ public class PatientMasterController {
 
         ResultPagination result = patientMasterService.searchMasters(search, pageable);
         return ResponseEntity.ok(ApiResponse.success("Lấy danh sách hồ sơ gốc thành công", result));
+    }
+
+    @GetMapping("/counts")
+    public ResponseEntity<ApiResponse<Map<String, Long>>> getCounts() {
+        Map<String, Long> counts = patientMasterService.getMasterCounts();
+        return ResponseEntity.ok(ApiResponse.success("Lấy thống kê hồ sơ gốc thành công", counts));
     }
 
     @GetMapping("/{id}")

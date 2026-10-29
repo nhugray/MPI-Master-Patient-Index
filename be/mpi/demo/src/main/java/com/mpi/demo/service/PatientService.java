@@ -1,5 +1,7 @@
 package com.mpi.demo.service;
 
+import java.util.Map;
+
 import org.springframework.data.domain.Pageable;
 
 import com.mpi.demo.dto.request.CreatePatientRequest;
@@ -21,4 +23,6 @@ public interface PatientService {
     ResultPagination search(PatientSearchRequest search, Pageable pageable);
 
     ResultPagination getByMasterPatientId(Long masterPatientId, Pageable pageable);
+
+    Map<String, Long> getPatientCounts();
 }

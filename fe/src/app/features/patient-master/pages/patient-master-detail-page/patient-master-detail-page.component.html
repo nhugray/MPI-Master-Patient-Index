@@ -115,15 +115,22 @@
         <div *ngIf="!isLoadingSourceRecords()" class="records-grid">
           <div *ngFor="let record of sourceRecords()" class="record-card"
             [class.record-card-primary]="record.matchStatus === 'MATCHED' || record.matchStatus === 'NEW_MASTER'"
-            [class.record-card-tertiary]="record.matchStatus !== 'MATCHED' && record.matchStatus !== 'NEW_MASTER'">
+            [class.record-card-tertiary]="record.matchStatus !== 'MATCHED' && record.matchStatus !== 'NEW_MASTER'"
+            (click)="openEditPatient(record)"
+            title="Nhấp để chỉnh sửa thông tin bệnh nhân này">
             <div class="record-header">
               <div class="record-system">
                 <span class="system-badge">{{ record.sourceSystemName }}</span>
                 <span class="record-code">{{ record.localPatientCode }}</span>
               </div>
-              <div class="record-date">
-                <span class="material-symbols-outlined date-icon">calendar_month</span>
-                Gộp: {{ formatDate(record.createdAt) }}
+              <div class="record-header-right">
+                <div class="record-date">
+                  <span class="material-symbols-outlined date-icon">calendar_month</span>
+                  Gộp: {{ formatDate(record.createdAt) }}
+                </div>
+                <button type="button" class="btn-card-edit" (click)="$event.stopPropagation(); openEditPatient(record)" title="Chỉnh sửa hồ sơ bệnh nhân">
+                  <span class="material-symbols-outlined">edit</span>
+                </button>
               </div>
             </div>
             <div class="record-info">
@@ -202,3 +209,5 @@
   (saved)="onPatientUpdated($event)">
 </app-patient-master-form>
 }
+
+<app-patient-form #patientForm (saved)="onPatientRecordSaved()"></app-patient-form>

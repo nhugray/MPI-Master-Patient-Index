@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
+import com.mpi.demo.constant.MatchStatusEnum;
 import com.mpi.demo.entity.Patient;
 import com.mpi.demo.entity.PatientMaster;
 
@@ -25,5 +26,7 @@ public interface PatientRepository extends JpaRepository<Patient, Long>, JpaSpec
     Long countByMasterPatient(PatientMaster masterPatient);
 
     Page<Patient> findByMasterPatientId(Long masterPatientId, Pageable pageable);
+
+    long countByMatchStatus(MatchStatusEnum matchStatus);
 
 }

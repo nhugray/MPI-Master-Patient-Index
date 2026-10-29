@@ -43,15 +43,15 @@
   <div class="stat-card stat-card-tertiary">
     <div class="stat-background"></div>
     <div class="stat-header">
-      <span class="stat-label">Đã gộp</span>
+      <span class="stat-label">Không hoạt động</span>
       <div class="stat-icon stat-icon-tertiary">
-        <span class="material-symbols-outlined">merge</span>
+        <span class="material-symbols-outlined">block</span>
       </div>
     </div>
     <div class="stat-body">
-      <div class="stat-value stat-value-tertiary">{{ mergedMasters() | number }}</div>
+      <div class="stat-value stat-value-tertiary">{{ inactiveMasters() | number }}</div>
       <div class="stat-info">
-        <span class="stat-description">Gộp hồ sơ trùng</span>
+        <span class="stat-description">{{ totalMasters() > 0 ? (inactiveMasters() / totalMasters() * 100 | number:'1.1-1') : 0 }}% hồ sơ inactive</span>
       </div>
     </div>
   </div>

@@ -1,9 +1,13 @@
 package com.mpi.demo.service.impl;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -18,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.mpi.demo.constant.MatchActionEnum;
 import com.mpi.demo.constant.MatchDecisionEnum;
 import com.mpi.demo.constant.MatchStatusEnum;
+import com.mpi.demo.constant.PatientStatusEnum;
 import com.mpi.demo.dto.request.PatientMasterSearchRequest;
 import com.mpi.demo.dto.request.UpdatePatientMasterRequest;
 import com.mpi.demo.dto.response.PatientMasterHistoryResponse;
@@ -98,6 +103,14 @@ public class PatientMasterServiceImpl implements PatientMasterService {
     }
 
     @Override
+    @Transactional
+    public void deleteMaster(Long id) {
+        PatientMaster master = patientMasterRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Hồ sơ gốc", "id", id));
+        patientMasterRepository.delete(master);
+    }
+
+    @Override
     public ResultPagination searchMasters(PatientMasterSearchRequest request, Pageable pageable) {
         if (pageable.getSort().isUnsorted()) {
             pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
@@ -174,12 +187,13 @@ public class PatientMasterServiceImpl implements PatientMasterService {
                 actionType = "REJECT";
                 colorCode = "error-optimal";
             } else {
-                actionTitle = "Tách hồ sơ (Unmerge)";
+                actionTitle = "";
                 actionType = "UNMERGE";
                 colorCode = "brand-primary";
             }
 
-            String patientCode = (mc != null && mc.getPatient() != null) ? mc.getPatient().getLocalPatientCode() : "N/A";
+            String patientCode = (mc != null && mc.getPatient() != null) ? mc.getPatient().getLocalPatientCode()
+                    : "N/A";
             String sourceName = (mc != null && mc.getPatient() != null && mc.getPatient().getSourceSystem() != null)
                     ? mc.getPatient().getSourceSystem().getName()
                     : "Hệ thống nguồn";
@@ -200,8 +214,7 @@ public class PatientMasterServiceImpl implements PatientMasterService {
                     performer,
                     detail,
                     colorCode,
-                    score
-            ));
+                    score));
         }
 
         List<MatchCandidate> candidates = matchCandidateRepository.findByCandidateMasterId(masterId);
@@ -211,7 +224,8 @@ public class PatientMasterServiceImpl implements PatientMasterService {
                 continue;
             }
             if (!processedCandidateIds.contains(mc.getId()) &&
-                    (mc.getDecision() == MatchDecisionEnum.AUTO_APPROVED || mc.getDecision() == MatchDecisionEnum.MANUAL_APPROVED)) {
+                    (mc.getDecision() == MatchDecisionEnum.AUTO_APPROVED
+                            || mc.getDecision() == MatchDecisionEnum.MANUAL_APPROVED)) {
                 if (patientId != null) {
                     processedPatientIds.add(patientId);
                 }
@@ -228,7 +242,8 @@ public class PatientMasterServiceImpl implements PatientMasterService {
 
                 String performer = mc.getReviewedBy() != null ? mc.getReviewedBy().getName() : "Hệ thống (Rule Engine)";
                 double scoreVal = mc.getMatchScore() != null ? mc.getMatchScore().doubleValue() : 0.0;
-                String detail = String.format("Gộp hồ sơ %s từ %s. Điểm tin cậy: %.1f%%.", patientCode, sourceName, scoreVal);
+                String detail = String.format("Gộp hồ sơ %s từ %s. Điểm tin cậy: %.1f%%.", patientCode, sourceName,
+                        scoreVal);
 
                 historyList.add(new PatientMasterHistoryResponse(
                         actionTitle,
@@ -237,8 +252,7 @@ public class PatientMasterServiceImpl implements PatientMasterService {
                         performer,
                         detail,
                         colorCode,
-                        scoreVal
-                ));
+                        scoreVal));
             }
         }
 
@@ -251,8 +265,7 @@ public class PatientMasterServiceImpl implements PatientMasterService {
                     "Quản trị viên / Cán bộ y tế",
                     "Cập nhật thông tin định danh hồ sơ gốc.",
                     "brand-primary",
-                    null
-            ));
+                    null));
         }
 
         if (master.getCreatedAt() != null) {
@@ -263,17 +276,43 @@ public class PatientMasterServiceImpl implements PatientMasterService {
                     "Hệ thống (Rule Engine)",
                     "Khởi tạo hồ sơ gốc với mã định danh EID: " + master.getEnterpriseId(),
                     "brand-primary",
-                    null
-            ));
+                    null));
         }
 
-        historyList.sort(Comparator.comparing(PatientMasterHistoryResponse::date, Comparator.nullsLast(Comparator.reverseOrder())));
+        historyList.sort(Comparator.comparing(PatientMasterHistoryResponse::date,
+                Comparator.nullsLast(Comparator.reverseOrder())));
 
         return historyList;
     }
 
     public String generateEnterpriseId() {
         return "EID-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+    }
+
+    @Override
+    public Map<String, Long> getMasterCounts() {
+        Map<String, Long> counts = new HashMap<>();
+        long total = patientMasterRepository.count();
+        long active = patientMasterRepository.countByStatus(PatientStatusEnum.ACTIVE);
+        long inactive = patientMasterRepository.countByStatus(PatientStatusEnum.INACTIVE);
+        long merged = patientMasterRepository.countByStatus(PatientStatusEnum.MERGED);
+
+        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+        long todayNew = patientMasterRepository.countByCreatedAtGreaterThanEqual(startOfDay);
+
+        counts.put("TOTAL", total);
+        counts.put("ACTIVE", active);
+        counts.put("INACTIVE", inactive);
+        counts.put("MERGED", merged);
+        counts.put("TODAY_NEW", todayNew);
+
+        counts.put("total", total);
+        counts.put("active", active);
+        counts.put("inactive", inactive);
+        counts.put("merged", merged);
+        counts.put("todayNew", todayNew);
+
+        return counts;
     }
 
     private PatientMasterResponse toResponse(PatientMaster master) {

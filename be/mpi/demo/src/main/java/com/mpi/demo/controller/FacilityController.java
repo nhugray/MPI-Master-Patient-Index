@@ -1,5 +1,7 @@
 package com.mpi.demo.controller;
 
+import java.util.Map;
+
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mpi.demo.dto.request.CreateFacilityRequest;
@@ -41,6 +43,12 @@ public class FacilityController {
 
         ResultPagination result = facilityService.search(search, pageable);
         return ResponseEntity.ok(ApiResponse.success("Lấy danh sách cơ sở y tế thành công", result));
+    }
+
+    @GetMapping("/counts")
+    public ResponseEntity<ApiResponse<Map<String, Long>>> getCounts() {
+        Map<String, Long> counts = facilityService.getFacilityCounts();
+        return ResponseEntity.ok(ApiResponse.success("Lấy thống kê cơ sở y tế thành công", counts));
     }
 
     @GetMapping("/{id}")

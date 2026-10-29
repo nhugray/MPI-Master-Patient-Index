@@ -58,7 +58,8 @@ public class PatientServiceImpl implements PatientService {
         public ResultPagination search(PatientSearchRequest search, Pageable pageable) {
                 final Pageable effectivePageable = pageable.getSort().isUnsorted()
                                 ? PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
-                                                Sort.by(Sort.Direction.DESC, "createdAt").and(Sort.by(Sort.Direction.DESC, "id")))
+                                                Sort.by(Sort.Direction.DESC, "createdAt")
+                                                                .and(Sort.by(Sort.Direction.DESC, "id")))
                                 : pageable;
                 Specification<Patient> spec = PatientSpecification.build(search);
                 Page<PatientResponse> pageResult = patientRepository.findBy(spec, q -> q.page(effectivePageable))
@@ -116,7 +117,8 @@ public class PatientServiceImpl implements PatientService {
                         }
 
                         if (topCandidate.getDecision() == MatchDecisionEnum.AUTO_APPROVED) {
-                                patientMasterService.linkToMaster(saved.getId(), topCandidate.getCandidateMaster().getId());
+                                patientMasterService.linkToMaster(saved.getId(),
+                                                topCandidate.getCandidateMaster().getId());
                         } else if (topCandidate.getDecision() == MatchDecisionEnum.PENDING) {
                                 saved.setMatchStatus(MatchStatusEnum.PENDING);
                                 patientRepository.save(saved);
@@ -174,7 +176,8 @@ public class PatientServiceImpl implements PatientService {
         public ResultPagination getByMasterPatientId(Long masterPatientId, Pageable pageable) {
                 final Pageable effectivePageable = pageable.getSort().isUnsorted()
                                 ? PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
-                                                Sort.by(Sort.Direction.DESC, "createdAt").and(Sort.by(Sort.Direction.DESC, "id")))
+                                                Sort.by(Sort.Direction.DESC, "createdAt")
+                                                                .and(Sort.by(Sort.Direction.DESC, "id")))
                                 : pageable;
                 Page<Patient> pageResult = patientRepository.findByMasterPatientId(masterPatientId, effectivePageable);
                 List<Long> patientIds = pageResult.getContent().stream().map(Patient::getId).toList();
@@ -187,6 +190,29 @@ public class PatientServiceImpl implements PatientService {
                 Page<PatientResponse> responseResult = pageResult
                                 .map(p -> PatientResponse.fromEntity(p, scores.get(p.getId())));
                 return ResultPagination.fromPage(responseResult);
+        }
+
+        @Override
+        public Map<String, Long> getPatientCounts() {
+                Map<String, Long> counts = new HashMap<>();
+                long total = patientRepository.count();
+                long pending = patientRepository.countByMatchStatus(MatchStatusEnum.PENDING);
+                long matched = patientRepository.countByMatchStatus(MatchStatusEnum.MATCHED);
+                long newMaster = patientRepository.countByMatchStatus(MatchStatusEnum.NEW_MASTER);
+                long rejected = patientRepository.countByMatchStatus(MatchStatusEnum.REJECTED);
+
+                counts.put("TOTAL", total);
+                counts.put("PENDING", pending);
+                counts.put("MATCHED", matched);
+                counts.put("NEW_MASTER", newMaster);
+                counts.put("REJECTED", rejected);
+
+                counts.put("total", total);
+                counts.put("pending", pending);
+                counts.put("matched", matched);
+                counts.put("newMaster", newMaster);
+                counts.put("rejected", rejected);
+                return counts;
         }
 
 }

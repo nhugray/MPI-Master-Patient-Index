@@ -57,9 +57,15 @@
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1.25rem;
   margin-bottom: 2rem;
+}
+
+@media (min-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
 }
 
 .filter-toolbar {
@@ -127,6 +133,10 @@
   background: var(--tertiary);
 }
 
+.stat-card-quaternary .stat-background {
+  background: #8b5cf6;
+}
+
 .stat-header {
   display: flex;
   align-items: center;
@@ -164,6 +174,11 @@
   color: var(--tertiary);
 }
 
+.stat-icon-quaternary {
+  background: rgba(139, 92, 246, 0.1);
+  color: #8b5cf6;
+}
+
 .stat-icon .material-symbols-outlined {
   font-size: 1.25rem;
 }
@@ -193,6 +208,10 @@
 
 .stat-value-tertiary {
   color: #f97316;
+}
+
+.stat-value-quaternary {
+  color: #8b5cf6;
 }
 
 .stat-info {

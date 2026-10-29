@@ -1,5 +1,7 @@
 package com.mpi.demo.service;
 
+import java.util.Map;
+
 import org.springframework.data.domain.Pageable;
 
 import com.mpi.demo.dto.request.CreateSourceSystemRequest;
@@ -19,4 +21,6 @@ public interface SourceSystemService {
     void delete(Long id);
 
     ResultPagination search(SourceSystemSearchRequest search, Pageable pageable);
+
+    Map<String, Long> getSourceSystemCounts();
 }

@@ -1,5 +1,7 @@
 package com.mpi.demo.service;
 
+import java.util.Map;
+
 import org.springframework.data.domain.Pageable;
 
 import com.mpi.demo.dto.request.CreateFacilityRequest;
@@ -19,4 +21,6 @@ public interface FacilityService {
     void delete(Long id);
 
     ResultPagination search(FacilitySearchRequest search, Pageable pageable);
+
+    Map<String, Long> getFacilityCounts();
 }

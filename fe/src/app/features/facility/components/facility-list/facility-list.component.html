@@ -31,7 +31,7 @@
       <div class="stat-value">{{ totalCount() | number }}</div>
       <div class="stat-tags">
         <span class="stat-tag">{{ activeCount() }} Hoạt động</span>
-        <span class="stat-tag">{{ totalCount() - activeCount() }} Tạm dừng</span>
+        <span class="stat-tag">{{ inactiveCount() }} Tạm dừng</span>
       </div>
     </div>
   </div>
@@ -45,11 +45,12 @@
       </div>
     </div>
     <div class="stat-body">
-      <div class="stat-value stat-value-secondary">64</div>
+      <div class="stat-value stat-value-secondary">{{ sourceSystemsCount() | number }}</div>
       <div class="stat-info">
         <span class="stat-description">HIS, LIS, RIS/PACS, CIS</span>
         <span class="stat-status stat-status-success">
-          <span class="material-symbols-outlined">check_circle</span> 100% Online
+          <span class="material-symbols-outlined">check_circle</span> {{ sourceSystemsCount() > 0 ?
+          (activeSourceSystemsCount() / sourceSystemsCount() * 100 | number:'1.0-0') : 0 }}% Online
         </span>
       </div>
     </div>
@@ -67,7 +68,8 @@
       <div class="stat-value stat-value-success">{{ activeCount() | number }}</div>
       <div class="stat-info">
         <span class="stat-pulse"></span>
-        <span class="stat-description">{{ (activeCount() / totalCount() * 100) | number:'1.1-1' }}% sẵn sàng nạp
+        <span class="stat-description">{{ (totalCount() > 0 ? (activeCount() / totalCount() * 100) : 0) | number:'1.1-1'
+          }}% sẵn sàng nạp
           EMR</span>
       </div>
     </div>
@@ -76,13 +78,13 @@
   <div class="stat-card stat-card-warning">
     <div class="stat-background"></div>
     <div class="stat-header">
-      <span class="stat-label">Cần kiểm tra</span>
+      <span class="stat-label">Ngừng hoạt động</span>
       <div class="stat-icon stat-icon-warning">
         <span class="material-symbols-outlined">sync_problem</span>
       </div>
     </div>
     <div class="stat-body">
-      <div class="stat-value stat-value-warning">{{ totalCount() - activeCount() | number }}</div>
+      <div class="stat-value stat-value-warning">{{ inactiveCount() | number }}</div>
       <div class="stat-info stat-info-warning">
         <span class="material-symbols-outlined">info</span>
         <span class="stat-description">Tạm ngừng / Bảo trì nguồn</span>

@@ -32,7 +32,8 @@
           <div class="field-label">{{ field.label }}</div>
           <div class="field-value" [ngClass]="{
             'field-match': field.isMatch,
-            'field-mismatch': !field.isMatch && field.patientValue !== '[Trống]' && field.masterValue !== '[Trống]',
+            'field-partial': field.isPartial,
+            'field-mismatch': !field.isMatch && !field.isPartial && field.patientValue !== '[Trống]' && field.masterValue !== '[Trống]',
             'field-empty': field.patientValue === '[Trống]'
           }">
             {{ field.patientValue }}
@@ -52,7 +53,8 @@
         <div class="field-row" *ngFor="let field of fieldComparisons()">
           <div class="field-value" [ngClass]="{
             'field-match': field.isMatch,
-            'field-mismatch': !field.isMatch && field.patientValue !== '[Trống]' && field.masterValue !== '[Trống]',
+            'field-partial': field.isPartial,
+            'field-mismatch': !field.isMatch && !field.isPartial && field.patientValue !== '[Trống]' && field.masterValue !== '[Trống]',
             'field-empty': field.masterValue === '[Trống]'
           }">
             {{ field.masterValue }}
@@ -65,8 +67,8 @@
     <div class="score-column">
       <div class="score-card">
         <div class="overall-score">
-          <div class="score-value">{{ overallScore() }}%</div>
-          <div class="score-label">Tỉ lệ Khớp Tổng thể</div>
+          <div class="score-value">{{ overallScore() }}</div>
+          <div class="score-label">Tổng điểm</div>
         </div>
       </div>
 
@@ -74,18 +76,18 @@
         <div class="breakdown-item" *ngFor="let field of fieldComparisons()">
           <div class="breakdown-header">
             <span class="breakdown-label">{{ field.label }}</span>
-            <span class="breakdown-percent" [ngClass]="{
-              'text-success': field.matchPercent === 100,
-              'text-primary': field.matchPercent > 0 && field.matchPercent < 100,
-              'text-error': field.matchPercent === 0
-            }">{{ field.matchPercent }}%</span>
+            <span class="breakdown-score" [ngClass]="{
+              'text-success': field.isMatch,
+              'text-primary': field.isPartial,
+              'text-error': field.score === 0
+            }">{{ field.score }} / {{ field.maxScore }} điểm</span>
           </div>
           <div class="progress-bar">
             <div class="progress-fill" [ngClass]="{
-              'fill-success': field.matchPercent === 100,
-              'fill-primary': field.matchPercent > 0 && field.matchPercent < 100,
-              'fill-error': field.matchPercent === 0
-            }" [style.width.%]="field.matchPercent"></div>
+              'fill-success': field.isMatch,
+              'fill-primary': field.isPartial,
+              'fill-error': field.score === 0
+            }" [style.width.%]="field.maxScore > 0 ? (field.score / field.maxScore) * 100 : 0"></div>
           </div>
         </div>
       </div>

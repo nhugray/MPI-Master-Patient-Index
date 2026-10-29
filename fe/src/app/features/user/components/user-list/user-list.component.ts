@@ -69,11 +69,31 @@ export class UserListComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.loadCounts();
     this.loadUsers();
   }
 
   reload(): void {
+    this.loadCounts();
     this.loadUsers();
+  }
+
+  loadCounts(): void {
+    this.userService.getCounts().pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: (response) => {
+        if (isSuccess(response)) {
+          const counts = response.data;
+          this.totalCount.set(counts['TOTAL'] ?? counts['total'] ?? 0);
+          this.activeCount.set(counts['ACTIVE'] ?? counts['active'] ?? 0);
+          this.adminCount.set(counts['ADMIN'] ?? counts['admin'] ?? 0);
+        }
+      },
+      error: (err) => {
+        console.error('Error loading user counts:', err);
+      }
+    });
   }
 
   loadUsers(): void {
@@ -86,15 +106,9 @@ export class UserListComponent implements OnInit {
           this.users.set(response.data.result);
           this.pageMeta.set(response.data.meta);
 
-          this.totalCount.set(response.data.meta?.total || 0);
-          this.activeCount.set(
-            response.data.result.filter((u: User) => u.status === UserStatus.ACTIVE).length
-          );
-          this.adminCount.set(
-            response.data.result.filter((u: User) =>
-              u.roles.some(r => r.name === 'ADMIN')
-            ).length
-          );
+          if (this.totalCount() === 0) {
+            this.totalCount.set(response.data.meta?.total || 0);
+          }
         }
         this.isLoading.set(false);
       },

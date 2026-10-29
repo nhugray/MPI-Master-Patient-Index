@@ -175,6 +175,14 @@ public class AsyncImportProcessorImpl implements AsyncImportProcessor {
                         patientMasterService.linkToMaster(patient.getId(), topCandidate.getCandidateMaster().getId());
                         detail.setStatus(ImportRowStatusEnum.SUCCESS);
                         job.setSuccessfulRows(job.getSuccessfulRows() + 1);
+
+                        for (MatchCandidate c : candidates) {
+                            if (!c.getId().equals(topCandidate.getId()) && c.getDecision() == MatchDecisionEnum.PENDING) {
+                                c.setDecision(MatchDecisionEnum.REJECTED);
+                                c.setReviewedAt(LocalDateTime.now());
+                                matchCandidateRepository.save(c);
+                            }
+                        }
                     } else if (topCandidate.getDecision() == MatchDecisionEnum.PENDING) {
                         detail.setStatus(ImportRowStatusEnum.REQUIRES_REVIEW);
                         detail.setWarningMessage("Phát hiện trùng khớp với độ tin cậy "

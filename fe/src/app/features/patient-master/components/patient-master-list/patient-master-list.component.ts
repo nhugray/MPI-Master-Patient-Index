@@ -54,15 +54,14 @@ export class PatientMasterListComponent implements OnInit {
   private searchParams = defaultSearchParams;
 
   activeCount = signal(0);
-  mergedCount = signal(0);
+  inactiveCount = signal(0);
+  todayNewCount = signal(0);
   totalCount = signal(0);
 
   readonly totalMasters = computed(() => this.totalCount());
   readonly activeMasters = computed(() => this.activeCount());
-  readonly mergedMasters = computed(() => this.mergedCount());
-  readonly todayNew = computed(() => {
-    return this.patientMasters().filter(m => isToday(m.createdAt)).length;
-  });
+  readonly inactiveMasters = computed(() => this.inactiveCount());
+  readonly todayNew = computed(() => this.todayNewCount());
 
   constructor() {
     effect(() => {
@@ -78,11 +77,32 @@ export class PatientMasterListComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.loadCounts();
     this.loadPatientMasters();
   }
 
   reload(): void {
+    this.loadCounts();
     this.loadPatientMasters();
+  }
+
+  loadCounts(): void {
+    this.patientMasterService.getCounts().pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
+      next: (response) => {
+        if (isSuccess(response)) {
+          const counts = response.data;
+          this.totalCount.set(counts['TOTAL'] ?? counts['total'] ?? 0);
+          this.activeCount.set(counts['ACTIVE'] ?? counts['active'] ?? 0);
+          this.inactiveCount.set(counts['INACTIVE'] ?? counts['inactive'] ?? 0);
+          this.todayNewCount.set(counts['TODAY_NEW'] ?? counts['todayNew'] ?? 0);
+        }
+      },
+      error: (err) => {
+        console.error('Error loading patient master counts:', err);
+      }
+    });
   }
 
   loadPatientMasters(): void {
@@ -104,13 +124,9 @@ export class PatientMasterListComponent implements OnInit {
           this.pageMeta.set(response.data.meta);
 
           const total = response.data.meta?.total || 0;
-          this.totalCount.set(total);
-          this.activeCount.set(
-            response.data.result.filter((m: PatientMaster) => m.status === 'ACTIVE').length
-          );
-          this.mergedCount.set(
-            response.data.result.filter((m: PatientMaster) => m.status === 'MERGED').length
-          );
+          if (this.totalCount() === 0) {
+            this.totalCount.set(total);
+          }
         }
         this.isLoading.set(false);
       },

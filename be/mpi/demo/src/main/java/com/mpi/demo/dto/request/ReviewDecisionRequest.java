@@ -10,6 +10,5 @@ public record ReviewDecisionRequest(
 
         String reviewNote,
 
-        @NotNull(message = "ReviewerId không được để trống")
         Long reviewerId) {
 }

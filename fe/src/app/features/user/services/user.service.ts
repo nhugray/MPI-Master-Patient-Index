@@ -41,6 +41,10 @@ export class UserService {
     });
   }
 
+  getCounts(): Observable<ApiResponse<{ [key: string]: number }>> {
+    return this.http.get<ApiResponse<{ [key: string]: number }>>(`${this.apiUrl}${this.basePath}/counts`);
+  }
+
   getById(id: number): Observable<ApiResponse<User>> {
     return this.http.get<ApiResponse<User>>(`${this.apiUrl}${this.basePath}/${id}`);
   }

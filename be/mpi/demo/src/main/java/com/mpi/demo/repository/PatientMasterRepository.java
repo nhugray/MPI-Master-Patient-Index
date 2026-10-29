@@ -1,6 +1,7 @@
 package com.mpi.demo.repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,9 +34,9 @@ public interface PatientMasterRepository
        @Query("SELECT pm FROM PatientMaster pm WHERE " +
                      "pm.nationalId = ?1 AND " +
                      "pm.status = 'ACTIVE'")
-       Optional<PatientMaster> findByNationalId(String nationalId);
+       List<PatientMaster> findByNationalId(String nationalId);
 
-       Optional<PatientMaster> findByNationalIdAndStatus(String nationalId, PatientStatusEnum status);
+       List<PatientMaster> findByNationalIdAndStatus(String nationalId, PatientStatusEnum status);
 
        Optional<PatientMaster> findByHealthInsuranceNoAndStatus(String healthInsuranceNo, PatientStatusEnum status);
 
@@ -50,4 +51,8 @@ public interface PatientMasterRepository
        }
 
        Optional<PatientMaster> findByEnterpriseId(String enterpriseId);
+
+       long countByStatus(PatientStatusEnum status);
+
+       long countByCreatedAtGreaterThanEqual(LocalDateTime dateTime);
 }

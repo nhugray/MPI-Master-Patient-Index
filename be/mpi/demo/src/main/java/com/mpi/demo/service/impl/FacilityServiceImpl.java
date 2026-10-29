@@ -1,5 +1,8 @@
 package com.mpi.demo.service.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -15,6 +18,7 @@ import com.mpi.demo.exception.DuplicateResourceException;
 import com.mpi.demo.exception.ResourceNotFoundException;
 import com.mpi.demo.helper.ResultPagination;
 import com.mpi.demo.repository.FacilityRepository;
+import com.mpi.demo.repository.SourceSystemRepository;
 import com.mpi.demo.service.FacilityService;
 import com.mpi.demo.specification.FacilitySpecification;
 
@@ -22,9 +26,11 @@ import com.mpi.demo.specification.FacilitySpecification;
 public class FacilityServiceImpl implements FacilityService {
 
     private final FacilityRepository facilityRepository;
+    private final SourceSystemRepository sourceSystemRepository;
 
-    public FacilityServiceImpl(FacilityRepository facilityRepository) {
+    public FacilityServiceImpl(FacilityRepository facilityRepository, SourceSystemRepository sourceSystemRepository) {
         this.facilityRepository = facilityRepository;
+        this.sourceSystemRepository = sourceSystemRepository;
     }
 
     @Override
@@ -84,6 +90,30 @@ public class FacilityServiceImpl implements FacilityService {
         Facility existingFacility = facilityRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Cơ sở y tế", "mã cơ sở", id));
         facilityRepository.delete(existingFacility);
+    }
+
+    @Override
+    public Map<String, Long> getFacilityCounts() {
+        Map<String, Long> counts = new HashMap<>();
+        long total = facilityRepository.count();
+        long active = facilityRepository.countByIsActive(true);
+        long inactive = facilityRepository.countByIsActive(false);
+        long sourceSystems = sourceSystemRepository.count();
+        long activeSourceSystems = sourceSystemRepository.countByIsActive(true);
+
+        counts.put("TOTAL", total);
+        counts.put("ACTIVE", active);
+        counts.put("INACTIVE", inactive);
+        counts.put("SOURCE_SYSTEMS", sourceSystems);
+        counts.put("ACTIVE_SOURCE_SYSTEMS", activeSourceSystems);
+
+        counts.put("total", total);
+        counts.put("active", active);
+        counts.put("inactive", inactive);
+        counts.put("sourceSystems", sourceSystems);
+        counts.put("activeSourceSystems", activeSourceSystems);
+
+        return counts;
     }
 
 }

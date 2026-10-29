@@ -15,4 +15,6 @@ public interface SourceSystemRepository extends JpaRepository<SourceSystem, Long
     Page<SourceSystem> findByNameContainingIgnoreCase(String name, Pageable pageable);
 
     Optional<SourceSystem> findByCode(String code);
+
+    long countByIsActive(Boolean isActive);
 }

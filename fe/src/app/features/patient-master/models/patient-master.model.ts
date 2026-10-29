@@ -28,7 +28,7 @@ export interface PatientMasterSearchRequest {
 }
 export const defaultSearchParams: PatientMasterSearchRequest = {
   page: 0,
-  size: 50,
+  size: 10,
   sort: 'createdAt,desc'
 };
 
