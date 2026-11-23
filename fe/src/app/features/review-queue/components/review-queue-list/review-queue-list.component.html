@@ -23,7 +23,7 @@
           <th>Hồ sơ mới</th>
           <th>Hồ sơ nghi trùng</th>
           <th>Điểm khớp</th>
-          <th>Ngày tạo</th>
+          <th>{{ selectedDecision() === 'REJECTED' ? 'Ngày từ chối' : 'Ngày tạo' }}</th>
           <th>Trạng thái</th>
           <th class="text-right">Hành động</th>
         </tr>
@@ -60,7 +60,9 @@
               </div>
             </td>
             <td>
-              <span class="cell-date">{{ formatDate(candidate.createdAt) }}</span>
+              <span class="cell-date">
+                {{ selectedDecision() === 'REJECTED' ? formatDate(candidate.reviewedAt || candidate.createdAt) : formatDate(candidate.createdAt) }}
+              </span>
             </td>
             <td>
               <span class="status-badge" [ngClass]="getDecisionClass(candidate.decision)">

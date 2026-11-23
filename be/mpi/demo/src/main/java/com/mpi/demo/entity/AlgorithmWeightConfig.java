@@ -34,6 +34,9 @@ public class AlgorithmWeightConfig {
     @Column(name = "national_id_weight", nullable = false, precision = 5, scale = 2)
     private BigDecimal nationalIdWeight;
 
+    @Column(name = "health_insurance_weight", nullable = false, precision = 5, scale = 2)
+    private BigDecimal healthInsuranceWeight;
+
     @Column(name = "phone_weight", nullable = false, precision = 5, scale = 2)
     private BigDecimal phoneWeight;
 
@@ -67,7 +70,7 @@ public class AlgorithmWeightConfig {
     }
 
     public AlgorithmWeightConfig(Long id, String version, BigDecimal nameWeight, BigDecimal dobWeight,
-            BigDecimal nationalIdWeight, BigDecimal phoneWeight, BigDecimal addressWeight,
+            BigDecimal nationalIdWeight, BigDecimal healthInsuranceWeight, BigDecimal phoneWeight, BigDecimal addressWeight,
             BigDecimal autoApprovalThreshold, BigDecimal manualReviewThreshold,
             Boolean isActive, String description, String createdBy,
             LocalDateTime createdAt, LocalDateTime deployedAt) {
@@ -76,6 +79,7 @@ public class AlgorithmWeightConfig {
         this.nameWeight = nameWeight;
         this.dobWeight = dobWeight;
         this.nationalIdWeight = nationalIdWeight;
+        this.healthInsuranceWeight = healthInsuranceWeight;
         this.phoneWeight = phoneWeight;
         this.addressWeight = addressWeight;
         this.autoApprovalThreshold = autoApprovalThreshold;
@@ -97,6 +101,7 @@ public class AlgorithmWeightConfig {
         private BigDecimal nameWeight;
         private BigDecimal dobWeight;
         private BigDecimal nationalIdWeight;
+        private BigDecimal healthInsuranceWeight;
         private BigDecimal phoneWeight;
         private BigDecimal addressWeight;
         private BigDecimal autoApprovalThreshold;
@@ -132,6 +137,11 @@ public class AlgorithmWeightConfig {
 
         public AlgorithmWeightConfigBuilder nationalIdWeight(BigDecimal nationalIdWeight) {
             this.nationalIdWeight = nationalIdWeight;
+            return this;
+        }
+
+        public AlgorithmWeightConfigBuilder healthInsuranceWeight(BigDecimal healthInsuranceWeight) {
+            this.healthInsuranceWeight = healthInsuranceWeight;
             return this;
         }
 
@@ -181,9 +191,9 @@ public class AlgorithmWeightConfig {
         }
 
         public AlgorithmWeightConfig build() {
-            return new AlgorithmWeightConfig(id, version, nameWeight, dobWeight, nationalIdWeight, phoneWeight,
-                    addressWeight, autoApprovalThreshold, manualReviewThreshold, isActive, description, createdBy,
-                    createdAt, deployedAt);
+            return new AlgorithmWeightConfig(id, version, nameWeight, dobWeight, nationalIdWeight,
+                    healthInsuranceWeight, phoneWeight, addressWeight, autoApprovalThreshold,
+                    manualReviewThreshold, isActive, description, createdBy, createdAt, deployedAt);
         }
     }
 }

@@ -1,0 +1,4 @@
+localPatientCode,fullName,dateOfBirth,gender,nationalId,healthInsuranceNo,phoneNumber,address
+BN_REVIEW_0001,Phạm Văn Dũng,15/01/1990,MALE,,HS4010045678901,0912222221,"23 Kim Mã, Ba Đình, Hà Nội"
+BN_REVIEW_0002,Vũ Thị Hoa,30/05/1988,FEMALE,001188005678,,0912222222,"56 Láng Hạ, Đống Đa, Hà Nội"
+BN_REVIEW_0003,Ngô Văn Minh,14/02/1980,MALE,079180009012,HS4010090123456,0988776655,"Quận 1, TP.HCM"

@@ -45,6 +45,7 @@ public class AlgorithmWeightConfigServiceImpl implements AlgorithmWeightConfigSe
                 response.nameWeight(),
                 response.dobWeight(),
                 response.nationalIdWeight(),
+                response.healthInsuranceWeight(),
                 response.phoneWeight(),
                 response.addressWeight(),
                 defaultAutoApprovalThreshold != null ? defaultAutoApprovalThreshold : response.autoApprovalThreshold(),
@@ -87,6 +88,7 @@ public class AlgorithmWeightConfigServiceImpl implements AlgorithmWeightConfigSe
                 .nameWeight(request.nameWeight())
                 .dobWeight(request.dobWeight())
                 .nationalIdWeight(request.nationalIdWeight())
+                .healthInsuranceWeight(request.healthInsuranceWeight())
                 .phoneWeight(request.phoneWeight())
                 .addressWeight(request.addressWeight())
                 .autoApprovalThreshold(autoThreshold)
@@ -127,6 +129,7 @@ public class AlgorithmWeightConfigServiceImpl implements AlgorithmWeightConfigSe
         BigDecimal total = request.nameWeight()
                 .add(request.dobWeight())
                 .add(request.nationalIdWeight())
+                .add(request.healthInsuranceWeight())
                 .add(request.phoneWeight())
                 .add(request.addressWeight());
 

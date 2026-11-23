@@ -19,7 +19,7 @@ export class WeightHistoryTableComponent {
   @Output() activate = new EventEmitter<number>();
 
   formatWeights(config: WeightConfig): string {
-    return `${config.nameWeight} / ${config.dobWeight} / ${config.nationalIdWeight} / ${config.phoneWeight} / ${config.addressWeight}`;
+    return `${config.nameWeight} / ${config.dobWeight} / ${config.nationalIdWeight} / ${config.healthInsuranceWeight ?? 0} / ${config.phoneWeight} / ${config.addressWeight}`;
   }
 
   formatDate(dateString: string | null): string {

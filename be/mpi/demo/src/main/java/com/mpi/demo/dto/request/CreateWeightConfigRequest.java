@@ -23,6 +23,11 @@ public record CreateWeightConfigRequest(
         @DecimalMax(value = "100.00", message = "Trọng số CCCD phải <= 100")
         BigDecimal nationalIdWeight,
 
+        @NotNull(message = "Trọng số BHYT không được để trống")
+        @DecimalMin(value = "0.00", message = "Trọng số BHYT phải >= 0")
+        @DecimalMax(value = "100.00", message = "Trọng số BHYT phải <= 100")
+        BigDecimal healthInsuranceWeight,
+
         @NotNull(message = "Trọng số Điện thoại không được để trống")
         @DecimalMin(value = "0.00", message = "Trọng số Điện thoại phải >= 0")
         @DecimalMax(value = "100.00", message = "Trọng số Điện thoại phải <= 100")

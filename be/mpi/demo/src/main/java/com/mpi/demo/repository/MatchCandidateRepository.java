@@ -19,6 +19,8 @@ public interface MatchCandidateRepository extends JpaRepository<MatchCandidate, 
 
     List<MatchCandidate> findByPatientIdInAndCandidateMasterId(Collection<Long> patientIds, Long masterId);
 
+    Page<MatchCandidate> findByDecision(MatchDecisionEnum decision, Pageable pageable);
+
     Page<MatchCandidate> findByDecisionOrderByCreatedAtDesc(MatchDecisionEnum decision, Pageable pageable);
 
     Page<MatchCandidate> findAllByOrderByCreatedAtDesc(Pageable pageable);

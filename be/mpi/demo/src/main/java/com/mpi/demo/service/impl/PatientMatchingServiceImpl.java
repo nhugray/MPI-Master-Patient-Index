@@ -97,9 +97,17 @@ public class PatientMatchingServiceImpl implements PatientMatchingService {
                     .forEach(m -> masterCandidates.put(m.getId(), m));
         }
 
+        if (patient.getHealthInsuranceNo() != null && !patient.getHealthInsuranceNo().isBlank()) {
+            patientMasterRepository.findByHealthInsuranceNo(patient.getHealthInsuranceNo())
+                    .ifPresent(m -> masterCandidates.put(m.getId(), m));
+        }
+
+        BigDecimal manualThreshold = this.manualReviewThreshold != null ? this.manualReviewThreshold
+                : config.getManualReviewThreshold();
+
         return masterCandidates.values().stream()
                 .map(master -> buildMatchCandidate(patient, master, config))
-                .filter(mc -> mc.getMatchScore().compareTo(new BigDecimal("30.00")) >= 0)
+                .filter(mc -> mc.getMatchScore().compareTo(manualThreshold) >= 0)
                 .sorted(Comparator.comparing(MatchCandidate::getMatchScore).reversed())
                 .collect(Collectors.toList());
     }
@@ -114,6 +122,10 @@ public class PatientMatchingServiceImpl implements PatientMatchingService {
 
         if (isExactMatch(patient.getNationalId(), master.getNationalId())) {
             score = score.add(config.getNationalIdWeight());
+        }
+
+        if (isExactMatch(patient.getHealthInsuranceNo(), master.getHealthInsuranceNo())) {
+            score = score.add(config.getHealthInsuranceWeight());
         }
 
         if (patient.getFullName() != null && master.getFullName() != null) {
@@ -320,8 +332,24 @@ public class PatientMatchingServiceImpl implements PatientMatchingService {
     @Override
     public Page<MatchCandidate> searchCandidates(MatchDecisionEnum decision, Pageable pageable) {
         if (decision == null) {
+            if (pageable.getSort().isSorted()) {
+                return matchCandidateRepository.findAll(pageable);
+            }
             return matchCandidateRepository.findAllByOrderByCreatedAtDesc(pageable);
         }
+
+        if (pageable.getSort().isSorted()) {
+            return matchCandidateRepository.findByDecision(decision, pageable);
+        }
+
+        if (decision == MatchDecisionEnum.REJECTED) {
+            Pageable sortedByReviewedAt = org.springframework.data.domain.PageRequest.of(
+                    pageable.getPageNumber(),
+                    pageable.getPageSize(),
+                    org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "reviewedAt"));
+            return matchCandidateRepository.findByDecision(decision, sortedByReviewedAt);
+        }
+
         return matchCandidateRepository.findByDecisionOrderByCreatedAtDesc(decision, pageable);
     }
 
@@ -391,6 +419,11 @@ public class PatientMatchingServiceImpl implements PatientMatchingService {
         BigDecimal nationalIdScore = nationalIdMatch ? config.getNationalIdWeight().setScale(2, RoundingMode.HALF_UP)
                 : BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
         breakdown.add(createBreakdownItem("nationalId", "CCCD/CMND", nationalIdScore, config.getNationalIdWeight()));
+
+        boolean hiMatch = isExactMatch(patient.getHealthInsuranceNo(), master.getHealthInsuranceNo());
+        BigDecimal hiScore = hiMatch ? config.getHealthInsuranceWeight().setScale(2, RoundingMode.HALF_UP)
+                : BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
+        breakdown.add(createBreakdownItem("healthInsuranceNo", "Bảo hiểm y tế", hiScore, config.getHealthInsuranceWeight()));
 
         boolean phoneMatch = isExactMatch(patient.getPhoneNumber(), master.getPhoneNumber());
         BigDecimal phoneScore = phoneMatch ? config.getPhoneWeight().setScale(2, RoundingMode.HALF_UP)

@@ -1,0 +1,4 @@
+localPatientCode,fullName,dateOfBirth,gender,nationalId,healthInsuranceNo,phoneNumber,address
+BN_NEW_101,Dương Bảo Ngọc,14/06/2002,FEMALE,036202009111,HS436202009111,0984556677,"15 Hai Bà Trưng, TP. Thái Bình"
+BN_NEW_102,Lương Gia Huy,28/11/1999,MALE,075199008222,HS475199008222,0985667788,"88 Hùng Vương, TP. Nha Trang, Khánh Hòa"
+BN_NEW_103,Thái Thị Cẩm Tú,05/04/2005,FEMALE,080205007333,HS480205007333,0986778899,"42 Trần Hưng Đạo, TP. Cần Thơ"

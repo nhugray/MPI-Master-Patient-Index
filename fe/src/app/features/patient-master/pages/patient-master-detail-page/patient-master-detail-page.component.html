@@ -84,16 +84,6 @@
           </div>
         </div>
 
-        <div class="score-box">
-          <div class="score-label">Điểm tin cậy</div>
-          <div class="score-circle">
-            <span class="score-value">{{ confidence().text }}</span>
-          </div>
-          <div class="score-verified" *ngIf="confidence().verified">
-            <span class="material-symbols-outlined verified-icon">verified</span>
-            Đã xác thực
-          </div>
-        </div>
       </div>
     </div>
 
@@ -116,8 +106,7 @@
           <div *ngFor="let record of sourceRecords()" class="record-card"
             [class.record-card-primary]="record.matchStatus === 'MATCHED' || record.matchStatus === 'NEW_MASTER'"
             [class.record-card-tertiary]="record.matchStatus !== 'MATCHED' && record.matchStatus !== 'NEW_MASTER'"
-            (click)="openEditPatient(record)"
-            title="Nhấp để chỉnh sửa thông tin bệnh nhân này">
+            (click)="openEditPatient(record)" title="Nhấp để chỉnh sửa thông tin bệnh nhân này">
             <div class="record-header">
               <div class="record-system">
                 <span class="system-badge">{{ record.sourceSystemName }}</span>
@@ -128,7 +117,8 @@
                   <span class="material-symbols-outlined date-icon">calendar_month</span>
                   Gộp: {{ formatDate(record.createdAt) }}
                 </div>
-                <button type="button" class="btn-card-edit" (click)="$event.stopPropagation(); openEditPatient(record)" title="Chỉnh sửa hồ sơ bệnh nhân">
+                <button type="button" class="btn-card-edit" (click)="$event.stopPropagation(); openEditPatient(record)"
+                  title="Chỉnh sửa hồ sơ bệnh nhân">
                   <span class="material-symbols-outlined">edit</span>
                 </button>
               </div>

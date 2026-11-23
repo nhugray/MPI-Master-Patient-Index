@@ -1,0 +1,4 @@
+localPatientCode,fullName,dateOfBirth,gender,nationalId,healthInsuranceNo,phoneNumber,address
+BN_NEW_001,Trần Quốc Toản,10/05/2003,MALE,040203001122,HS440203001122,0981122334,"Số 15 Hàng Da, Hoàn Kiếm, Hà Nội"
+BN_NEW_002,Nguyễn Huỳnh Như,22/09/2004,FEMALE,079204005566,HS479204005566,0982233445,"280 Nguyễn Đình Chiểu, Q.3, TP.HCM"
+BN_NEW_003,Lê Anh Tuấn,18/12/2000,MALE,001200007788,HS401200007788,0983344556,"Số 9 Cầu Diễn, Bắc Từ Liêm, Hà Nội"

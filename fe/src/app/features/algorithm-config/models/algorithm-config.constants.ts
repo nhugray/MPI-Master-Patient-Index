@@ -27,6 +27,12 @@ export const WEIGHT_FIELDS: WeightFieldDefinition[] = [
     colorClass: 'text-error'
   },
   {
+    key: 'healthInsuranceWeight',
+    label: 'Mã số Thẻ BHYT (BHYT)',
+    description: 'Trọng số cho số thẻ bảo hiểm y tế, khớp chính xác hỗ trợ xác thực chéo.',
+    colorClass: 'text-error'
+  },
+  {
     key: 'phoneWeight',
     label: 'Số Điện thoại',
     description: 'Trọng số cho số điện thoại, hỗ trợ xác thực chéo.',
@@ -43,9 +49,10 @@ export const WEIGHT_FIELDS: WeightFieldDefinition[] = [
 export const TOTAL_WEIGHT_EXPECTED = 100;
 
 export const DEFAULT_WEIGHT_FORM: Record<WeightFieldKey, number> = {
-  nameWeight: 40,
-  dobWeight: 25,
-  nationalIdWeight: 30,
+  nameWeight: 30,
+  dobWeight: 20,
+  nationalIdWeight: 25,
+  healthInsuranceWeight: 20,
   phoneWeight: 3,
   addressWeight: 2
 };

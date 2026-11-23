@@ -1,0 +1,4 @@
+localPatientCode,fullName,dateOfBirth,gender,nationalId,healthInsuranceNo,phoneNumber,address
+BN_MULTI_001,Phạm Văn Dũng,15/01/1990,MALE,,DN401090004567,0912222221,"Số 25 Kim Mã, Ba Đình, Hà Nội"
+BN_MULTI_002,Vu Thi Hoa,30/05/1988,FEMALE,,DN401188005678,0912222222,"Láng Hạ, Đống Đa, Hà Nội"
+BN_MULTI_003,Nguyễn Văn An,12/03/1985,MALE,079085001234,DN479085001234,0902222222,"Bến Thành, Quận 1, TP.HCM"

@@ -82,11 +82,12 @@ export class ReviewQueueListComponent implements OnInit {
 
   onDecisionTabChange(decision: MatchDecisionEnum | 'ALL'): void {
     this.selectedDecision.set(decision);
+    const sortField = decision === MatchDecisionEnum.REJECTED ? 'reviewedAt,desc' : 'createdAt,desc';
     this.searchParams = {
       ...this.searchParams,
       decision: decision === 'ALL' ? undefined : decision,
       page: 0,
-      sort: 'createdAt,desc'
+      sort: sortField
     };
     this.loadCandidates();
   }

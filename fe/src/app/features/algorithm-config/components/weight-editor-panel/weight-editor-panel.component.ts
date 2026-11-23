@@ -20,6 +20,7 @@ export class WeightEditorPanelComponent {
         nameWeight: value.nameWeight,
         dobWeight: value.dobWeight,
         nationalIdWeight: value.nationalIdWeight,
+        healthInsuranceWeight: value.healthInsuranceWeight ?? 0,
         phoneWeight: value.phoneWeight,
         addressWeight: value.addressWeight
       });

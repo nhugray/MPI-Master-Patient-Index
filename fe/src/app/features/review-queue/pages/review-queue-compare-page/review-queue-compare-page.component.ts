@@ -77,9 +77,10 @@ export class ReviewQueueComparePageComponent implements OnInit {
         breakdownMap.get('dateOfBirth'),
         25
       ),
-      this.buildComparison('CCCD/CMND', 'nationalId', patient.nationalId || '', master.nationalId || '', breakdownMap.get('nationalId'), 31),
-      this.buildComparison('Số điện thoại', 'phoneNumber', patient.phoneNumber || '', master.phoneNumber || '', breakdownMap.get('phoneNumber'), 5),
-      this.buildComparison('Địa chỉ', 'address', patient.address || '', master.address || '', breakdownMap.get('address'), 9),
+      this.buildComparison('CCCD/CMND', 'nationalId', patient.nationalId || '', master.nationalId || '', breakdownMap.get('nationalId'), 25),
+      this.buildComparison('Mã số BHYT', 'healthInsuranceNo', patient.healthInsuranceNo || '', master.healthInsuranceNo || '', breakdownMap.get('healthInsuranceNo'), 20),
+      this.buildComparison('Số điện thoại', 'phoneNumber', patient.phoneNumber || '', master.phoneNumber || '', breakdownMap.get('phoneNumber'), 3),
+      this.buildComparison('Địa chỉ', 'address', patient.address || '', master.address || '', breakdownMap.get('address'), 2),
     ];
   });
 

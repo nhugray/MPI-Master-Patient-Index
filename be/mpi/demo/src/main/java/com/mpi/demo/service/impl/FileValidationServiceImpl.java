@@ -44,8 +44,11 @@ public class FileValidationServiceImpl implements FileValidationService {
         int invalidRows = 0;
 
         for (int i = 0; i < data.rows().size(); i++) {
-            int rowNumber = i + 2;
             Map<String, String> row = data.rows().get(i);
+            if (isRowEmpty(row)) {
+                continue;
+            }
+            int rowNumber = i + 2;
             List<String> rowMessages = validateRow(row, mappings, sourceSystemId, localCodes, nationalIds);
             if (rowMessages.isEmpty()) {
                 validRows++;
@@ -172,4 +175,11 @@ public class FileValidationServiceImpl implements FileValidationService {
         return "general";
     }
 
+
+    private boolean isRowEmpty(Map<String, String> row) {
+        if (row == null || row.isEmpty()) {
+            return true;
+        }
+        return row.values().stream().allMatch(v -> v == null || v.trim().isEmpty());
+    }
 }

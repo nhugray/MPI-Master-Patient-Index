@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Báo Cáo Slide Thuyết Trình Đề Tài MPI - Giao Diện Sáng (Light Theme)</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    @page {
+      size: 1920px 1080px;
+      margin: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #F8FAFC;
+      color: #1E293B;
+      -webkit-font-smoothing: antialiased;
+      margin: 0;
+      padding: 0;
+    }
+
+    .slide {
+      width: 1920px;
+      height: 1080px;
+      page-break-after: always;
+      break-after: page;
+      position: relative;
+      overflow: hidden;
+      background: radial-gradient(circle at 10% 10%, rgba(2, 132, 199, 0.04) 0%, transparent 40%),
+                  radial-gradient(circle at 90% 90%, rgba(99, 102, 241, 0.04) 0%, transparent 45%),
+                  #F8FAFC;
+      padding: 56px 80px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* Ambient background grid */
+    .slide::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image: 
+        linear-gradient(rgba(15, 23, 42, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(15, 23, 42, 0.025) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .slide-content {
+      position: relative;
+      z-index: 2;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header styling */
+    .slide-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 32px;
+      padding-bottom: 18px;
+      border-bottom: 2px solid #E2E8F0;
+    }
+
+    .header-left .topic-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      background: #E0F2FE;
+      border: 1px solid #BAE6FD;
+      color: #0369A1;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .header-left h2 {
+      font-size: 34px;
+      font-weight: 800;
+      color: #0F172A;
+      letter-spacing: -0.5px;
+    }
+
+    .header-left p {
+      font-size: 16px;
+      color: #475569;
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    .slide-number {
+      font-size: 18px;
+      font-weight: 800;
+      color: #0284C7;
+      background: #FFFFFF;
+      padding: 8px 20px;
+      border-radius: 12px;
+      border: 1px solid #CBD5E1;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Common Card Styles */
+    .card {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 20px;
+      padding: 26px;
+      box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.04), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
+    }
+
+    .card-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #0F172A;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .badge-primary { background: #E0F2FE; color: #0284C7; border: 1px solid #BAE6FD; }
+    .badge-success { background: #DCFCE7; color: #15803D; border: 1px solid #BBF7D0; }
+    .badge-warning { background: #FEF3C7; color: #B45309; border: 1px solid #FDE68A; }
+    .badge-danger  { background: #FEE2E2; color: #B91C1C; border: 1px solid #FECACA; }
+    .badge-purple  { background: #F3E8FF; color: #7E22CE; border: 1px solid #E9D5FF; }
+
+    /* SVG Icon Helpers */
+    .icon {
+      width: 22px;
+      height: 22px;
+      stroke-width: 2;
+      stroke: currentColor;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    /* Footer */
+    .slide-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+      padding-top: 16px;
+      border-top: 1px solid #E2E8F0;
+      font-size: 13px;
+      color: #64748B;
+      font-weight: 500;
+    }
+
+    .footer-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .footer-tag {
+      background: #EDF2F7;
+      padding: 3px 10px;
+      border-radius: 4px;
+      color: #334155;
+      font-weight: 600;
+    }
+
+    /* SLIDE 1 SPECIFIC */
+    .hero-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      text-align: center;
+      padding: 0 80px;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 24px;
+      background: #E0F2FE;
+      border: 1px solid #0284C7;
+      border-radius: 9999px;
+      color: #0369A1;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.15);
+    }
+
+    .hero-title {
+      font-size: 58px;
+      font-weight: 800;
+      line-height: 1.18;
+      color: #0F172A;
+      margin-bottom: 18px;
+      letter-spacing: -1.2px;
+    }
+
+    .hero-title span {
+      background: linear-gradient(135deg, #0284C7 0%, #0369A1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: 22px;
+      color: #475569;
+      max-width: 1150px;
+      line-height: 1.6;
+      margin-bottom: 44px;
+      font-weight: 500;
+    }
+
+    .hero-meta-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      width: 100%;
+      max-width: 1300px;
+      margin-bottom: 36px;
+    }
+
+    .hero-meta-card {
+      background: #FFFFFF;
+      border: 1px solid #E2E8F0;
+      border-radius: 16px;
+      padding: 20px;
+      text-align: left;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+
+    .hero-meta-label {
+      font-size: 12px;
+      color: #64748B;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .hero-meta-value {
+      font-size: 17px;
+      font-weight: 700;
+      color: #0F172A;
+    }
+
+    /* SLIDE 2 GRID */
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 26px;
+      margin-bottom: 20px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 26px;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 22px;
+    }
+
+    .problem-icon-wrapper {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: #FEE2E2;
+      border: 1px solid #FECACA;
+      color: #DC2626;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .callout-box-light {
+      background: #FFF1F2;
+      border: 1.5px solid #FDA4AF;
+      border-radius: 16px;
+      padding: 22px 28px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .callout-icon-light {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: #FEE2E2;
+      color: #DC2626;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .callout-content h4 {
+      font-size: 17px;
+      font-weight: 800;
+      color: #9F1239;
+      margin-bottom: 6px;
+    }
+
+    .callout-content p {
+      font-size: 14px;
+      color: #4C0519;
+      line-height: 1.6;
+    }
+
+    /* CODE BOX LIGHT */
+    .code-box-light {
+      background: #F8FAFC;
+      border: 1px solid #CBD5E1;
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: #0F172A;
+      line-height: 1.6;
+      margin-top: 10px;
+    }
+
+    /* SLIDE 4 BLOCKING */
+    .blocking-card-light {
+      background: #FFFFFF;
+      border: 1.5px solid #BAE6FD;
+      border-radius: 16px;
+      padding: 22px;
+      position: relative;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.05);
+    }
+
+    .blocking-badge-light {
+      position: absolute;
+      top: -12px;
+      left: 20px;
+      background: #0284C7;
+      color: #FFFFFF;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 12px;
+      border-radius: 6px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    /* TABLE STYLES LIGHT */
+    .data-table-light {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    .data-table-light th {
+      background: #F1F5F9;
+      color: #334155;
+      font-weight: 700;
+      text-align: left;
+      padding: 12px 16px;
+      border-top: 1px solid #CBD5E1;
+      border-bottom: 2px solid #CBD5E1;
+    }
+
+    .data-table-light td {
+      padding: 13px 16px;
+      border-bottom: 1px solid #E2E8F0;
+      color: #1E293B;
+    }
+
+    .data-table-light tr:nth-child(even) td {
+      background: #F8FAFC;
+    }
+
+    /* WORKFLOW FLOWCHART LIGHT */
+    .flow-steps {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 14px;
+    }
+
+    .flow-step-light {
+      flex: 1;
+      background: #FFFFFF;
+      border-radius: 14px;
+      padding: 20px;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.03);
+    }
+
+    .flow-step-light.step-success { border: 2px solid #86EFAC; background: #F0FDF4; }
+    .flow-step-light.step-warning { border: 2px solid #FDE68A; background: #FFFBEB; }
+    .flow-step-light.step-danger  { border: 2px solid #FECACA; background: #FEF2F2; }
+
+    .step-arrow-light {
+      color: #94A3B8;
+      font-size: 26px;
+      font-weight: 800;
+    }
+
+    /* TECH PILLS LIGHT */
+    .tech-pill-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .tech-pill-light {
+      background: #F1F5F9;
+      border: 1px solid #CBD5E1;
+      border-radius: 8px;
+      padding: 7px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #0F172A;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tech-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .dot-blue { background: #0284C7; }
+    .dot-green { background: #16A34A; }
+    .dot-amber { background: #D97706; }
+    .dot-purple { background: #9333EA; }
+
+  </style>
+</head>
+<body>
+
+  <!-- ==================== SLIDE 1: TRANG TIÊU ĐỀ ==================== -->
+  <section class="slide">
+    <div class="slide-content">
+      <div class="hero-container">
+        <div class="hero-badge">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          HỆ THỐNG Y TẾ SỐ • ENTERPRISE MASTER PATIENT INDEX
+        </div>
+
+        <h1 class="hero-title">HỆ THỐNG QUẢN LÝ ĐỊNH DANH<br><span>BỆNH NHÂN TẬP TRUNG (MPI)</span></h1>
+        
+        <p class="hero-subtitle">
+          Giải pháp công nghệ chuẩn hóa, khử trùng lặp và hợp nhất hồ sơ bệnh nhân toàn mạng lưới y tế — Xây dựng nguồn chân lý dữ liệu duy nhất (Golden Record)
+        </p>
+
+        <div class="hero-meta-grid">
+          <div class="hero-meta-card">
+            <div class="hero-meta-label">Người Báo Cáo</div>
+            <div class="hero-meta-value">Nhật Hoàng Long</div>
+          </div>
+          <div class="hero-meta-card">
+            <div class="hero-meta-label">Công Nghệ Cốt Lõi</div>
+            <div class="hero-meta-value">Java 21 • Angular 19 • MySQL</div>
+          </div>
+          <div class="hero-meta-card">
+            <div class="hero-meta-label">Lĩnh Vực Ứng Dụng</div>
+            <div class="hero-meta-value">Bệnh Án Điện Tử (EMR / EHR)</div>
+          </div>
+          <div class="hero-meta-card">
+            <div class="hero-meta-label">Trạng Thái Hệ Thống</div>
+            <div class="hero-meta-value" style="color: #16A34A;">✓ Production Ready (v2.5)</div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 14px; justify-content: center;">
+          <span class="badge badge-primary">Thuật toán Tìm kiếm Blocking</span>
+          <span class="badge badge-success">Mô hình Tính điểm Levenshtein NFD</span>
+          <span class="badge badge-warning">Review Queue Đối Soát Trực Quan</span>
+          <span class="badge badge-purple">Bảo mật JWT + HttpOnly Cookie</span>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <div class="footer-left">
+          <span>Đề tài: Master Patient Index (MPI)</span>
+          <span class="footer-tag">Healthcare Integration Platform</span>
+        </div>
+        <div>Trang 01 / 11</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SLIDE 2: THỰC TRẠNG VẤN ĐỀ ==================== -->
+  <section class="slide">
+    <div class="slide-content">
+      <div class="slide-header">
+        <div class="header-left">
+          <div class="topic-badge" style="background: #FEE2E2; color: #B91C1C; border-color: #FECACA;">01. Bối cảnh & Thực trạng</div>
+          <h2>Thách Thức Phân Mảnh Dữ Liệu Trong Ngành Y Tế</h2>
+          <p>Tại sao hệ thống y tế hiện nay rất cần một giải pháp Quản lý Định danh Bệnh nhân Tập trung?</p>
+        </div>
+        <div class="slide-number">02 / 11</div>
+      </div>
+
+      <div class="grid-3" style="flex: 1;">
+        <div class="card">
+          <div class="card-title">
+            <div class="problem-icon-wrapper">
+              <svg class="icon" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+            </div>
+            1. Phân Mảnh Dữ Liệu (Data Silos)
+          </div>
+          <p style="color: #475569; font-size: 14px; line-height: 1.6; margin-bottom: 14px;">
+            Mỗi bệnh viện, phòng khám, khoa xét nghiệm vận hành các phần mềm quản lý bệnh viện độc lập (HIS, LIS, RIS/PACS).
+          </p>
+          <ul style="color: #334155; font-size: 14px; line-height: 1.8; padding-left: 20px;">
+            <li>Cùng một công dân nhưng mỗi viện cấp 1 mã bệnh nhân cục bộ (Local ID) khác nhau.</li>
+            <li>Dữ liệu bệnh án bị "cô lập", bác sĩ tuyến trên không đọc được kết quả tuyến dưới.</li>
+            <li>Không có hệ thống liên thông để nhận diện bệnh nhân toàn mạng lưới y tế.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <div class="problem-icon-wrapper">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            2. Sai Lệch Dữ Liệu Đầu Vào
+          </div>
+          <p style="color: #475569; font-size: 14px; line-height: 1.6; margin-bottom: 14px;">
+            Dữ liệu tiếp đón do con người nhập liệu thủ công với tần suất sai số và không đồng nhất rất cao.
+          </p>
+          <ul style="color: #334155; font-size: 14px; line-height: 1.8; padding-left: 20px;">
+            <li>Lỗi gõ phím tiếng Việt: có dấu/không dấu (VD: <em>Nguyễn Văn An</em> vs <em>Nguyen Van An</em>).</li>
+            <li>Thiếu thông tin định danh: Bệnh nhân quên mang CCCD, chỉ nhớ năm sinh mà không nhớ ngày tháng.</li>
+            <li>Thay đổi số điện thoại, chuyển nơi cư trú khiến hồ sơ bị nhân bản thành người khác.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <div class="problem-icon-wrapper">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            3. Trùng Lặp Hồ Sơ Trầm Trọng
+          </div>
+          <p style="color: #475569; font-size: 14px; line-height: 1.6; margin-bottom: 14px;">
+            Một người bệnh thực tế có từ 3 đến 5 hồ sơ y tế khác nhau tồn tại song song trong hệ thống.
+          </p>
+          <ul style="color: #334155; font-size: 14px; line-height: 1.8; padding-left: 20px;">
+            <li>Hồ sơ "ma" (Ghost records) gây sai lệch thống kê dịch tễ học và quản trị bệnh viện.</li>
+            <li>Tốn dung lượng cơ sở dữ liệu và chi phí bảo trì lưu trữ định kỳ.</li>
+            <li>Rào cản lớn nhất khi triển khai Bệnh án Điện tử (EMR) và Hồ sơ Sức khỏe Toàn dân (EHR).</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="callout-box-light">
+        <div class="callout-icon-light">
+          <svg class="icon" style="width: 28px; height: 28px;" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+        </div>
+        <div class="callout-content">
+          <h4>HẬU QUẢ NGHIÊM TRỌNG ĐỐI VỚI BỆNH NHÂN & BỆNH VIỆN</h4>
+          <p>
+            <strong>• Nguy cơ y khoa trực tiếp:</strong> Bác sĩ không thể nắm bắt tiền sử dị ứng thuốc, nhóm máu hiếm hay bệnh nền đã điều trị ở viện khác ➔ dẫn tới kê đơn tương tác thuốc nguy hiểm, sốc phản vệ, đe dọa sinh mạng.<br>
+            <strong>• Lãng phí tài chính:</strong> Bệnh nhân bị chỉ định chụp X-Quang, MRI, xét nghiệm máu nhiều lần dù vừa thực hiện ở tuyến trước vài ngày ➔ thất thoát ngân sách bảo hiểm y tế (BHYT).
+          </p>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <div class="footer-left">
+          <span>01. Bối cảnh & Thực trạng</span>
+          <span class="footer-tag">Clinical Hazard & Data Silos</span>
+        </div>
+        <div>Trang 02 / 11</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SLIDE 3: GIẢI PHÁP MPI ==================== -->
+  <section class="slide">
+    <div class="slide-content">
+      <div class="slide-header">
+        <div class="header-left">
+          <div class="topic-badge">02. Giải pháp đề tài</div>
+          <h2>Giải Pháp: Hệ Thống Master Patient Index (MPI)</h2>
+          <p>Mô hình xây dựng "Hồ Sơ Gốc" (Golden Record) đóng vai trò Single Source of Truth</p>
+        </div>
+        <div class="slide-number">03 / 11</div>
+      </div>
+
+      <div class="grid-2" style="flex: 1; align-items: stretch;">
+        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div class="card-title">
+              <svg class="icon" style="color: #0284C7;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+              Khái Niệm Master Patient Index (MPI)
+            </div>
+            <p style="color: #334155; font-size: 15px; line-height: 1.7; margin-bottom: 20px;">
+              <strong>Master Patient Index (MPI)</strong> là cơ sở dữ liệu định danh bệnh nhân trung tâm, có nhiệm vụ liên kết, quản lý và đối soát thông tin nhân khẩu học của mọi bệnh nhân trên tất cả các cơ sở khám chữa bệnh thuộc mạng lưới.
+            </p>
+
+            <div style="background: #F0F9FF; border-left: 4px solid #0284C7; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+              <h4 style="color: #0369A1; font-size: 15px; margin-bottom: 6px;">HỒ SƠ GỐC (GOLDEN RECORD - ENTERPRISE ID)</h4>
+              <p style="color: #0C4A6E; font-size: 13px; line-height: 1.6;">
+                Mỗi công dân được cấp duy nhất một mã định danh doanh nghiệp <strong>Enterprise ID (EID)</strong>. Toàn bộ các hồ sơ bệnh nhân từ các nguồn (HIS Bạch Mai, HIS Chợ Rẫy, File Excel nạp vào) sẽ được gộp và liên kết (link) trỏ về mã EID này.
+              </p>
+            </div>
+          </div>
+
+          <div class="hero-meta-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 0;">
+            <div class="hero-meta-card">
+              <div class="hero-meta-label">Mã Cục Bộ (Local ID)</div>
+              <div class="hero-meta-value" style="font-size: 15px;">HIS-BM-00912<br>HIS-CR-88211</div>
+            </div>
+            <div class="hero-meta-card" style="border-color: #BAE6FD; background: #F0F9FF;">
+              <div class="hero-meta-label" style="color: #0369A1;">Hồ Sơ Gốc (Golden EID)</div>
+              <div class="hero-meta-value" style="color: #0284C7; font-size: 15px;">EID-2026-000452<br>(Duy nhất toàn mạng lưới)</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div class="card-title">
+              <svg class="icon" style="color: #16A34A;" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              Cơ Chế Xử Lý So Khớp Hybrid (Tự Động + Duyệt Thủ Công)
+            </div>
+            <p style="color: #475569; font-size: 14px; line-height: 1.6; margin-bottom: 18px;">
+              Hệ thống kết hợp sức mạnh thuật toán AI/Probabilistic với sự thẩm định chuyên môn của nhân viên y tế (Human-in-the-loop):
+            </p>
+
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <div style="background: #F0FDF4; border: 1.5px solid #BBF7D0; border-radius: 12px; padding: 14px 18px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                  <strong style="color: #15803D; font-size: 15px;">1. Tự Động Gộp (Auto-Match & Merge)</strong>
+                  <span class="badge badge-success">Điểm &ge; 92%</span>
+                </div>
+                <p style="font-size: 13px; color: #166534;">Độ tin cậy gần như tuyệt đối (trùng CCCD hoặc chuẩn họ tên, DOB, SĐT) ➔ Tự động gán vào Golden Record hiện có.</p>
+              </div>
+
+              <div style="background: #FFFBEB; border: 1.5px solid #FDE68A; border-radius: 12px; padding: 14px 18px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                  <strong style="color: #B45309; font-size: 15px;">2. Hàng Đợi Thẩm Định (Review Queue)</strong>
+                  <span class="badge badge-warning">65% &le; Điểm &lt; 92%</span>
+                </div>
+                <p style="font-size: 13px; color: #92400E;">Hồ sơ rơi vào vùng nghi ngờ ➔ Chuyển cho Reviewer mở màn hình So sánh trực quan (Diff Viewer) để duyệt gộp hoặc từ chối.</p>
+              </div>
+
+              <div style="background: #F5F3FF; border: 1.5px solid #DDD6FE; border-radius: 12px; padding: 14px 18px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                  <strong style="color: #6D28D9; font-size: 15px;">3. Tạo Mới Hoàn Toàn (New Master EID)</strong>
+                  <span class="badge badge-purple">Điểm &lt; 65%</span>
+                </div>
+                <p style="font-size: 13px; color: #5B21B6;">Bệnh nhân mới lần đầu xuất hiện trong hệ thống ➔ Cấp phát mã Enterprise ID hoàn toàn mới.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <div class="footer-left">
+          <span>02. Giới thiệu Giải pháp MPI</span>
+          <span class="footer-tag">Golden Record & EID Architecture</span>
+        </div>
+        <div>Trang 03 / 11</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SLIDE 4: THUẬT TOÁN BLOCKING ==================== -->
+  <section class="slide">
+    <div class="slide-content">
+      <div class="slide-header">
+        <div class="header-left">
+          <div class="topic-badge">03. Thuật toán Cốt lõi (P1)</div>
+          <h2>Thuật Toán Tìm Kiếm Ứng Viên Master (Blocking Strategy)</h2>
+          <p>Phương pháp khoanh vùng ứng viên tiềm năng siêu tốc bám sát mã nguồn trong PatientMatchingServiceImpl</p>
+        </div>
+        <div class="slide-number">04 / 11</div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom: 20px;">
+        <div class="card" style="border-left: 4px solid #DC2626;">
+          <div class="card-title">
+            <svg class="icon" style="color: #DC2626;" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            Thách Thức Khi So Sánh Vét Cạn (Full Scan)
+          </div>
+          <p style="color: #334155; font-size: 14px; line-height: 1.6; margin-bottom: 10px;">
+            Nếu mỗi bản ghi bệnh nhân mới nạp vào đều phải so khớp chuỗi với toàn bộ hàng triệu hồ sơ trong Database:
+          </p>
+          <div class="code-box-light" style="background: #FFF1F2; border-color: #FECACA; color: #9F1239;">
+            Độ phức tạp tính toán: O(N × M)<br>
+            • N = 10,000 bệnh nhân import mới<br>
+            • M = 1,000,000 hồ sơ gốc trong CSDL<br>
+            ➔ Cần thực hiện 10 TỶ phép so sánh Levenshtein Distance!<br>
+            ➔ Hậu quả: Tràn bộ nhớ RAM, Database bị treo, thời gian xử lý kéo dài hàng giờ!
+          </div>
+        </div>
+
+        <div class="card" style="border-left: 4px solid #16A34A;">
+          <div class="card-title">
+            <svg class="icon" style="color: #16A34A;" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+            Giải Pháp: Chiến Lược Đa Khóa Chặn (Multi-pass Blocking)
+          </div>
+          <p style="color: #334155; font-size: 14px; line-height: 1.6; margin-bottom: 10px;">
+            Hệ thống MPI áp dụng cơ chế <strong>Blocking Strategy</strong> đa tiêu chí nhằm khoanh vùng tập ứng viên trong vài mili-giây:
+          </p>
+          <div class="code-box-light" style="background: #F0FDF4; border-color: #BBF7D0; color: #166534;">
+            Tận dụng triệt để Composite Index trên Database:<br>
+            • Chỉ truy vấn các hồ sơ thỏa mãn ít nhất một khóa chặn<br>
+            • Gom nhóm các Candidate vào HashMap loại bỏ trùng lặp<br>
+            • Giảm không gian tìm kiếm từ 1,000,000 xuống còn 10 ~ 20 ứng viên!<br>
+            ➔ Tốc độ tìm kiếm: &lt; 15ms cho mỗi bản ghi!
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-3" style="flex: 1;">
+        <div class="blocking-card-light">
+          <div class="blocking-badge-light">Khóa Chặn 1: DOB + Name Prefix</div>
+          <h4 style="font-size: 16px; font-weight: 700; color: #0F172A; margin-top: 8px; margin-bottom: 8px;">Ngày Sinh + 3 Ký Tự Đầu Họ Tên</h4>
+          <p style="font-size: 13px; color: #475569; line-height: 1.5; margin-bottom: 10px;">
+            Truy vấn các hồ sơ gốc có cùng ngày sinh và 3 chữ cái đầu của tên (ví dụ: "NGU" cho Nguyễn, "TRA" cho Trần).
+          </p>
+          <div class="code-box-light" style="font-size: 12px; padding: 10px;">
+            SELECT * FROM patient_master<br>
+            WHERE date_of_birth = :dob<br>
+            AND UPPER(SUBSTRING(full_name, 1, 3)) = :first3;
+          </div>
+        </div>
+
+        <div class="blocking-card-light" style="border-color: #BBF7D0;">
+          <div class="blocking-badge-light" style="background: #16A34A;">Khóa Chặn 2: Phone Suffix</div>
+          <h4 style="font-size: 16px; font-weight: 700; color: #0F172A; margin-top: 8px; margin-bottom: 8px;">4 Số Cuối Số Điện Thoại</h4>
+          <p style="font-size: 13px; color: #475569; line-height: 1.5; margin-bottom: 10px;">
+            Bắt trường hợp người bệnh đổi nhà mạng nhưng giữ số đuôi hoặc nhập sai mã vùng/đầu số.
+          </p>
+          <div class="code-box-light" style="font-size: 12px; padding: 10px;">
+            SELECT * FROM patient_master<br>
+            WHERE phone_number LIKE %:last4<br>
+            AND status = 'ACTIVE';
+          </div>
+        </div>
+
+        <div class="blocking-card-light" style="border-color: #DDD6FE;">
+          <div class="blocking-badge-light" style="background: #7C3AED;">Khóa Chặn 3: National ID</div>
+          <h4 style="font-size: 16px; font-weight: 700; color: #0F172A; margin-top: 8px; margin-bottom: 8px;">Số Định Danh CCCD / CMND</h4>
+          <p style="font-size: 13px; color: #475569; line-height: 1.5; margin-bottom: 10px;">
+            Truy vấn trực tiếp theo mã định danh công dân 12 số hoặc CMND 9 số cũ có sẵn Index B-Tree.
+          </p>
+          <div class="code-box-light" style="font-size: 12px; padding: 10px;">
+            SELECT * FROM patient_master<br>
+            WHERE national_id = :nationalId<br>
+            AND status = 'ACTIVE';
+          </div>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <div class="footer-left">
+          <span>03. Thuật toán Cốt lõi (P1)</span>
+          <span class="footer-tag">High-Performance Blocking Strategy</span>
+        </div>
+        <div>Trang 04 / 11</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SLIDE 5: THUẬT TOÁN TÍNH ĐIỂM ==================== -->
+  <section class="slide">
+    <div class="slide-content">
+      <div class="slide-header">
+        <div class="header-left">
+          <div class="topic-badge">04. Thuật toán Cốt lõi (P2)</div>
+          <h2>Thuật Toán Tính Điểm Xác Suất (Probabilistic Matching)</h2>
+          <p>Mô hình chuẩn hóa tiếng Việt, tính khoảng cách Levenshtein và tổng hợp điểm theo trọng số</p>
+        </div>
+        <div class="slide-number">05 / 11</div>
+      </div>
+
+      <div class="grid-2" style="flex: 1; align-items: stretch;">
+        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div class="card-title">
+              <svg class="icon" style="color: #0284C7;" viewBox="0 0 24 24"><path d="M4 7V4h16v3M9 20h6M12 4v16"/></svg>
+              1. Chuẩn Hóa Chuỗi Tiếng Việt & Levenshtein
+            </div>
+            
+            <p style="color: #334155; font-size: 14px; line-height: 1.6; margin-bottom: 10px;">
+              <strong>Bước 1: Chuẩn hóa NFD Unicode (Normalize)</strong><br>
+              Tách dấu tổ hợp <code>\p{M}</code>, chuyển chữ thường, loại bỏ khoảng trắng dư thừa giúp xử lý triệt để lỗi bộ gõ Telex / VNI.
+            </p>
+            <div class="code-box-light" style="font-size: 12px; margin-bottom: 14px;">
+              Normalizer.normalize(s.trim().toLowerCase(), Normalizer.Form.NFD)<br>
+              &nbsp;&nbsp;.replaceAll("\\p{M}", "");
+            </div>
+
+            <p style="color: #334155; font-size: 14px; line-height: 1.6; margin-bottom: 10px;">
+              <strong>Bước 2: Thuật toán khoảng cách Levenshtein Distance</strong><br>
+              Tính số bước chỉnh sửa tối thiểu (thêm, xóa, thay thế) giữa 2 chuỗi để quy đổi về tỷ lệ tương đồng 0.0 ~ 1.0:
+            </p>
+            <div class="code-box-light" style="background: #FFFBEB; border-color: #FDE68A; color: #92400E; font-size: 12px;">
+              Similarity(s1, s2) = 1.0 - [ LevenshteinDistance(n1, n2) / max(len(n1), len(n2)) ]
+            </div>
+          </div>
+
+          <div style="background: #F0F9FF; border: 1px solid #BAE6FD; border-radius: 12px; padding: 14px;">
+            <span style="color: #0369A1; font-weight: 700; font-size: 13px;">Ví dụ thực tế:</span>
+            <div style="font-size: 13px; color: #0C4A6E; margin-top: 4px;">
+              "Nguyễn Văn An" vs "Nguyen Van An" ➔ Sau khi chuẩn hóa thành "nguyen van an" ➔ Khoảng cách = 0 ➔ <strong>Độ tương đồng = 100%!</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div class="card-title">
+              <svg class="icon" style="color: #16A34A;" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+              2. Bảng Phân Bổ Trọng Số (Algorithm Weights)
+            </div>
+            
+            <p style="color: #475569; font-size: 13px; line-height: 1.5; margin-bottom: 8px;">
+              Công thức tổng hợp điểm: <code>MatchScore = ∑ (Weight_i × Similarity_i)</code>
+            </p>
+
+            <table class="data-table-light">
+              <thead>
+                <tr>
+                  <th>Trường dữ liệu</th>
+                  <th>Trọng số (%)</th>
+                  <th>Phương thức so khớp</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong style="color: #0284C7;">CCCD / CMND</strong></td>
+                  <td><span class="badge badge-primary">40%</span></td>
+                  <td>Khớp chính xác tuyệt đối (Exact Match)</td>
+                </tr>
+                <tr>
+                  <td><strong style="color: #16A34A;">Họ và tên</strong></td>
+                  <td><span class="badge badge-success">25%</span></td>
+                  <td>Chuẩn hóa tiếng Việt + Levenshtein Distance</td>
+                </tr>
+                <tr>
+                  <td><strong style="color: #B45309;">Ngày sinh (DOB)</strong></td>
+                  <td><span class="badge badge-warning">15%</span></td>
+                  <td>Khớp chính xác ngày/tháng/năm</td>
+                </tr>
+                <tr>
+                  <td><strong style="color: #B45309;">Số điện thoại</strong></td>
+                  <td><span class="badge badge-warning">15%</span></td>
+                  <td>Khớp chính xác chuỗi số điện thoại</td>
+                </tr>
+                <tr>
+                  <td><strong style="color: #7E22CE;">Địa chỉ thường trú</strong></td>
+                  <td><span class="badge badge-purple">5%</span></td>
+                  <td>Levenshtein Distance chuỗi địa chỉ</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div style="background: #F0FDF4; border: 1.5px solid #86EFAC; border-radius: 12px; padding: 14px; margin-top: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="color: #15803D; font-weight: 700; font-size: 14px;">Tổng Điểm Tương Đồng Tối Đa:</span>
+              <span style="font-size: 20px; font-weight: 800; color: #15803D; font-family: 'JetBrains Mono', monospace;">100.00%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <div class="footer-left">
+          <span>04. Thuật toán Cốt lõi (P2)</span>
+          <span class="footer-tag">Weighted Probabilistic Matching</span>
+        </div>
+        <div>Trang 05 / 11</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SLIDE 6: QUY TRÌNH QUYẾT ĐỊNH & REVIEW QUEUE ==================== -->
+  <section class="slide">
+    <div class="slide-content">
+      <div class="slide-header">
+        <div class="header-left">
+          <div class="topic-badge">05. Quy trình Nghiệp vụ</div>
+          <h2>Quy Trình Quyết Định & Hàng Đợi Thẩm Định (Review Queue)</h2>
+          <p>Mô hình kiểm duyệt dữ liệu 3 phân tầng kết hợp giao diện đối soát chuyên sâu</p>
+        </div>
+        <div class="slide-number">06 / 11</div>
+      </div>
+
+      <div class="flow-steps" style="margin-bottom: 24px;">
+        <div class="flow-step-light step-success">
+          <div class="badge badge-success" style="margin-bottom: 8px;">NGƯỠNG CAO: &ge; 92%</div>
+          <h4 style="color: #15803D; font-size: 17px; margin-bottom: 6px;">TỰ ĐỘNG GỘP (Auto Approved)</h4>
+          <p style="color: #475569; font-size: 13px; line-height: 1.5;">
+            Hệ thống tự động liên kết <code>patient.master_patient_id</code> vào Golden Record.<br>
+            Trạng thái: <strong>MATCHED</strong>.
+          </p>
+        </div>
+
+        <div class="step-arrow-light">➔</div>
+
+        <div class="flow-step-light step-warning">
+          <div class="badge badge-warning" style="margin-bottom: 8px;">VÙNG NGHI VẤN: 65% ~ 92%</div>
+          <h4 style="color: #B45309; font-size: 17px; margin-bottom: 6px;">HÀNG ĐỢI DUYỆT (Review Queue)</h4>
+          <p style="color: #475569; font-size: 13px; line-height: 1.5;">
+            Lưu vào <code>match_candidate</code>.<br>
+            Chuyên viên y tế mở màn hình So Sánh Trực Quan (Diff Viewer) thẩm định.
+          </p>
+        </div>
+
+        <div class="step-arrow-light">➔</div>
+
+        <div class="flow-step-light step-danger">
+          <div class="badge badge-danger" style="margin-bottom: 8px;">NGƯỠNG THẤP: &lt; 65%</div>
+          <h4 style="color: #B91C1C; font-size: 17px; margin-bottom: 6px;">TẠO MỚI (New Master)</h4>
+          <p style="color: #475569; font-size: 13px; line-height: 1.5;">
+            Không trùng khớp với bất kỳ ai.<br>
+            Hệ thống sinh mã <strong>Enterprise ID mới</strong> đại diện độc lập.
+          </p>
+        </div>
+      </div>
+
+      <div class="grid-2" style="flex: 1;">
+        <div class="card">
+          <div class="card-title">
+            <svg class="icon" style="color: #B45309;" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            Màn Hình So Sánh Hồ Sơ (Diff Viewer)
+          </div>
+          <ul style="color: #334155; font-size: 14px; line-height: 1.8; padding-left: 20px;">
+            <li><strong>So sánh trực quan 2 cột:</strong> Cột Hồ sơ bệnh nhân mới vs Cột Hồ sơ gốc hiện tại.</li>
+            <li><strong>Highlight khác biệt:</strong> Tự động bôi màu các trường trùng khớp (xanh lá) và khác biệt (cam/đỏ).</li>
+            <li><strong>Bảng điểm chi tiết (Score Breakdown):</strong> Hiển thị rõ số điểm đạt được trên từng thuộc tính (CCCD: 40/40, Tên: 23/25, SĐT: 15/15...).</li>
+            <li><strong>Thao tác dứt khoát:</strong> Nút "Duyệt Gộp" (Merge) hoặc "Từ Chối" (Reject) kèm lý do thẩm định.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <svg class="icon" style="color: #0284C7;" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Cơ Chế Unlink & Sửa Sai Thông Minh
+          </div>
+          <ul style="color: #334155; font-size: 14px; line-height: 1.8; padding-left: 20px;">
+            <li><strong>Tình huống thực tế:</strong> Chuyên viên lỡ bấm "Từ chối" bản ghi A (hệ thống tự tạo Master tạm), sau đó phát hiện hồ sơ B mới là đúng và bấm "Duyệt gộp" lại.</li>
+            <li><strong>Hệ thống tự động xử lý:</strong>
+              <div style="margin-top: 8px; padding: 12px 14px; background: #F8FAFC; border: 1px solid #CBD5E1; border-radius: 8px; font-size: 13px; color: #0369A1;">
+                ✓ Tự động gỡ liên kết (Unlink) khỏi Master cũ<br>
+                ✓ Xóa bỏ Master tạo nhầm (dọn rác CSDL tự động)<br>
+                ✓ Ghi nhật ký vào MatchDecisionLog: <em>"Bệnh nhân X đã unlink bởi [Tên User] lúc [Thời gian]"</em>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <div class="footer-left">
+          <span>05. Quy trình Quyết định & Review Queue</span>
+          <span class="footer-tag">Decision Engine & Smart Unlink</span>
+        </div>
+        <div>Trang 06 / 11</div>
+      </div>
+    </div>
+  </section>
+
+  
+  <!-- ==================== SLIDE 7: LUỒNG NGHIỆP VỤ IMPORT ĐẾN HỢP NHẤT HỒ SƠ ==================== -->
+  <section class="slide">
+    <div class="slide-content">
+      <div class="slide-header">
+        <div class="header-left">
+          <div class="topic-badge">06. Luồng Nghiệp Vụ Toàn Trình (End-to-End)</div>
+          <h2>Quy Trình Nghiệp Vụ: Từ Nạp Tệp (Import) Đến Hợp Nhất Hồ Sơ Gốc</h2>
+          <p>Kiến trúc xử lý bất đồng bộ (@Async Thread Pool) kết hợp kiểm duyệt đa tầng từ tệp Excel/CSV thô</p>
+        </div>
+        <div class="slide-number">07 / 11</div>
+      </div>
+
+      <!-- 4-STEP PROCESS BAR -->
+      <div class="flow-steps" style="margin-bottom: 20px;">
+        <div class="flow-step-light" style="border: 2px solid #BAE6FD; background: #F0F9FF;">
+          <div class="badge badge-primary" style="margin-bottom: 6px; font-size: 11px;">BƯỚC 1: TIẾP NHẬN</div>
+          <h4 style="color: #0369A1; font-size: 15px; margin-bottom: 4px;">Tải Tệp & Thẩm Định</h4>
+          <p style="color: #475569; font-size: 12px; line-height: 1.4;">
+            Upload Excel (.xlsx) / CSV.<br>
+            Validate định dạng, đếm số dòng, xem trước dữ liệu mẫu (Preview).
+          </p>
+        </div>
+
+        <div class="step-arrow-light">➔</div>
+
+        <div class="flow-step-light" style="border: 2px solid #DDD6FE; background: #F5F3FF;">
+          <div class="badge" style="background: #EDE9FE; color: #6D28D9; border: 1px solid #C4B5FD; margin-bottom: 6px; font-size: 11px;">BƯỚC 2: ĐIỀU PHỐI</div>
+          <h4 style="color: #6D28D9; font-size: 15px; margin-bottom: 4px;">Khởi Chạy Bất Đồng Bộ</h4>
+          <p style="color: #475569; font-size: 12px; line-height: 1.4;">
+            <code>ImportJobOrchestrator</code> đẩy việc vào <code>@Async Thread Pool</code>.<br>
+            HTTP phản hồi ngay; Polling tiến độ % thời gian thực.
+          </p>
+        </div>
+
+        <div class="step-arrow-light">➔</div>
+
+        <div class="flow-step-light" style="border: 2px solid #FDE68A; background: #FFFBEB;">
+          <div class="badge badge-warning" style="margin-bottom: 6px; font-size: 11px;">BƯỚC 3: XỬ LÝ DÒNG</div>
+          <h4 style="color: #B45309; font-size: 15px; margin-bottom: 4px;">Khử Trùng & So Khớp</h4>
+          <p style="color: #475569; font-size: 12px; line-height: 1.4;">
+            Kiểm tra trùng mã nội bộ nguồn.<br>
+            Quét 3 khối Blocking & tính điểm Levenshtein có trọng số.
+          </p>
+        </div>
+
+        <div class="step-arrow-light">➔</div>
+
+        <div class="flow-step-light" style="border: 2px solid #86EFAC; background: #F0FDF4;">
+          <div class="badge badge-success" style="margin-bottom: 6px; font-size: 11px;">BƯỚC 4: KẾT THÚC</div>
+          <h4 style="color: #15803D; font-size: 15px; margin-bottom: 4px;">Quyết Định & Hậu Kiểm</h4>
+          <p style="color: #475569; font-size: 12px; line-height: 1.4;">
+            Tự động gộp / Hàng đợi duyệt / Tạo mới.<br>
+            Báo cáo tổng kết & Nút Retry dòng lỗi.
+          </p>
+        </div>
+      </div>
+
+      <!-- 2 DETAILED CARDS -->
+      <div class="grid-2" style="flex: 1; gap: 20px;">
+        <!-- Card Left: Code & Pipeline Execution -->
+        <div class="card" style="padding: 20px;">
+          <div class="card-title" style="margin-bottom: 12px;">
+            <svg class="icon" style="color: #0284C7;" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            Chi Tiết Thực Thi Mã Nguồn (Pipeline Flow)
+          </div>
+          <ul style="color: #334155; font-size: 13.5px; line-height: 1.75; padding-left: 18px; margin: 0;">
+            <li><strong>Thẩm định & Lưu trữ an toàn:</strong> <code>FileStorageService</code> lưu file thô, cấp phát <code>fileToken</code> duy nhất. <code>FileParserService</code> phân tích tiêu đề và trả về dữ liệu xem trước <code>GET /{jobId}/preview</code>.</li>
+            <li><strong>Giải phóng luồng HTTP:</strong> <code>ImportJobOrchestrator.startImportWithAsyncProcessing</code> khởi chạy phương thức <code>@Async("importTaskExecutor")</code> trong <code>AsyncImportProcessorImpl</code>, ngăn ngừa 100% rủi ro timeout khi nạp hàng chục ngàn dòng.</li>
+            <li><strong>Phát hiện mã trùng nội bộ:</strong> Kiểm tra <code>existsBySourceSystemIdAndLocalPatientCode()</code>. Nếu mã đã có trong cùng nguồn $ightarrow$ gắn nhãn <code>DUPLICATE</code>, tăng <code>duplicateRows</code>.</li>
+            <li><strong>Cơ chế cô lập lỗi (Fault Isolation):</strong> Dòng nào sai định dạng ngày tháng hoặc thiếu dữ liệu bắt buộc $ightarrow$ lưu chi tiết lỗi vào <code>ImportJobDetail (FAILED)</code>. Các dòng hợp lệ khác vẫn được xử lý thông suốt.</li>
+          </ul>
+        </div>
+
+        <!-- Card Right: Decision Matrix -->
+        <div class="card" style="padding: 20px;">
+          <div class="card-title" style="margin-bottom: 12px;">
+            <svg class="icon" style="color: #16A34A;" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            Phân Luồng Quyết Định Từng Dòng (Decision Flow)
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <div style="background: #F0FDF4; border: 1.5px solid #BBF7D0; border-radius: 10px; padding: 10px 14px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <strong style="color: #15803D; font-size: 13.5px;">1. Tự Động Gộp (Score &ge; 92%) &bull; AUTO_APPROVED</strong>
+                <span class="badge badge-success" style="font-size: 11px;">Dòng Thành Công</span>
+              </div>
+              <p style="color: #334155; font-size: 12.5px; margin-top: 3px; line-height: 1.4;">
+                Gọi <code>linkToMaster(patientId, masterId)</code> hợp nhất vào Golden Record; tự động reject các ứng viên phụ; tăng <code>successfulRows</code>.
+              </p>
+            </div>
+
+            <div style="background: #FFFBEB; border: 1.5px solid #FDE68A; border-radius: 10px; padding: 10px 14px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <strong style="color: #B45309; font-size: 13.5px;">2. Nghi Vấn Trùng Lặp (65% &le; Score &lt; 92%) &bull; PENDING</strong>
+                <span class="badge badge-warning" style="font-size: 11px;">Cần Duyệt Tay</span>
+              </div>
+              <p style="color: #334155; font-size: 12.5px; margin-top: 3px; line-height: 1.4;">
+                Đánh dấu dòng <code>REQUIRES_REVIEW</code>, đẩy vào <strong>Review Queue</strong> để chuyên viên y tế thẩm định trên giao diện Diff Viewer.
+              </p>
+            </div>
+
+            <div style="background: #F0F9FF; border: 1.5px solid #BAE6FD; border-radius: 10px; padding: 10px 14px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <strong style="color: #0369A1; font-size: 13.5px;">3. Tạo Hồ Sơ Gốc Mới (Score &lt; 65% hoặc 0 ứng viên)</strong>
+                <span class="badge badge-primary" style="font-size: 11px;">New Master</span>
+              </div>
+              <p style="color: #334155; font-size: 12.5px; margin-top: 3px; line-height: 1.4;">
+                Gọi <code>createMaster(patient)</code> cấp mã định danh <code>MPI-xxxxxxxx</code> mới độc lập; tăng <code>successfulRows</code>.
+              </p>
+            </div>
+
+            <div style="background: #FEF2F2; border: 1.5px solid #FECACA; border-radius: 10px; padding: 10px 14px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <strong style="color: #B91C1C; font-size: 13.5px;">4. Khắc Phục Dòng Lỗi (Retry Mechanism)</strong>
+                <span class="badge badge-danger" style="font-size: 11px;">Nút Retry</span>
+              </div>
+              <p style="color: #334155; font-size: 12.5px; margin-top: 3px; line-height: 1.4;">
+                Sau khi job hoàn tất, chuyên viên nhấn nút <strong>"Retry Failed Rows"</strong> (<code>POST /{jobId}/retry-failed</code>) để nạp lại ngay các dòng lỗi.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <div class="footer-left">
+          <span>06. Luồng Nghiệp Vụ Toàn Trình (End-to-End)</span>
+          <span class="footer-tag">Async Import & Matching Pipeline</span>
+        </div>
+        <div>Trang 07 / 11</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SLIDE 8: CÔNG NGHỆ SỬ DỤNG ==================== -->
+  <section class="slide">
+    <div class="slide-content">
+      <div class="slide-header">
+        <div class="header-left">
+          <div class="topic-badge">07. Kiến trúc Kỹ thuật</div>
+          <h2>Công Nghệ Sử Dụng Khi Xây Dựng Dự Án</h2>
+          <p>Ngăn xếp công nghệ hiện đại, chuẩn kiến trúc doanh nghiệp, tối ưu hiệu năng và an toàn dữ liệu</p>
+        </div>
+        <div class="slide-number">08 / 11</div>
+      </div>
+
+      <div class="grid-4" style="flex: 1;">
+        <div class="card">
+          <div class="card-title">
+            <svg class="icon" style="color: #0284C7;" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+            1. Backend Core
+          </div>
+          <div class="tech-pill-container">
+            <div class="tech-pill-light"><span class="tech-dot dot-blue"></span>Java 21 / 25 LTS</div>
+            <div class="tech-pill-light"><span class="tech-dot dot-blue"></span>Spring Boot 3.x</div>
+            <div class="tech-pill-light"><span class="tech-dot dot-blue"></span>Spring Data JPA</div>
+            <div class="tech-pill-light"><span class="tech-dot dot-blue"></span>Hibernate 6 ORM</div>
+            <div class="tech-pill-light"><span class="tech-dot dot-blue"></span>@Async Worker Pool</div>
+            <div class="tech-pill-light"><span class="tech-dot dot-blue"></span>Maven Build Tool</div>
+          </div>
+          <p style="font-size: 13px; color: #475569; line-height: 1.6; margin-top: 16px;">
+            Kiến trúc phân tầng rõ ràng (Controller - Service - Repository - Specification), hỗ trợ xử lý luồng bất đồng bộ khi nạp file lớn.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <svg class="icon" style="color: #D97706;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="12 8 8 12 12 16 16 12 12 8"/></svg>
+            2. Frontend Core
+          </div>
+          <div class="tech-pill-container">
+            <div class="tech-pill-light"><span class="tech-dot dot-amber"></span>Angular 19 SPA</div>
+            <div class="tech-pill-light"><span class="tech-dot dot-amber"></span>TypeScript 5.x</div>
+            <div class="tech-pill-light"><span class="tech-dot dot-amber"></span>Standalone Components</div>
+            <div class="tech-pill-light"><span class="tech-dot dot-amber"></span>Angular Signals</div>
+            <div class="tech-pill-light"><span class="tech-dot dot-amber"></span>RxJS Reactive Stream</div>
+            <div class="tech-pill-light"><span class="tech-dot dot-amber"></span>Pure CSS Design Tokens</div>
+          </div>
+          <p style="font-size: 13px; color: #475569; line-height: 1.6; margin-top: 16px;">
+            Giao diện hiện đại Bento-grid, quản lý state hoàn toàn bằng Signals mượt mà, không phụ thuộc thư viện UI cồng kềnh.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <svg class="icon" style="color: #16A34A;" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+            3. Database & Storage
+          </div>
+          <div class="tech-pill-container">
+            <div class="tech-pill-light"><span class="tech-dot dot-green"></span>MySQL 8.x Database</div>
+            <div class="tech-pill-light"><span class="tech-dot dot-green"></span>InnoDB Engine</div>
+            <div class="tech-pill-light"><span class="tech-dot dot-green"></span>Composite Indexes</div>
+            <div class="tech-pill-light"><span class="tech-dot dot-green"></span>Prefix B-Tree Index</div>
+            <div class="tech-pill-light"><span class="tech-dot dot-green"></span>Apache POI (Excel)</div>
+            <div class="tech-pill-light"><span class="tech-dot dot-green"></span>OpenCSV Ingestion</div>
+          </div>
+          <p style="font-size: 13px; color: #475569; line-height: 1.6; margin-top: 16px;">
+            Được đánh Index chuyên biệt phục vụ các truy vấn Blocking khóa chặn, đáp ứng tốc độ truy xuất dưới 15ms.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <svg class="icon" style="color: #9333EA;" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            4. Bảo Mật & DevOps
+          </div>
+          <div class="tech-pill-container">
+            <div class="tech-pill-light"><span class="tech-dot dot-purple"></span>Spring Security 6</div>
+            <div class="tech-pill-light"><span class="tech-dot dot-purple"></span>JWT Authentication</div>
+            <div class="tech-pill-light"><span class="tech-dot dot-purple"></span>HttpOnly Cookie</div>
+            <div class="tech-pill-light"><span class="tech-dot dot-purple"></span>RBAC Role Matrix</div>
+            <div class="tech-pill-light"><span class="tech-dot dot-purple"></span>Docker Container</div>
+            <div class="tech-pill-light"><span class="tech-dot dot-purple"></span>Swagger / OpenAPI 3</div>
+          </div>
+          <p style="font-size: 13px; color: #475569; line-height: 1.6; margin-top: 16px;">
+            Cơ chế bảo vệ kép chống XSS và CSRF qua Cookie bảo mật, phân quyền nghiêm ngặt theo 3 vai trò ADMIN, REVIEWER, VIEWER.
+          </p>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <div class="footer-left">
+          <span>06. Kiến trúc Kỹ thuật</span>
+          <span class="footer-tag">Modern Enterprise Tech Stack</span>
+        </div>
+        <div>Trang 08 / 11</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SLIDE 8: TỔNG HỢP CHỨC NĂNG P1 ==================== -->
+  <section class="slide">
+    <div class="slide-content">
+      <div class="slide-header">
+        <div class="header-left">
+          <div class="topic-badge">08. Tổng hợp Tính năng (P1)</div>
+          <h2>Phân Hệ Nghiệp Vụ Bệnh Nhân & Xử Lý Dữ Liệu Lớn</h2>
+          <p>Các module tính năng cốt lõi đã được xây dựng và hoàn thiện 100% trong đề tài</p>
+        </div>
+        <div class="slide-number">09 / 11</div>
+      </div>
+
+      <div class="grid-2" style="flex: 1;">
+        <div class="card">
+          <div class="card-title">
+            <span class="badge badge-primary">01</span>
+            Quản Lý Bệnh Nhân Nguồn (Patient Records)
+          </div>
+          <ul style="color: #334155; font-size: 14px; line-height: 1.8; padding-left: 20px;">
+            <li><strong>Bộ lọc đa tiêu chí:</strong> Tìm kiếm theo họ tên, mã bệnh nhân, CCCD, số điện thoại, hệ thống nguồn, trạng thái đối chiếu.</li>
+            <li><strong>Bảng thẻ thống kê toàn hệ thống:</strong> Đếm số lượng thực tế qua API (Tổng bệnh nhân, Chờ đối chiếu, Đã đối chiếu, Tạo mới) — không phụ thuộc phân trang.</li>
+            <li><strong>CRUD hoàn chỉnh:</strong> Thêm, sửa, xóa hồ sơ bệnh nhân nguồn với form validation chặt chẽ (định dạng CCCD, SĐT).</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <span class="badge badge-success">02</span>
+            Nhập Liệu Hàng Loạt Bất Đồng Bộ (Async Import)
+          </div>
+          <ul style="color: #334155; font-size: 14px; line-height: 1.8; padding-left: 20px;">
+            <li><strong>Hỗ trợ đa định dạng:</strong> Tải lên file Excel (.xlsx) và CSV với dung lượng lớn hàng nghìn dòng.</li>
+            <li><strong>Xử lý bất đồng bộ (@Async):</strong> Trả về Job ID ngay lập tức, tiến trình phân tích chạy ngầm, không gây block giao diện người dùng.</li>
+            <li><strong>Thanh tiến trình thời gian thực:</strong> Frontend polling cập nhật tỷ lệ %, số dòng thành công, số dòng lỗi.</li>
+            <li><strong>Chịu lỗi thông minh:</strong> Dòng nào lỗi được ghi log chi tiết mã lỗi, các dòng hợp lệ tiếp tục được đẩy vào Matching Engine.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <span class="badge badge-warning">03</span>
+            Hàng Đợi Phê Duyệt & So Sánh (Review Queue)
+          </div>
+          <ul style="color: #334155; font-size: 14px; line-height: 1.8; padding-left: 20px;">
+            <li><strong>Danh sách hồ sơ nghi ngờ:</strong> Hiển thị các ứng viên có điểm tương đồng nằm trong khoảng 65% ~ 92%.</li>
+            <li><strong>Giao diện Diff Viewer chuyên sâu:</strong> So sánh 2 cột trực quan giữa Bệnh nhân nguồn và Hồ sơ gốc.</li>
+            <li><strong>Bảng phân tích điểm:</strong> Xem chi tiết điểm số từng thuộc tính và lý do gợi ý gộp.</li>
+            <li><strong>Thao tác 1 chạm:</strong> Duyệt gộp (Merge) hoặc Từ chối (Reject), tự động giải phóng bản ghi khỏi hàng đợi.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <span class="badge badge-purple">04</span>
+            Quản Lý Hồ Sơ Gốc (Patient Master - Golden Record)
+          </div>
+          <ul style="color: #334155; font-size: 14px; line-height: 1.8; padding-left: 20px;">
+            <li><strong>Danh mục Master EID:</strong> Quản lý danh sách Golden Record toàn quốc, thẻ trạng thái Hoạt động / Tạm khóa.</li>
+            <li><strong>Trang Chi tiết Bento-Grid:</strong> Thông tin cá nhân, chỉ số tin cậy (Confidence Score %), danh sách hồ sơ nguồn liên kết.</li>
+            <li><strong>Tích hợp Sửa Nhanh:</strong> Bấm trực tiếp vào từng hồ sơ nguồn trong danh sách để mở form chỉnh sửa tiện lợi, dùng lại component chuẩn.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <div class="footer-left">
+          <span>07. Tổng hợp Tính năng (P1)</span>
+          <span class="footer-tag">Patient & Master Management</span>
+        </div>
+        <div>Trang 09 / 11</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SLIDE 9: TỔNG HỢP CHỨC NĂNG P2 ==================== -->
+  <section class="slide">
+    <div class="slide-content">
+      <div class="slide-header">
+        <div class="header-left">
+          <div class="topic-badge">09. Tổng hợp Tính năng (P2)</div>
+          <h2>Phân Hệ Quản Trị Hệ Thống, Mạng Lưới & Truy Vết</h2>
+          <p>Đảm bảo an ninh, tính minh bạch y tế và khả năng tùy biến thuật toán linh hoạt</p>
+        </div>
+        <div class="slide-number">10 / 11</div>
+      </div>
+
+      <div class="grid-2" style="flex: 1;">
+        <div class="card">
+          <div class="card-title">
+            <span class="badge badge-primary">05</span>
+            Xác Thực & Phân Quyền (Auth & RBAC)
+          </div>
+          <ul style="color: #334155; font-size: 14px; line-height: 1.8; padding-left: 20px;">
+            <li><strong>Cơ chế JWT Kép:</strong> Access Token thời hạn ngắn cho Header + Refresh Token trong Cookie HttpOnly chống rò rỉ token.</li>
+            <li><strong>Phân quyền Role-based:</strong> Phân chia chặt chẽ quyền hạn: <em>ADMIN</em> (toàn quyền hệ thống), <em>REVIEWER</em> (duyệt hàng đợi), <em>VIEWER</em> (chỉ tra cứu).</li>
+            <li><strong>Quản lý Người Dùng:</strong> CRUD tài khoản, đổi mật khẩu, xem hồ sơ cá nhân và bảng thống kê số lượng qua API.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <span class="badge badge-success">06</span>
+            Quản Lý Cơ Sở Y Tế & Hệ Thống Nguồn (Facility & Sources)
+          </div>
+          <ul style="color: #334155; font-size: 14px; line-height: 1.8; padding-left: 20px;">
+            <li><strong>Quản lý Mạng lưới Cơ sở (Facilities):</strong> Quản lý danh mục bệnh viện thành viên, loại hình (Công lập, Tư nhân, Trạm y tế). Thống kê số lượng hoạt động/tạm dừng qua API.</li>
+            <li><strong>Quản lý Hệ thống Nguồn (Source Systems):</strong> Quản lý danh mục các hệ thống HIS, LIS, PACS, CIS trực thuộc từng bệnh viện.</li>
+            <li><strong>Bảng thẻ thống kê thời gian thực:</strong> Hiển thị chính xác tổng hệ thống, số lượng online, sẵn sàng tích hợp EMR.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <span class="badge badge-warning">07</span>
+            Nhật Ký Truy Vết Y Tế (Match Decision Log - Audit Trail)
+          </div>
+          <ul style="color: #334155; font-size: 14px; line-height: 1.8; padding-left: 20px;">
+            <li><strong>Minh bạch trách nhiệm pháp lý:</strong> Ghi lại mọi hành động Gộp (Merge), Tách (Unlink), Từ chối (Reject).</li>
+            <li><strong>Ghi nhận danh tính chính xác:</strong> Bắt đúng username của người đang đăng nhập thực hiện thao tác (không gán cứng).</li>
+            <li><strong>Hiển thị Timeline thời gian thực:</strong> Trình bày trực quan trên trang chi tiết Master giúp dễ dàng tra cứu lịch sử khi có thanh tra y tế.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <span class="badge badge-purple">08</span>
+            Cấu Hình Động Trọng Số Thuật Toán (Weight Config)
+          </div>
+          <ul style="color: #334155; font-size: 14px; line-height: 1.8; padding-left: 20px;">
+            <li><strong>Tùy chỉnh linh hoạt:</strong> Cho phép Admin thay đổi trọng số của từng tiêu chí (CCCD, Họ tên, Ngày sinh, SĐT, Địa chỉ) trực tiếp trên Web.</li>
+            <li><strong>Điều chỉnh ngưỡng:</strong> Tùy biến ngưỡng Tự động duyệt và ngưỡng Duyệt tay theo đặc thù dữ liệu từng thời kỳ mà không cần sửa code hay build lại.</li>
+            <li><strong>Quản lý theo phiên bản:</strong> Lưu vết lịch sử cấu hình, đảm bảo tính ổn định của hệ thống.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="slide-footer">
+        <div class="footer-left">
+          <span>08. Tổng hợp Tính năng (P2)</span>
+          <span class="footer-tag">Security, Audit Trail & Algorithm Config</span>
+        </div>
+        <div>Trang 10 / 11</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SLIDE 10: TỔNG KẾT & ROADMAP ==================== -->
+  <section class="slide">
+    <div class="slide-content">
+      <div class="slide-header">
+        <div class="header-left">
+          <div class="topic-badge">10. Tổng kết & Đánh giá</div>
+          <h2>Giá Trị Thực Tiễn & Hướng Phát Triển Tương Lai</h2>
+          <p>Khẳng định tính hoàn thiện, hiệu quả ứng dụng và lộ trình nâng cấp hệ thống MPI</p>
+        </div>
+        <div class="slide-number">11 / 11</div>
+      </div>
+
+      <div class="grid-2" style="flex: 1; align-items: stretch; margin-bottom: 24px;">
+        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div class="card-title" style="color: #15803D;">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              Kết Quả & Giá Trị Thực Tiễn Đạt Được
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 14px; margin-top: 14px;">
+              <div style="background: #F0FDF4; border-left: 4px solid #16A34A; padding: 12px 16px; border-radius: 8px;">
+                <strong style="color: #15803D; font-size: 15px;">• Tự Động Hóa Định Danh Lên Đến 85% ~ 90%</strong>
+                <p style="color: #166534; font-size: 13px; margin-top: 2px;">Giảm thiểu tối đa áp lực cho nhân viên tiếp đón, rút ngắn thời gian tra cứu hồ sơ từ vài phút xuống vài phần trăm giây.</p>
+              </div>
+
+              <div style="background: #F0F9FF; border-left: 4px solid #0284C7; padding: 12px 16px; border-radius: 8px;">
+                <strong style="color: #0369A1; font-size: 15px;">• Nâng Cao An Toàn Điều Trị Y Khoa</strong>
+                <p style="color: #0C4A6E; font-size: 13px; margin-top: 2px;">Bác sĩ tiếp cận được lịch sử bệnh án toàn diện, dị ứng thuốc và bệnh nền, giảm thiểu tuyệt đối sai sót y khoa.</p>
+              </div>
+
+              <div style="background: #F5F3FF; border-left: 4px solid #7C3AED; padding: 12px 16px; border-radius: 8px;">
+                <strong style="color: #6D28D9; font-size: 15px;">• Tiết Kiệm Chi Phí & Nguồn Lực Y Tế</strong>
+                <p style="color: #5B21B6; font-size: 13px; margin-top: 2px;">Tránh thực hiện trùng lặp các xét nghiệm đắt tiền (X-Quang, MRI, xét nghiệm máu), chống trục lợi quỹ BHYT.</p>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top: 16px; font-size: 14px; color: #64748B; font-style: italic;">
+            "Hệ thống là mảnh ghép nền tảng quyết định sự thành công của Bệnh án điện tử EMR và Hồ sơ sức khỏe toàn dân EHR."
+          </div>
+        </div>
+
+        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div class="card-title" style="color: #0284C7;">
+              <svg class="icon" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              Định Hướng Phát Triển Tiếp Theo (Roadmap)
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 14px; margin-top: 14px;">
+              <div style="background: #F8FAFC; border: 1px solid #CBD5E1; padding: 14px; border-radius: 12px;">
+                <strong style="color: #0F172A; font-size: 15px;">1. Chuẩn Hóa Quốc Tế HL7 FHIR (Fast Healthcare Interoperability Resources)</strong>
+                <p style="color: #475569; font-size: 13px; margin-top: 4px;">Tích hợp chuẩn <code>Patient Resource</code> của FHIR để sẵn sàng kết nối mở với mọi bệnh viện quốc tế và thiết bị y tế IoT.</p>
+              </div>
+
+              <div style="background: #F8FAFC; border: 1px solid #CBD5E1; padding: 14px; border-radius: 12px;">
+                <strong style="color: #0F172A; font-size: 15px;">2. Ứng Dụng Trí Tuệ Nhân Tạo (Machine Learning / Deep Learning)</strong>
+                <p style="color: #475569; font-size: 13px; margin-top: 4px;">Áp dụng mô hình học máy tự động điều chỉnh bộ trọng số (Weights) dựa trên hàng nghìn quyết định duyệt/từ chối của bác sĩ.</p>
+              </div>
+
+              <div style="background: #F8FAFC; border: 1px solid #CBD5E1; padding: 14px; border-radius: 12px;">
+                <strong style="color: #0F172A; font-size: 15px;">3. Thuật Toán Ngữ Âm Chuyên Biệt Tiếng Việt (Vietnamese Metaphone)</strong>
+                <p style="color: #475569; font-size: 13px; margin-top: 4px;">Nhận diện phát âm tương đồng cho các tên hay bị nhầm lẫn trong tiếng Việt (như Dũng / Dưỡng, Hoàng / Toàn, Giang / Dâng).</p>
+              </div>
+            </div>
+          </div>
+
+          <div style="text-align: right; margin-top: 16px;">
+            <span class="badge badge-primary" style="font-size: 13px; padding: 6px 14px;">Next Version 3.0 Enterprise</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align: center; padding: 14px; background: linear-gradient(90deg, #E0F2FE 0%, #EEF2FF 100%); border: 1px solid #BAE6FD; border-radius: 12px;">
+        <span style="font-size: 18px; font-weight: 800; color: #0369A1; letter-spacing: 0.5px;">
+          XIN TRÂN TRỌNG CẢM ƠN QUÝ THẦY CÔ & HỘI ĐỒNG ĐÃ LẮNG NGHE!
+        </span>
+      </div>
+
+      <div class="slide-footer">
+        <div class="footer-left">
+          <span>10. Kết luận & Roadmap</span>
+          <span class="footer-tag">Master Patient Index • 2026</span>
+        </div>
+        <div>Trang 11 / 11</div>
+      </div>
+    </div>
+  </section>
+
+</body>
+</html>

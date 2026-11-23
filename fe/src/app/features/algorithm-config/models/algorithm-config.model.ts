@@ -4,6 +4,7 @@ export interface WeightConfig {
   nameWeight: number;
   dobWeight: number;
   nationalIdWeight: number;
+  healthInsuranceWeight: number;
   phoneWeight: number;
   addressWeight: number;
   autoApprovalThreshold: number;
@@ -19,6 +20,7 @@ export interface CreateWeightConfigRequest {
   nameWeight: number;
   dobWeight: number;
   nationalIdWeight: number;
+  healthInsuranceWeight: number;
   phoneWeight: number;
   addressWeight: number;
   autoApprovalThreshold?: number;
@@ -31,5 +33,6 @@ export type WeightFieldKey =
   | 'nameWeight'
   | 'dobWeight'
   | 'nationalIdWeight'
+  | 'healthInsuranceWeight'
   | 'phoneWeight'
   | 'addressWeight';

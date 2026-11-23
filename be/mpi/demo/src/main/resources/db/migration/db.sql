@@ -221,6 +221,7 @@ CREATE TABLE `algorithm_weight_config` (
     `name_weight` decimal(5, 2) NOT NULL,
     `dob_weight` decimal(5, 2) NOT NULL,
     `national_id_weight` decimal(5, 2) NOT NULL,
+    `health_insurance_weight` decimal(5, 2) NOT NULL DEFAULT 0.00,
     `phone_weight` decimal(5, 2) NOT NULL,
     `address_weight` decimal(5, 2) NOT NULL,
     `auto_approval_threshold` decimal(5, 2) NOT NULL,

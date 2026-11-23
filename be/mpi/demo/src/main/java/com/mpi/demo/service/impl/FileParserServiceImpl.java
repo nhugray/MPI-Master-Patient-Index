@@ -61,12 +61,19 @@ public class FileParserServiceImpl implements FileParserService {
             List<String> headers = normalizeHeaders(List.of(rawHeaders));
             List<Map<String, String>> rows = new ArrayList<>();
             String[] values;
-            int rowNumber = 1;            while ((values = csvReader.readNext()) != null) {
+            int rowNumber = 1;
+            while ((values = csvReader.readNext()) != null) {
+                if (isRowEmpty(values)) {
+                    continue;
+                }
                 rowNumber++;
                 if (rowNumber > MAX_ROWS) {
                     throw new FileParsingException("File CSV vượt quá giới hạn tối đa " + MAX_ROWS + " dòng.");
                 }
-                rows.add(toRow(headers, values));
+                Map<String, String> row = toRow(headers, values);
+                if (!isRowEmpty(row)) {
+                    rows.add(row);
+                }
             }
             return new ParsedFileData(headers, rows, FileTypeEnum.CSV);
 
@@ -102,7 +109,10 @@ public class FileParserServiceImpl implements FileParserService {
             for (int i = 1; i <= sheet.getLastRowNum(); i++) {
                 Row row = sheet.getRow(i);
                 if (row != null) {
-                    rows.add(toRow(headers, row, dataFormatter));
+                    Map<String, String> rowMap = toRow(headers, row, dataFormatter);
+                    if (!isRowEmpty(rowMap)) {
+                        rows.add(rowMap);
+                    }
                 }
             }
             return new ParsedFileData(headers, rows, FileTypeEnum.XLSX);
@@ -145,5 +155,24 @@ public class FileParserServiceImpl implements FileParserService {
             result.put(headers.get(i), value);
         }
         return result;
+    }
+
+    private boolean isRowEmpty(String[] values) {
+        if (values == null || values.length == 0) {
+            return true;
+        }
+        for (String val : values) {
+            if (val != null && !val.trim().isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean isRowEmpty(Map<String, String> row) {
+        if (row == null || row.isEmpty()) {
+            return true;
+        }
+        return row.values().stream().allMatch(v -> v == null || v.trim().isEmpty());
     }
 }
